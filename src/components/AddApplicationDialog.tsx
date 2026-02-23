@@ -1,19 +1,29 @@
 import { useState } from "react";
 import { Application, ApplicationStatus } from "@/types/application";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus } from "lucide-react";
 
 interface AddApplicationDialogProps {
   onAdd: (app: Omit<Application, "id">) => void;
 }
 
-const statuses: ApplicationStatus[] = [
-  "Sendt", "Avslag", "Mulig avslag", "Avslag etter test", "Lagt ut på nytt", "Intervju", "Tilbud"
-];
+const statuses: ApplicationStatus[] = ["Sendt", "Avslag", "Intervju", "Tilbud"];
 
 const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
   const [open, setOpen] = useState(false);
@@ -48,30 +58,55 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="company">Bedrift</Label>
-            <Input id="company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Bedriftsnavn" required />
+            <Input
+              id="company"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder="Bedriftsnavn"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="position">Stilling</Label>
-            <Input id="position" value={position} onChange={(e) => setPosition(e.target.value)} placeholder="Stillingstittel" required />
+            <Input
+              id="position"
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              placeholder="Stillingstittel"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="date">Dato sendt</Label>
-            <Input id="date" value={dateSent} onChange={(e) => setDateSent(e.target.value)} placeholder="DD.MM.ÅÅ" required />
+            <Input
+              id="date"
+              value={dateSent}
+              onChange={(e) => setDateSent(e.target.value)}
+              placeholder="DD.MM.ÅÅ"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select value={status} onValueChange={(v) => setStatus(v as ApplicationStatus)}>
+            <Select
+              value={status}
+              onValueChange={(v) => setStatus(v as ApplicationStatus)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {statuses.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="w-full">Legg til</Button>
+          <Button type="submit" className="w-full">
+            Legg til
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
