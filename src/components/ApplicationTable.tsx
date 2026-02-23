@@ -57,7 +57,7 @@ const ApplicationTable = ({
   }, [editingId]);
 
   return (
-    <div className="h-[40rem] w-[44.5rem] overflow-y-scroll rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
+    <div className="h-[40rem] w-full overflow-y-scroll overflow-x-auto rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur lg:w-[44.5rem]">
       <Table className="">
         <TableHeader>
           <TableRow className="bg-slate-900/80">
