@@ -57,7 +57,7 @@ const ApplicationTable = ({
   }, [editingId]);
 
   return (
-    <div className="h-full w-[45rem] rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
+    <div className="h-[40rem] w-[44.5rem] overflow-y-scroll rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
       <Table className="">
         <TableHeader>
           <TableRow className="bg-slate-900/80">
@@ -136,10 +136,10 @@ const ApplicationTable = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="h-7 w-7 -ml-4 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
                   onClick={() => onDelete(app.id)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4 " />
                 </Button>
               </TableCell>
             </TableRow>
