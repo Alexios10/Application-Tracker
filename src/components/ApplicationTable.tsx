@@ -57,7 +57,7 @@ const ApplicationTable = ({
   }, [editingId]);
 
   return (
-    <div className="h-full rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
+    <div className="h-full w-[45rem] rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
       <Table className="">
         <TableHeader>
           <TableRow className="bg-slate-900/80">
@@ -79,6 +79,7 @@ const ApplicationTable = ({
             <TableHead className="font-semibold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
           {applications.map((app, index) => (
             <TableRow
