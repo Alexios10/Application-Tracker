@@ -1,11 +1,4 @@
-export type ApplicationStatus = 
-  | "Sendt" 
-  | "Avslag" 
-  | "Mulig avslag" 
-  | "Avslag etter test"
-  | "Lagt ut på nytt"
-  | "Intervju"
-  | "Tilbud";
+export type ApplicationStatus = "Sendt" | "Avslag" | "Intervju" | "Tilbud";
 
 export interface Application {
   id: string;
