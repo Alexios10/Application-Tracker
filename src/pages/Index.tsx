@@ -1,16 +1,34 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Application, ApplicationStatus } from "@/types/application";
-import { initialApplications } from "@/data/applications";
 import StatsCards from "@/components/StatsCards";
 import ApplicationTable from "@/components/ApplicationTable";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Input } from "@/components/ui/input";
 import { Briefcase, Search } from "lucide-react";
 
+const API_BASE = "http://localhost:5242";
+
 const Index = () => {
-  const [applications, setApplications] =
-    useState<Application[]>(initialApplications);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/applications`);
+        if (!res.ok) {
+          console.error("Failed to fetch applications", res.statusText);
+          return;
+        }
+        const data: Application[] = await res.json();
+        setApplications(data);
+      } catch (err) {
+        console.error("Error fetching applications", err);
+      }
+    };
+
+    fetchApplications();
+  }, []);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return applications;
@@ -22,19 +40,61 @@ const Index = () => {
   const rejected = applications.filter((a) => a.status === "Avslag").length;
   const pending = applications.filter((a) => a.status === "Sendt").length;
 
-  const handleAdd = (app: Omit<Application, "id">) => {
-    const newApp: Application = { ...app, id: String(Date.now()) };
-    setApplications((prev) => [newApp, ...prev]);
+  const handleAdd = async (app: Omit<Application, "id">) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(app),
+      });
+      if (!res.ok) {
+        console.error("Failed to add application", res.statusText);
+        return;
+      }
+      const created: Application = await res.json();
+      setApplications((prev) => [created, ...prev]);
+    } catch (err) {
+      console.error("Error adding application", err);
+    }
   };
 
-  const handleUpdateStatus = (id: string, status: ApplicationStatus) => {
-    setApplications((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status } : a)),
-    );
+  const handleUpdateStatus = async (id: string, status: ApplicationStatus) => {
+    const existing = applications.find((a) => a.id === id);
+    if (!existing) return;
+
+    const updated: Application = { ...existing, status };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (!res.ok) {
+        console.error("Failed to update status", res.statusText);
+        return;
+      }
+      setApplications((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status } : a)),
+      );
+    } catch (err) {
+      console.error("Error updating status", err);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setApplications((prev) => prev.filter((a) => a.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        console.error("Failed to delete application", res.statusText);
+        return;
+      }
+      setApplications((prev) => prev.filter((a) => a.id !== id));
+    } catch (err) {
+      console.error("Error deleting application", err);
+    }
   };
 
   return (

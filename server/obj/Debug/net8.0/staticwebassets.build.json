@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "mgPstOSZpckbp/TGwTcwbtJw93Lru77pni9h+uPdADQ=",
+  "Source": "ApplicationTracker.Api",
+  "BasePath": "_content/ApplicationTracker.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
