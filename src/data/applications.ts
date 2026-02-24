@@ -288,4 +288,11 @@ export const initialApplications: Application[] = [
     dateSent: "22.02.26",
     status: "Sendt",
   },
+  {
+    id: "42",
+    company: "Intility",
+    position: "Jr. Application Specialist",
+    dateSent: "24.02.26",
+    status: "Sendt",
+  },
 ];

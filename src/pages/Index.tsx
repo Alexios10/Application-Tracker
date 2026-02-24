@@ -19,9 +19,7 @@ const Index = () => {
   }, [applications, search]);
 
   const totalSent = applications.length;
-  const rejected = applications.filter(
-    (a) => a.status === "Avslag" || a.status === "Avslag etter test",
-  ).length;
+  const rejected = applications.filter((a) => a.status === "Avslag").length;
   const pending = applications.filter((a) => a.status === "Sendt").length;
 
   const handleAdd = (app: Omit<Application, "id">) => {
