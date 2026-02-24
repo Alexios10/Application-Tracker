@@ -2,8 +2,13 @@ using ApplicationTracker.Api.Data;
 using ApplicationTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Kestrel to listen on the port provided by the environment (e.g. Railway)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -29,8 +34,6 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 // Minimal API setup
 
 var app = builder.Build();
-
-app.UseHttpsRedirection();
 app.UseCors();
 
 app.MapGet("/api/applications", async (ApplicationDbContext db) =>
@@ -79,10 +82,11 @@ app.MapDelete("/api/applications/{id}", async (string id, ApplicationDbContext d
     return Results.NoContent();
 });
 
-app.Run();
-
+// Apply any pending migrations at startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 }
+
+app.Run();
