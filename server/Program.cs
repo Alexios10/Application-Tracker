@@ -15,7 +15,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:8080")
+        policy.WithOrigins("https://application-tracker-five-pi.vercel.app/", "http://localhost:8080")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -80,3 +80,9 @@ app.MapDelete("/api/applications/{id}", async (string id, ApplicationDbContext d
 });
 
 app.Run();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
