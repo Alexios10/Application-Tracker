@@ -2,7 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -68,6 +73,8 @@ export default {
           "info-foreground": "hsl(var(--status-info-foreground))",
           success: "hsl(var(--status-success))",
           "success-foreground": "hsl(var(--status-success-foreground))",
+          ghosted: "hsl(var(--status-ghosted))",
+          "ghosted-foreground": "hsl(var(--status-ghosted-foreground))",
         },
       },
       borderRadius: {

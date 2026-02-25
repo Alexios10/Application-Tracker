@@ -25,6 +25,10 @@ const statusConfig: Record<
     label: "Tilbud",
     className: "bg-status-success text-status-success-foreground",
   },
+  Ghosted: {
+    label: "Ghosted",
+    className: "bg-status-ghosted text-status-ghosted-foreground",
+  },
 };
 
 const StatusBadge = ({ status }: StatusBadgeProps) => {

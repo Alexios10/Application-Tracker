@@ -1,4 +1,9 @@
-export type ApplicationStatus = "Sendt" | "Avslag" | "Intervju" | "Tilbud";
+export type ApplicationStatus =
+  | "Sendt"
+  | "Avslag"
+  | "Intervju"
+  | "Tilbud"
+  | "Ghosted";
 
 export interface Application {
   id: string;

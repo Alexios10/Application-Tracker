@@ -25,7 +25,13 @@ interface ApplicationTableProps {
   onDelete: (id: string) => void;
 }
 
-const statuses: ApplicationStatus[] = ["Sendt", "Avslag", "Intervju", "Tilbud"];
+const statuses: ApplicationStatus[] = [
+  "Sendt",
+  "Avslag",
+  "Intervju",
+  "Tilbud",
+  "Ghosted",
+];
 
 const ApplicationTable = ({
   applications,

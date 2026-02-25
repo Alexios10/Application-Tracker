@@ -5,7 +5,8 @@ public enum ApplicationStatus
   Sendt,
   Avslag,
   Intervju,
-  Tilbud
+  Tilbud,
+  Ghosted
 }
 
 public class Application

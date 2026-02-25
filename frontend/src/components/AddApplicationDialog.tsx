@@ -23,7 +23,13 @@ interface AddApplicationDialogProps {
   onAdd: (app: Omit<Application, "id">) => void;
 }
 
-const statuses: ApplicationStatus[] = ["Sendt", "Avslag", "Intervju", "Tilbud"];
+const statuses: ApplicationStatus[] = [
+  "Sendt",
+  "Avslag",
+  "Intervju",
+  "Tilbud",
+  "Ghosted",
+];
 
 const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
   const [open, setOpen] = useState(false);
