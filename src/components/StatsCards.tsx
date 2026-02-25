@@ -1,15 +1,29 @@
 import { Send, XCircle, Clock } from "lucide-react";
 
+type StatsCardKey = "total" | "rejected" | "pending";
+
 interface StatsCardsProps {
   total: number;
   rejected: number;
   pending: number;
+  selectedCard?: StatsCardKey;
+  onCardClick?: (card: StatsCardKey) => void;
 }
 
-const StatsCards = ({ total, rejected, pending }: StatsCardsProps) => {
+const StatsCards = ({
+  total,
+  rejected,
+  pending,
+  selectedCard,
+  onCardClick,
+}: StatsCardsProps) => {
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      <div className="relative flex justify-between overflow-hidden rounded-2xl border border-sky-500/30 bg-gradient-to-br from-sky-500/80 via-emerald-400/80 to-sky-500/70 p-5 text-slate-950 shadow-xl">
+      <div
+        className={`relative flex justify-between overflow-hidden rounded-2xl border bg-gradient-to-br from-sky-500/80 via-emerald-400/80 to-sky-500/70 p-5 text-slate-950 shadow-xl cursor-pointer transition-transform hover:scale-[1.01] ${selectedCard === "total" ? "ring-2 ring-offset-2 ring-offset-slate-950 ring-emerald-300" : "border-sky-500/30"}`}
+        onClick={() => onCardClick?.("total")}
+        aria-label="Vis alle søknader"
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-900/80">
@@ -24,7 +38,11 @@ const StatsCards = ({ total, rejected, pending }: StatsCardsProps) => {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/10 to-transparent" />
       </div>
 
-      <div className="rounded-2xl flex border border-red-500/25 bg-gradient-to-br from-red-500/10 via-slate-900/40 to-slate-900/70 p-5 text-slate-100 shadow-lg">
+      <div
+        className={`rounded-2xl flex border bg-gradient-to-br from-red-500/10 via-slate-900/40 to-slate-900/70 p-5 text-slate-100 shadow-lg cursor-pointer transition-transform hover:scale-[1.01] ${selectedCard === "rejected" ? "ring-2 ring-offset-2 ring-offset-slate-950 ring-red-400" : "border-red-500/25"}`}
+        onClick={() => onCardClick?.("rejected")}
+        aria-label="Vis avslagne søknader"
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-300/90">
@@ -40,7 +58,11 @@ const StatsCards = ({ total, rejected, pending }: StatsCardsProps) => {
         </div>
       </div>
 
-      <div className="rounded-2xl flex border border-amber-400/25 bg-gradient-to-br from-amber-400/15 via-slate-900/40 to-slate-900/70 p-5 text-slate-100 shadow-lg">
+      <div
+        className={`rounded-2xl flex border bg-gradient-to-br from-amber-400/15 via-slate-900/40 to-slate-900/70 p-5 text-slate-100 shadow-lg cursor-pointer transition-transform hover:scale-[1.01] ${selectedCard === "pending" ? "ring-2 ring-offset-2 ring-offset-slate-950 ring-amber-300" : "border-amber-400/25"}`}
+        onClick={() => onCardClick?.("pending")}
+        aria-label="Vis søknader som venter svar"
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-amber-200/90">

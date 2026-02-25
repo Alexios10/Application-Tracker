@@ -11,6 +11,9 @@ const API_BASE = "http://localhost:5242"; // Just for development, should be env
 const Index = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>(
+    "all",
+  );
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -31,10 +34,19 @@ const Index = () => {
   }, []);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return applications;
-    const q = search.toLowerCase();
-    return applications.filter((a) => a.company.toLowerCase().startsWith(q));
-  }, [applications, search]);
+    let result = applications;
+
+    if (statusFilter !== "all") {
+      result = result.filter((a) => a.status === statusFilter);
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((a) => a.company.toLowerCase().startsWith(q));
+    }
+
+    return result;
+  }, [applications, statusFilter, search]);
 
   const totalSent = applications.length;
   const rejected = applications.filter((a) => a.status === "Avslag").length;
@@ -140,6 +152,24 @@ const Index = () => {
                 total={totalSent}
                 rejected={rejected}
                 pending={pending}
+                selectedCard={
+                  statusFilter === "all"
+                    ? "total"
+                    : statusFilter === "Avslag"
+                      ? "rejected"
+                      : statusFilter === "Sendt"
+                        ? "pending"
+                        : "total"
+                }
+                onCardClick={(card) => {
+                  if (card === "total") {
+                    setStatusFilter("all");
+                  } else if (card === "rejected") {
+                    setStatusFilter("Avslag");
+                  } else if (card === "pending") {
+                    setStatusFilter("Sendt");
+                  }
+                }}
               />
             </div>
 
