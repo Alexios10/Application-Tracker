@@ -53,6 +53,7 @@ const Index = () => {
   const totalSent = applications.length;
   const rejected = applications.filter((a) => a.status === "Avslag").length;
   const pending = applications.filter((a) => a.status === "Sendt").length;
+  const ghosted = applications.filter((a) => a.status === "Ghosted").length;
 
   const handleAdd = async (app: Omit<Application, "id">) => {
     try {
@@ -139,7 +140,7 @@ const Index = () => {
                 {totalSent} søknader totalt
               </p>
               <p>
-                {pending} venter svar · {rejected} avslag
+                {pending} venter svar · {rejected} avslag · {ghosted} ghosted
               </p>
             </div>
             <AddApplicationDialog onAdd={handleAdd} />
@@ -154,6 +155,7 @@ const Index = () => {
                 total={totalSent}
                 rejected={rejected}
                 pending={pending}
+                ghosted={ghosted}
                 selectedCard={
                   statusFilter === "all"
                     ? "total"
@@ -161,7 +163,9 @@ const Index = () => {
                       ? "rejected"
                       : statusFilter === "Sendt"
                         ? "pending"
-                        : "total"
+                        : statusFilter === "Ghosted"
+                          ? "ghosted"
+                          : "total"
                 }
                 onCardClick={(card) => {
                   if (card === "total") {
@@ -170,6 +174,8 @@ const Index = () => {
                     setStatusFilter("Avslag");
                   } else if (card === "pending") {
                     setStatusFilter("Sendt");
+                  } else if (card === "ghosted") {
+                    setStatusFilter("Ghosted");
                   }
                 }}
               />
