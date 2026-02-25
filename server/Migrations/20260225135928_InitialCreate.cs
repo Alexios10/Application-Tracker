@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -15,10 +14,10 @@ namespace ApplicationTracker.Api.Migrations
                 name: "applications",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<string>(type: "text", nullable: false),
                     company = table.Column<string>(type: "text", nullable: false),
                     position = table.Column<string>(type: "text", nullable: false),
-                    date_sent = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    date_sent = table.Column<string>(type: "text", nullable: false),
                     status = table.Column<string>(type: "text", nullable: false),
                     note = table.Column<string>(type: "text", nullable: true)
                 },
