@@ -6,7 +6,7 @@ export type ApplicationStatus =
   | "Ghosted";
 
 export interface Application {
-  id: string;
+  id: number;
   company: string;
   position: string;
   dateSent: string;

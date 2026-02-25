@@ -73,7 +73,7 @@ const Index = () => {
     }
   };
 
-  const handleUpdateStatus = async (id: string, status: ApplicationStatus) => {
+  const handleUpdateStatus = async (id: number, status: ApplicationStatus) => {
     const existing = applications.find((a) => a.id === id);
     if (!existing) return;
 
@@ -97,7 +97,7 @@ const Index = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     try {
       const res = await fetch(`${API_BASE}/api/applications/${id}`, {
         method: "DELETE",

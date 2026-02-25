@@ -59,17 +59,12 @@ app.MapGet("/api/applications", async (ApplicationDbContext db) =>
 
 app.MapPost("/api/applications", async (ApplicationDbContext db, Application application) =>
 {
-    if (string.IsNullOrWhiteSpace(application.Id))
-    {
-        application.Id = Guid.NewGuid().ToString();
-    }
-
     db.Applications.Add(application);
     await db.SaveChangesAsync();
     return Results.Created($"/api/applications/{application.Id}", application);
 });
 
-app.MapPut("/api/applications/{id}", async (string id, ApplicationDbContext db, Application updated) =>
+app.MapPut("/api/applications/{id}", async (int id, ApplicationDbContext db, Application updated) =>
 {
     var existing = await db.Applications.FindAsync(id);
     if (existing is null)
@@ -87,7 +82,7 @@ app.MapPut("/api/applications/{id}", async (string id, ApplicationDbContext db, 
     return Results.NoContent();
 });
 
-app.MapDelete("/api/applications/{id}", async (string id, ApplicationDbContext db) =>
+app.MapDelete("/api/applications/{id}", async (int id, ApplicationDbContext db) =>
 {
     var existing = await db.Applications.FindAsync(id);
     if (existing is null)

@@ -11,7 +11,7 @@ public enum ApplicationStatus
 
 public class Application
 {
-  public string Id { get; set; } = string.Empty;
+  public int Id { get; set; }
   public string Company { get; set; } = string.Empty;
   public string Position { get; set; } = string.Empty;
   public string DateSent { get; set; } = string.Empty;

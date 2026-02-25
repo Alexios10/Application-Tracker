@@ -32,8 +32,8 @@ import { Trash2 } from "lucide-react";
 
 interface ApplicationTableProps {
   applications: Application[];
-  onUpdateStatus: (id: string, status: ApplicationStatus) => void;
-  onDelete: (id: string) => void;
+  onUpdateStatus: (id: number, status: ApplicationStatus) => void;
+  onDelete: (id: number) => void;
 }
 
 const statuses: ApplicationStatus[] = [
@@ -50,7 +50,7 @@ const ApplicationTable = ({
   onDelete,
 }: ApplicationTableProps) => {
   // ID på søknaden som har åpen status-dropdown i tabellen (kan bare være én om gangen)
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const editRef = useRef<HTMLDivElement>(null);
 
   // Lukk status dropdown når man klikker utenfor
