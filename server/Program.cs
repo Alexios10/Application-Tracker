@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
-
+// Configure JSON options to serialize enums as strings
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
