@@ -6,7 +6,7 @@ import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Input } from "@/components/ui/input";
 import { Briefcase, Search } from "lucide-react";
 
-const API_BASE = "http://localhost:5242"; // Just for development, should be env var in production
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5242";
 
 const Index = () => {
   const [applications, setApplications] = useState<Application[]>([]);
