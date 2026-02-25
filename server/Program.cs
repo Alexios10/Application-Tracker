@@ -94,7 +94,7 @@ app.MapDelete("/api/applications/{id}", async (int id, ApplicationDbContext db) 
     return Results.NoContent();
 });
 
-// Apply any pending migrations at startup and seed data if empty
+// Apply any pending migrations at startup and seed data if empty (only for development/testing purposes)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
