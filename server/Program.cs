@@ -6,9 +6,12 @@ using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Kestrel to listen on the port provided by the environment (e.g. Railway)
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+// In production (e.g. Railway), respect the PORT environment variable if present
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

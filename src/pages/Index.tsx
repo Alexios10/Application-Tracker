@@ -6,7 +6,7 @@ import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Input } from "@/components/ui/input";
 import { Briefcase, Search } from "lucide-react";
 
-const API_BASE = "https://application-tracker-production-fd09.up.railway.app";
+const API_BASE = "http://localhost:5242"; // Just for development, should be env var in production
 
 const Index = () => {
   const [applications, setApplications] = useState<Application[]>([]);
