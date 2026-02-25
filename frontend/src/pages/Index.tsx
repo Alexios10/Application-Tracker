@@ -113,8 +113,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-8 sm:px-6 lg:px-10">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
+      <div className="mx-auto flex min-h-screen flex-col px-4 py-8 sm:px-6 lg:px-10 xl:px-16">
         {/* Header */}
         <header className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="grid flex-1 gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,2.3fr)]">
+        <main className="grid flex-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.8fr)]">
           {/* Left column: stats + search */}
           <section className="space-y-6">
             <div className="overflow-hidden rounded-3xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-5 shadow-[0_18px_60px_rgba(15,23,42,0.9)]">
@@ -208,7 +208,7 @@ const Index = () => {
           </section>
 
           {/* Right column: table */}
-          <section className="flex w-full flex-col overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950/85 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.9)] sm:p-5 lg:w-[47rem]">
+          <section className="flex w-full min-w-0 flex-col overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950/85 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.9)] sm:p-5">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div>
                 <h2 className="text-sm font-medium text-slate-100">
