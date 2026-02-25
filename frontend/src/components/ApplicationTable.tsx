@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Application, ApplicationStatus } from "@/types/application";
 import StatusBadge from "@/components/StatusBadge";
 import {
@@ -51,8 +51,29 @@ const ApplicationTable = ({
 }: ApplicationTableProps) => {
   // ID på søknaden som har åpen status-dropdown i tabellen (kan bare være én om gangen)
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [selectOpen, setSelectOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const editRef = useRef<HTMLDivElement>(null);
   const editRefMobile = useRef<HTMLDivElement>(null);
+
+  // Track screen size to distinguish mobile vs desktop
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 639px)");
+    const onChange = () => setIsMobile(mql.matches);
+    onChange();
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  // Auto-open the Select dropdown when editingId changes (all screen sizes)
+  useEffect(() => {
+    if (editingId !== null) {
+      const timer = setTimeout(() => setSelectOpen(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      setSelectOpen(false);
+    }
+  }, [editingId]);
 
   // Lukk status dropdown når man klikker utenfor
   useEffect(() => {
@@ -101,14 +122,16 @@ const ApplicationTable = ({
                     className="flex h-8 w-[120px] items-center"
                   >
                     <Select
-                      defaultOpen
+                      open={isMobile && selectOpen}
+                      onOpenChange={(open) => {
+                        setSelectOpen(open);
+                        if (!open) setEditingId(null);
+                      }}
                       value={app.status}
                       onValueChange={(v) => {
                         onUpdateStatus(app.id, v as ApplicationStatus);
+                        setSelectOpen(false);
                         setEditingId(null);
-                      }}
-                      onOpenChange={(open) => {
-                        if (!open) setEditingId(null);
                       }}
                     >
                       <SelectTrigger className="h-7 w-full text-xs border-slate-700 bg-slate-900 text-slate-100">
@@ -221,9 +244,15 @@ const ApplicationTable = ({
                 {editingId === app.id ? (
                   <div ref={editRef} className="flex h-8 w-full items-center">
                     <Select
+                      open={!isMobile && selectOpen}
+                      onOpenChange={(open) => {
+                        setSelectOpen(open);
+                        if (!open) setEditingId(null);
+                      }}
                       value={app.status}
                       onValueChange={(v) => {
                         onUpdateStatus(app.id, v as ApplicationStatus);
+                        setSelectOpen(false);
                         setEditingId(null);
                       }}
                     >
