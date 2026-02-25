@@ -20,8 +20,7 @@ namespace ApplicationTracker.Api.Migrations
                     company = table.Column<string>(type: "text", nullable: false),
                     position = table.Column<string>(type: "text", nullable: false),
                     date_sent = table.Column<string>(type: "text", nullable: false),
-                    status = table.Column<string>(type: "text", nullable: false),
-                    note = table.Column<string>(type: "text", nullable: true)
+                    status = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

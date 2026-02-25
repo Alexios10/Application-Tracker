@@ -40,10 +40,6 @@ namespace ApplicationTracker.Api.Migrations
                         .HasColumnType("text")
                         .HasColumnName("date_sent");
 
-                    b.Property<string>("Note")
-                        .HasColumnType("text")
-                        .HasColumnName("note");
-
                     b.Property<string>("Position")
                         .IsRequired()
                         .HasColumnType("text")

@@ -34,9 +34,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                         entity.Property(a => a.Status)
                     .HasColumnName("status")
                     .HasConversion<string>();
-
-                        entity.Property(a => a.Note)
-                    .HasColumnName("note");
                 });
         }
 }

@@ -76,7 +76,6 @@ app.MapPut("/api/applications/{id}", async (int id, ApplicationDbContext db, App
     existing.Position = updated.Position;
     existing.DateSent = updated.DateSent;
     existing.Status = updated.Status;
-    existing.Note = updated.Note;
 
     await db.SaveChangesAsync();
     return Results.NoContent();

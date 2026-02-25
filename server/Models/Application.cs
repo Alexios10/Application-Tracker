@@ -16,5 +16,4 @@ public class Application
   public string Position { get; set; } = string.Empty;
   public string DateSent { get; set; } = string.Empty;
   public ApplicationStatus Status { get; set; }
-  public string? Note { get; set; }
 }

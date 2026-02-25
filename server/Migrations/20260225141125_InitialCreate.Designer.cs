@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ApplicationTracker.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260225140720_InitialCreate")]
+    [Migration("20260225141125_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -42,10 +42,6 @@ namespace ApplicationTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("date_sent");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("text")
-                        .HasColumnName("note");
 
                     b.Property<string>("Position")
                         .IsRequired()
