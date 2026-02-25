@@ -52,6 +52,7 @@ const ApplicationTable = ({
   // ID på søknaden som har åpen status-dropdown i tabellen (kan bare være én om gangen)
   const [editingId, setEditingId] = useState<number | null>(null);
   const editRef = useRef<HTMLDivElement>(null);
+  const editRefMobile = useRef<HTMLDivElement>(null);
 
   // Lukk status dropdown når man klikker utenfor
   useEffect(() => {
@@ -62,6 +63,8 @@ const ApplicationTable = ({
 
       // Hvis vi klikker inne i selve cellen / triggeren, ikke lukk
       if (editRef.current && editRef.current.contains(target)) return;
+      if (editRefMobile.current && editRefMobile.current.contains(target))
+        return;
 
       // Hvis vi klikker inne i dropdown-menyen, ikke lukk (Radix portal)
       if (target.closest(".status-select-dropdown")) return;
@@ -94,14 +97,18 @@ const ApplicationTable = ({
               <div className="flex items-center gap-1 shrink-0">
                 {editingId === app.id ? (
                   <div
-                    ref={editRef}
+                    ref={editRefMobile}
                     className="flex h-8 w-[120px] items-center"
                   >
                     <Select
+                      defaultOpen
                       value={app.status}
                       onValueChange={(v) => {
                         onUpdateStatus(app.id, v as ApplicationStatus);
                         setEditingId(null);
+                      }}
+                      onOpenChange={(open) => {
+                        if (!open) setEditingId(null);
                       }}
                     >
                       <SelectTrigger className="h-7 w-full text-xs border-slate-700 bg-slate-900 text-slate-100">
