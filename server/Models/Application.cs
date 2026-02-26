@@ -16,4 +16,8 @@ public class Application
   public string Position { get; set; } = string.Empty;
   public string DateSent { get; set; } = string.Empty;
   public ApplicationStatus Status { get; set; }
+
+  // Kobling til brukeren som eier søknaden
+  public string? UserId { get; set; }
+  public User? User { get; set; }
 }
