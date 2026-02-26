@@ -1,26 +1,37 @@
 import { useState, useMemo, useEffect } from "react";
 import { Application, ApplicationStatus } from "@/types/application";
+import { useAuth } from "@/hooks/useAuth";
 import StatsCards from "@/components/StatsCards";
 import ApplicationTable from "@/components/ApplicationTable";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Input } from "@/components/ui/input";
-import { Briefcase, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Briefcase, Search, LogOut } from "lucide-react";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
 ).replace(/\/+$/, "");
 
 const Index = () => {
+  const { user, logout } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>(
     "all",
   );
 
+  // Hjelpefunksjon: legg til Authorization-header på alle kall
+  const authHeaders = (): HeadersInit => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${user?.token}`,
+  });
+
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/applications`);
+        const res = await fetch(`${API_BASE}/api/applications`, {
+          headers: authHeaders(),
+        });
         if (!res.ok) {
           console.error("Failed to fetch applications", res.statusText);
           return;
@@ -33,7 +44,7 @@ const Index = () => {
     };
 
     fetchApplications();
-  }, []);
+  }, [user?.token]);
 
   const filtered = useMemo(() => {
     let result = applications;
@@ -59,7 +70,7 @@ const Index = () => {
     try {
       const res = await fetch(`${API_BASE}/api/applications`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(app),
       });
       if (!res.ok) {
@@ -82,7 +93,7 @@ const Index = () => {
     try {
       const res = await fetch(`${API_BASE}/api/applications/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(updated),
       });
       if (!res.ok) {
@@ -101,6 +112,7 @@ const Index = () => {
     try {
       const res = await fetch(`${API_BASE}/api/applications/${id}`, {
         method: "DELETE",
+        headers: authHeaders(),
       });
       if (!res.ok) {
         console.error("Failed to delete application", res.statusText);
@@ -137,13 +149,22 @@ const Index = () => {
           <div className="flex items-center gap-4 self-start sm:self-auto">
             <div className="hidden text-right text-xs text-slate-400/80 sm:block">
               <p className="font-medium text-slate-200/90">
-                {totalSent} søknader totalt
+                Hei, {user?.fullName} · {totalSent} søknader
               </p>
               <p>
                 {pending} venter svar · {rejected} avslag · {ghosted} ghosted
               </p>
             </div>
             <AddApplicationDialog onAdd={handleAdd} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={logout}
+              title="Logg ut"
+              className="text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
         </header>
 
