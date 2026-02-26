@@ -84,7 +84,8 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://application-tracker-five-pi.vercel.app", "http://localhost:8080")
+        policy.WithOrigins("https://application-tracker-five-pi.vercel.app", "http://localhost:8080", "https://minesoknader.no",
+            "https://www.minesoknader.no")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
