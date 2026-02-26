@@ -101,6 +101,13 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// For produksjon: server statiske filer fra frontend/dist
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+// Fallback: alle ukjente ruter sender index.html (SPA)
+app.MapFallbackToFile("index.html");
+
 // ========== HJELPEFUNKSJON: Lag JWT-token ==========
 string GenerateToken(User user)
 {
