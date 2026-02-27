@@ -15,13 +15,17 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  const API_BASE = (
+    import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
+  ).replace(/\/+$/, "");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess(false);
     try {
-      const res = await fetch("/api/reports", {
+      const res = await fetch(`${API_BASE}/api/reports`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject, description }),
