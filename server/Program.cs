@@ -166,7 +166,7 @@ app.MapPost("/api/auth/register", async (UserManager<User> userManager, Register
     }
 
     var token = GenerateToken(user);
-    return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!));
+    return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!, user.IsAdmin));
 });
 
 // INNLOGGING
@@ -181,7 +181,7 @@ app.MapPost("/api/auth/login", async (UserManager<User> userManager, LoginReques
         return Results.BadRequest(new { error = "Feil brukernavn eller passord." });
 
     var token = GenerateToken(user);
-    return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!));
+    return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!, user.IsAdmin));
 });
 
 // HENT INNLOGGET BRUKER-INFO
@@ -257,4 +257,4 @@ app.Run();
 // ---------- DTO-er (Data Transfer Objects) ----------
 public record RegisterRequest(string Username, string Email, string FullName, string Password);
 public record LoginRequest(string Username, string Password);
-public record AuthResponse(string Token, string FullName, string Username);
+public record AuthResponse(string Token, string FullName, string Username, bool IsAdmin);
