@@ -11,6 +11,9 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Legg til controller-tjenester
+builder.Services.AddControllers();
+
 // ---------- PORT (Railway) ----------
 var port = Environment.GetEnvironmentVariable("PORT");
 if (!string.IsNullOrEmpty(port))
