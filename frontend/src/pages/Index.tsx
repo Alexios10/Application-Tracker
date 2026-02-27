@@ -160,6 +160,14 @@ const Index = () => {
               </p>
             </div>
             <AddApplicationDialog onAdd={handleAdd} />
+            {user?.isAdmin && (
+              <Button
+                className="bg-sky-900 text-sky-200 hover:bg-sky-700"
+                onClick={() => (window.location.href = "/admin/reports")}
+              >
+                Admin rapporter
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
