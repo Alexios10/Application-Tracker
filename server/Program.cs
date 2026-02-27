@@ -104,11 +104,13 @@ var app = builder.Build();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
 // For produksjon: server statiske filer fra frontend/dist
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+// Map API controllers før fallback
+app.MapControllers();
 
 // Fallback: alle ukjente ruter sender index.html (SPA)
 app.MapFallbackToFile("index.html");
