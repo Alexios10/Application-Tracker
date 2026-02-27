@@ -63,11 +63,11 @@ const AdminReportsPage = () => {
               <p className="mt-1 text-sm text-slate-300/80">
                 Her ser du alle rapporter sendt inn av brukere.
               </p>
-              <div className="mt-4">
+              <div className="mt-10">
                 <Button
                   type="button"
                   variant="outline"
-                  className="bg-slate-900/80 border-slate-700 text-slate-200 hover:bg-slate-800 px-4 py-2"
+                  className="bg-slate-900/80 border-slate-700 text-slate-200 hover:bg-slate-400 px-4 py-2"
                   onClick={handleBack}
                 >
                   ← Tilbake
