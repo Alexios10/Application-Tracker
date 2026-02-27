@@ -173,7 +173,7 @@ const Index = () => {
         </header>
 
         <main className="grid flex-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.8fr)]">
-          {/* Left column: stats + search */}
+          {/* Venstre seksjon */}
           <section className="space-y-6">
             <div className="overflow-hidden rounded-3xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-5 shadow-[0_18px_60px_rgba(15,23,42,0.9)]">
               <StatsCards
@@ -230,9 +230,12 @@ const Index = () => {
                 />
               </div>
             </div>
-            <div className="flex ml-2">
+            <div className="flex flex-col items-center sm:items-start gap-2 w-full">
+              <span className="text-slate-400 text-center sm:text-left">
+                Rapporter et problem eller forbedring
+              </span>
               <Button
-                className="bg-secondary text-secondary-foreground px-4 py-2 rounded hover:bg-secondary/80 border"
+                className="w-full sm:w-auto px-4 py-2 rounded border border-rose-900 hover:bg-black/10 hover:border-rose-700"
                 onClick={() => setReportOpen(true)}
                 type="button"
               >
@@ -241,7 +244,7 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Right column: table */}
+          {/* Høyre seksjon */}
           <section className="flex w-full min-w-0 flex-col overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950/85 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.9)] sm:p-5">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div>
@@ -262,8 +265,8 @@ const Index = () => {
             </div>
           </section>
         </main>
+
         <ReportModal open={reportOpen} onClose={() => setReportOpen(false)} />
-        {/* Knappen er nå flyttet opp under søkeboksen */}
       </div>
     </div>
   );
