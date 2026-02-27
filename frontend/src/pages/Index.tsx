@@ -69,6 +69,7 @@ const Index = () => {
     fetchApplications();
   }, [user?.token]);
 
+  // Filtrer søknader basert på status og søketekst (ser kun på bedrift for søk) - brukMemo for optimalisering
   const filtered = useMemo(() => {
     let result = applications;
 
