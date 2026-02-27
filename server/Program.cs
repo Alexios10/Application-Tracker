@@ -101,6 +101,7 @@ var app = builder.Build();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 
 // For produksjon: server statiske filer fra frontend/dist
 app.UseDefaultFiles();
