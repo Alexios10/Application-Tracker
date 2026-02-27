@@ -1,6 +1,17 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
@@ -50,13 +61,8 @@ const ProfilePage = () => {
     }
   };
 
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const handleDelete = async () => {
-    if (
-      !window.confirm(
-        "Er du sikker på at du vil slette brukeren din? Dette kan ikke angres.",
-      )
-    )
-      return;
     setLoading(true);
     setError("");
     try {
@@ -73,6 +79,7 @@ const ProfilePage = () => {
       setError(err.message || "Ukjent feil");
     } finally {
       setLoading(false);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -152,15 +159,42 @@ const ProfilePage = () => {
               </Button>
             </form>
             <hr className="my-6 border-slate-700" />
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={loading}
-              className="w-full"
+            {/* Delete user confirmation modal */}
+            <AlertDialog
+              open={deleteDialogOpen}
+              onOpenChange={setDeleteDialogOpen}
             >
-              Slett bruker
-            </Button>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={loading}
+                  className="w-full"
+                >
+                  Slett bruker
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-slate-400">
+                    Dette vil slette brukeren din permanent. Denne handlingen
+                    kan ikke angres.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
+                    Avbryt
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={handleDelete}
+                  >
+                    Slett
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </section>
         </main>
       </div>
