@@ -61,6 +61,12 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
         <DialogHeader>
           <DialogTitle>Ny søknad</DialogTitle>
         </DialogHeader>
+        <button
+          className="absolute w-7 h-7 flex items-center justify-center top-3 right-3 z-10 rounded-full p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-800 focus:outline-none border border-slate-300"
+          onClick={() => setOpen(false)}
+        >
+          X
+        </button>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="company">Bedrift</Label>

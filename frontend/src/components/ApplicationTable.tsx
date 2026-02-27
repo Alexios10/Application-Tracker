@@ -29,11 +29,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
+import { EditApplicationModal } from "./EditApplicationModal";
 
 interface ApplicationTableProps {
   applications: Application[];
   onUpdateStatus: (id: number, status: ApplicationStatus) => void;
   onDelete: (id: number) => void;
+  onEdit?: (app: Application) => void;
 }
 
 const statuses: ApplicationStatus[] = [
@@ -48,9 +51,13 @@ const ApplicationTable = ({
   applications,
   onUpdateStatus,
   onDelete,
+  onEdit,
 }: ApplicationTableProps) => {
   // ID på søknaden som har åpen status-dropdown i tabellen (kan bare være én om gangen)
   const [editingId, setEditingId] = useState<number | null>(null);
+  // Modal for redigering
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editApp, setEditApp] = useState<Application | null>(null);
   const [selectOpen, setSelectOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const editRef = useRef<HTMLDivElement>(null);
@@ -98,70 +105,57 @@ const ApplicationTable = ({
   }, [editingId]);
 
   return (
-    <div className="h-[40rem] w-full overflow-y-scroll overflow-x-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
+    <div className="h-[40rem] w-full overflow-y-auto rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
+      {/* Modal for endring */}
+      <EditApplicationModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        application={editApp}
+        onSave={(updated) => {
+          setEditModalOpen(false);
+          setEditApp(null);
+          if (updated && updated.id && typeof onEdit === "function") {
+            onEdit(updated);
+          }
+        }}
+      />
       {/* Mobile card layout */}
       <div className="flex flex-col divide-y divide-slate-800/80 sm:hidden">
         {applications.map((app, index) => (
           <div
             key={app.id}
-            className="group flex flex-col gap-2 px-4 py-4 transition-colors hover:bg-slate-900/80"
+            className="group flex flex-col gap-2 px-4 py-4 bg-slate-900/60 rounded-xl m-2 shadow-md transition-colors hover:bg-slate-900/80"
           >
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center justify-between gap-2 mb-2">
               <div className="min-w-0 flex-1">
                 <span className="text-xs text-slate-500 mr-2">
                   #{index + 1}
                 </span>
-                <span className="text-sm font-medium text-slate-100">
+                <span className="text-base font-semibold text-slate-100">
                   {app.company}
                 </span>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {editingId === app.id ? (
-                  <div
-                    ref={editRefMobile}
-                    className="flex h-8 w-[120px] items-center"
-                  >
-                    <Select
-                      open={isMobile && selectOpen}
-                      onOpenChange={(open) => {
-                        setSelectOpen(open);
-                        if (!open) setEditingId(null);
-                      }}
-                      value={app.status}
-                      onValueChange={(v) => {
-                        onUpdateStatus(app.id, v as ApplicationStatus);
-                        setSelectOpen(false);
-                        setEditingId(null);
-                      }}
-                    >
-                      <SelectTrigger className="h-7 w-full text-xs border-slate-700 bg-slate-900 text-slate-100">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="status-select-dropdown border-slate-700 bg-slate-900 text-slate-100">
-                        {statuses.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setEditingId(app.id)}
-                    className="cursor-pointer"
-                  >
-                    <StatusBadge status={app.status} />
-                  </button>
-                )}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-sky-400 hover:text-sky-300 hover:bg-sky-900/10"
+                  onClick={() => {
+                    setEditApp(app);
+                    setEditModalOpen(true);
+                  }}
+                  title="Endre søknad"
+                >
+                  <Pencil className="h-5 w-5" />
+                </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
@@ -190,133 +184,193 @@ const ApplicationTable = ({
                 </AlertDialog>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-xs text-slate-400">
-              <span className="truncate">{app.position}</span>
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mb-2">
+              <span className="truncate max-w-[120px]">{app.position}</span>
               <span className="shrink-0 text-slate-500">·</span>
               <span className="shrink-0">{app.dateSent}</span>
+              <span className="shrink-0">·</span>
+              {editingId === app.id ? (
+                <div
+                  ref={editRefMobile}
+                  className="flex h-8 w-[120px] items-center"
+                >
+                  <Select
+                    open={isMobile && selectOpen}
+                    onOpenChange={(open) => {
+                      setSelectOpen(open);
+                      if (!open) setEditingId(null);
+                    }}
+                    value={app.status}
+                    onValueChange={(v) => {
+                      onUpdateStatus(app.id, v as ApplicationStatus);
+                      setSelectOpen(false);
+                      setEditingId(null);
+                    }}
+                  >
+                    <SelectTrigger className="h-7 w-full text-xs border-slate-700 bg-slate-900 text-slate-100">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="status-select-dropdown border-slate-700 bg-slate-900 text-slate-100">
+                      {statuses.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEditingId(app.id)}
+                  className="cursor-pointer"
+                >
+                  <StatusBadge status={app.status} />
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
 
       {/* Desktop table layout */}
-      <Table className="hidden sm:table table-fixed w-full">
-        <TableHeader>
-          <TableRow className="bg-slate-900/80">
-            <TableHead className="w-[36px] text-xs font-semibold uppercase tracking-wide text-slate-400">
-              #
-            </TableHead>
-            <TableHead className="w-[22%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Bedrift
-            </TableHead>
-            <TableHead className="w-[32%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Stilling
-            </TableHead>
-            <TableHead className="w-[18%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Dato sendt
-            </TableHead>
-            <TableHead className="w-[16%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Status
-            </TableHead>
-            <TableHead className="w-[36px] font-semibold"></TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {applications.map((app, index) => (
-            <TableRow
-              key={app.id}
-              className="group border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/80 transition-colors [&>td]:py-4"
-            >
-              <TableCell className="text-xs text-slate-500">
-                {index + 1}
-              </TableCell>
-              <TableCell className="text-sm font-medium text-slate-100">
-                <span className="line-clamp-2 break-words">{app.company}</span>
-              </TableCell>
-              <TableCell className="text-sm text-slate-400">
-                <span className="line-clamp-2 break-words">{app.position}</span>
-              </TableCell>
-              <TableCell className="text-sm text-slate-400 whitespace-nowrap">
-                {app.dateSent}
-              </TableCell>
-              <TableCell>
-                {editingId === app.id ? (
-                  <div ref={editRef} className="flex h-8 w-full items-center">
-                    <Select
-                      open={!isMobile && selectOpen}
-                      onOpenChange={(open) => {
-                        setSelectOpen(open);
-                        if (!open) setEditingId(null);
-                      }}
-                      value={app.status}
-                      onValueChange={(v) => {
-                        onUpdateStatus(app.id, v as ApplicationStatus);
-                        setSelectOpen(false);
-                        setEditingId(null);
-                      }}
+      <div className="hidden sm:block w-full overflow-x-auto">
+        <Table className="min-w-[700px] w-full table-fixed">
+          <TableHeader>
+            <TableRow className="bg-slate-900/80">
+              <TableHead className="w-[36px] text-xs font-semibold uppercase tracking-wide text-slate-400">
+                #
+              </TableHead>
+              <TableHead className="w-[22%] text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Bedrift
+              </TableHead>
+              <TableHead className="w-[28%] text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Stilling
+              </TableHead>
+              <TableHead className="w-[18%] text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Dato sendt
+              </TableHead>
+              <TableHead className="w-[14%] text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Status
+              </TableHead>
+              <TableHead className="w-[80px] text-xs font-semibold uppercase tracking-wide text-slate-400 text-center">
+                Handling
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {applications.map((app, index) => (
+              <TableRow
+                key={app.id}
+                className="border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/80 transition-colors"
+              >
+                <TableCell className="text-xs text-slate-500 py-4 text-center">
+                  {index + 1}
+                </TableCell>
+                <TableCell className="text-sm font-medium text-slate-100 py-4">
+                  <span className="line-clamp-2 break-words">
+                    {app.company}
+                  </span>
+                </TableCell>
+                <TableCell className="text-sm text-slate-400 py-4">
+                  <span className="line-clamp-2 break-words">
+                    {app.position}
+                  </span>
+                </TableCell>
+                <TableCell className="text-sm text-slate-400 py-4 whitespace-nowrap">
+                  {app.dateSent}
+                </TableCell>
+                <TableCell className="py-4">
+                  {editingId === app.id ? (
+                    <div ref={editRef} className="flex h-8 w-full items-center">
+                      <Select
+                        open={!isMobile && selectOpen}
+                        onOpenChange={(open) => {
+                          setSelectOpen(open);
+                          if (!open) setEditingId(null);
+                        }}
+                        value={app.status}
+                        onValueChange={(v) => {
+                          onUpdateStatus(app.id, v as ApplicationStatus);
+                          setSelectOpen(false);
+                          setEditingId(null);
+                        }}
+                      >
+                        <SelectTrigger className="h-7 w-full text-xs border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="status-select-dropdown border-slate-700 bg-slate-900 text-slate-100">
+                          {statuses.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setEditingId(app.id)}
+                      className="flex h-8 w-full cursor-pointer items-center justify-start"
                     >
-                      <SelectTrigger className="h-7 w-full text-xs border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="status-select-dropdown border-slate-700 bg-slate-900 text-slate-100">
-                        {statuses.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setEditingId(app.id)}
-                    className="flex h-8 w-full cursor-pointer items-center justify-start"
-                  >
-                    <StatusBadge status={app.status} />
-                  </button>
-                )}
-              </TableCell>
-              <TableCell>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+                      <StatusBadge status={app.status} />
+                    </button>
+                  )}
+                </TableCell>
+                <TableCell className="py-4 text-center">
+                  <div className="flex items-center justify-center gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 -ml-4 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                      className="h-8 w-8 text-sky-400 hover:text-sky-300 hover:bg-sky-900/10"
+                      onClick={() => {
+                        setEditApp(app);
+                        setEditModalOpen(true);
+                      }}
+                      title="Endre søknad"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Pencil className="h-5 w-5" />
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                      <AlertDialogDescription className="text-slate-400">
-                        Dette vil slette søknaden til{" "}
-                        <span className="font-medium text-slate-200">
-                          {app.company}
-                        </span>{" "}
-                        permanent. Denne handlingen kan ikke angres.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
-                        Avbryt
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        onClick={() => onDelete(app.id)}
-                      >
-                        Slett
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                          <AlertDialogDescription className="text-slate-400">
+                            Dette vil slette søknaden til{" "}
+                            <span className="font-medium text-slate-200">
+                              {app.company}
+                            </span>{" "}
+                            permanent. Denne handlingen kan ikke angres.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
+                            Avbryt
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={() => onDelete(app.id)}
+                          >
+                            Slett
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
