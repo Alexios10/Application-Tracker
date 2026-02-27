@@ -49,16 +49,6 @@ const AdminReportsPage = () => {
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
       <div className="mx-auto flex min-h-screen flex-col px-4 py-8 sm:px-6 lg:px-10 xl:px-16">
         <header className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex w-full mb-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="bg-slate-900/80 border-slate-700 text-slate-200 hover:bg-slate-800 px-4 py-2"
-              onClick={handleBack}
-            >
-              ← Tilbake
-            </Button>
-          </div>
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40">
               <span className="font-bold text-slate-950 text-lg">📝</span>
@@ -73,6 +63,16 @@ const AdminReportsPage = () => {
               <p className="mt-1 text-sm text-slate-300/80">
                 Her ser du alle rapporter sendt inn av brukere.
               </p>
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="bg-slate-900/80 border-slate-700 text-slate-200 hover:bg-slate-800 px-4 py-2"
+                  onClick={handleBack}
+                >
+                  ← Tilbake
+                </Button>
+              </div>
             </div>
           </div>
         </header>
