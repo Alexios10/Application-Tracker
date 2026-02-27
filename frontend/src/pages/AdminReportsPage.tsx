@@ -49,7 +49,7 @@ const AdminReportsPage = () => {
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
       <div className="mx-auto flex min-h-screen flex-col px-4 py-8 sm:px-6 lg:px-10 xl:px-16">
         <header className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex justify-end w-full mb-2">
+          <div className="flex w-full mb-2">
             <Button
               type="button"
               variant="outline"
