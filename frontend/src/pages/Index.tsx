@@ -6,7 +6,8 @@ import ApplicationTable from "@/components/ApplicationTable";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Briefcase, Search, LogOut } from "lucide-react";
+import { Briefcase, Search } from "lucide-react";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { ReportModal } from "@/components/ReportModal";
 
 const API_BASE = (
@@ -168,15 +169,7 @@ const Index = () => {
                 Admin rapporter
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={logout}
-              title="Logg ut"
-              className="text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
+            <ProfileMenu />
           </div>
         </header>
 

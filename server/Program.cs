@@ -195,6 +195,44 @@ app.MapGet("/api/auth/me", (ClaimsPrincipal user) =>
 
 // ========== APPLICATION-ENDEPUNKTER (beskyttet per bruker) ==========
 
+// Oppdater profil (navn og/eller passord)
+app.MapPut("/api/user", async (UserManager<User> userManager, ClaimsPrincipal principal, ApplicationDbContext db, UpdateUserRequest req) =>
+{
+    var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is null) return Results.Unauthorized();
+    var user = await userManager.FindByIdAsync(userId);
+    if (user is null) return Results.NotFound();
+    if (!string.IsNullOrWhiteSpace(req.FullName)) user.FullName = req.FullName;
+    // Oppdater UserName hvis nytt navn er forskjellig
+    if (!string.IsNullOrWhiteSpace(req.FullName) && user.UserName != req.FullName)
+        user.UserName = req.FullName;
+    var updateResult = await userManager.UpdateAsync(user);
+    if (!updateResult.Succeeded) return Results.BadRequest(new { error = "Kunne ikke oppdatere navn." });
+    if (!string.IsNullOrWhiteSpace(req.Password))
+    {
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var passResult = await userManager.ResetPasswordAsync(user, token, req.Password);
+        if (!passResult.Succeeded) return Results.BadRequest(new { error = "Kunne ikke endre passord." });
+    }
+    return Results.Ok();
+}).RequireAuthorization();
+
+// Slett bruker og tilhørende søknader
+app.MapDelete("/api/user", async (UserManager<User> userManager, ClaimsPrincipal principal, ApplicationDbContext db) =>
+{
+    var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is null) return Results.Unauthorized();
+    var user = await userManager.FindByIdAsync(userId);
+    if (user is null) return Results.NotFound();
+    // Slett alle søknader først
+    var apps = db.Applications.Where(a => a.UserId == userId);
+    db.Applications.RemoveRange(apps);
+    await db.SaveChangesAsync();
+    var result = await userManager.DeleteAsync(user);
+    if (!result.Succeeded) return Results.BadRequest(new { error = "Kunne ikke slette bruker." });
+    return Results.Ok();
+}).RequireAuthorization();
+
 // Hent kun EGNE søknader
 app.MapGet("/api/applications", async (ApplicationDbContext db, ClaimsPrincipal user) =>
 {
@@ -258,3 +296,5 @@ app.Run();
 public record RegisterRequest(string Username, string Email, string FullName, string Password);
 public record LoginRequest(string Username, string Password);
 public record AuthResponse(string Token, string FullName, string Username, bool IsAdmin);
+// Enkel DTO for oppdatering av bruker
+public record UpdateUserRequest(string? FullName, string? Password);
