@@ -44,25 +44,42 @@ const AdminReportsPage = () => {
   }, [user?.token]);
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Innsendte rapporter</h1>
-      {loading && <div>Laster rapporter...</div>}
-      {error && <div className="text-red-600 mb-2">{error}</div>}
-      {reports.length === 0 && !loading && <div>Ingen rapporter funnet.</div>}
-      <ul className="space-y-4">
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6 text-sky-300">
+        Innsendte rapporter
+      </h1>
+      {loading && (
+        <div className="mb-4 text-slate-400">Laster rapporter...</div>
+      )}
+      {error && <div className="text-red-600 mb-4">{error}</div>}
+      {reports.length === 0 && !loading && (
+        <div className="text-slate-400">Ingen rapporter funnet.</div>
+      )}
+      <div className="grid gap-5">
         {reports.map((r) => (
-          <li key={r.id} className="border rounded p-4 bg-slate-900">
-            <div className="font-semibold text-sky-300">{r.subject}</div>
-            <div className="text-slate-200 whitespace-pre-line mb-2">
+          <div
+            key={r.id}
+            className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-5 shadow-md"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-semibold text-lg text-sky-200">
+                {r.subject}
+              </div>
+              <span className="text-xs text-slate-400">
+                {r.createdAt && new Date(r.createdAt).toLocaleString()}
+              </span>
+            </div>
+            <div className="text-slate-200 whitespace-pre-line mb-2 text-sm">
               {r.description}
             </div>
-            <div className="text-xs text-slate-400">
-              {r.createdAt && new Date(r.createdAt).toLocaleString()}{" "}
-              {r.userId && <>· Bruker-ID: {r.userId}</>}
-            </div>
-          </li>
+            {r.userId && (
+              <div className="text-xs text-slate-500">
+                Bruker-ID: {r.userId}
+              </div>
+            )}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
