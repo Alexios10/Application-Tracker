@@ -7,6 +7,7 @@ import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Briefcase, Search, LogOut } from "lucide-react";
+import { ReportModal } from "@/components/ReportModal";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
@@ -19,6 +20,7 @@ const Index = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>(
     "all",
   );
+  const [reportOpen, setReportOpen] = useState(false);
 
   // Hjelpefunksjon: legg til Authorization-header på alle kall
   const authHeaders = (): HeadersInit => ({
@@ -26,6 +28,7 @@ const Index = () => {
     Authorization: `Bearer ${user?.token}`,
   });
 
+  // Hent alle søknader ved innlastning og når token endres (etter login)
   useEffect(() => {
     const fetchApplications = async () => {
       try {
@@ -133,6 +136,7 @@ const Index = () => {
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40">
               <Briefcase className="h-5 w-5 text-slate-950" />
             </div>
+
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300/80">
                 Oversikt
@@ -226,6 +230,15 @@ const Index = () => {
                 />
               </div>
             </div>
+            <div className="flex ml-2">
+              <Button
+                className="bg-secondary text-secondary-foreground px-4 py-2 rounded hover:bg-secondary/80 border"
+                onClick={() => setReportOpen(true)}
+                type="button"
+              >
+                Rapporter feil/ønske
+              </Button>
+            </div>
           </section>
 
           {/* Right column: table */}
@@ -249,6 +262,8 @@ const Index = () => {
             </div>
           </section>
         </main>
+        <ReportModal open={reportOpen} onClose={() => setReportOpen(false)} />
+        {/* Knappen er nå flyttet opp under søkeboksen */}
       </div>
     </div>
   );
