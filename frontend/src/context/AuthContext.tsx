@@ -11,6 +11,7 @@ interface AuthUser {
   token: string;
   fullName: string;
   username: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -88,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token: data.token,
         fullName: data.fullName,
         username: data.username,
+        isAdmin: data.isAdmin ?? false,
       };
       setUser(authUser);
       saveUser(authUser);
@@ -121,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token: data.token,
         fullName: data.fullName,
         username: data.username,
+        isAdmin: data.isAdmin ?? false,
       };
       setUser(authUser);
       saveUser(authUser);
