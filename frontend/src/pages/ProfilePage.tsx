@@ -26,6 +26,7 @@ const ProfilePage = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +62,6 @@ const ProfilePage = () => {
     }
   };
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const handleDelete = async () => {
     setLoading(true);
     setError("");
