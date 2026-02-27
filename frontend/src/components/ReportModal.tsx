@@ -39,7 +39,6 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogTitle>Rapporter et problem eller forbedring</DialogTitle>
       <DialogContent>
         {success ? (
           <div className="text-green-600">Takk for tilbakemeldingen!</div>
