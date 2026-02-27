@@ -15,6 +15,25 @@ const API_BASE = (
 ).replace(/\/+$/, "");
 
 const Index = () => {
+  // Oppdaterer hele søknaden
+  const handleEditApplication = async (updated: Application) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/applications/${updated.id}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify(updated),
+      });
+      if (!res.ok) {
+        console.error("Failed to update application", res.statusText);
+        return;
+      }
+      setApplications((prev) =>
+        prev.map((a) => (a.id === updated.id ? { ...updated } : a)),
+      );
+    } catch (err) {
+      console.error("Error updating application", err);
+    }
+  };
   const { user, logout } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [search, setSearch] = useState("");
@@ -262,6 +281,7 @@ const Index = () => {
                 applications={filtered}
                 onUpdateStatus={handleUpdateStatus}
                 onDelete={handleDelete}
+                onEdit={handleEditApplication}
               />
             </div>
           </section>
