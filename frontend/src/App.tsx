@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 import AdminReportsPage from "./pages/AdminReportsPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Index />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />
