@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5242";
+
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -18,7 +20,7 @@ const ResetPasswordPage: React.FC = () => {
       return;
     }
     try {
-      const res = await fetch("/api/account/reset-password", {
+      const res = await fetch(`${API_BASE}/api/account/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),
