@@ -140,6 +140,18 @@ const LoginPage = () => {
             />
           </div>
 
+          {/* Glemt passord-lenke kun for login */}
+          {!isRegister && (
+            <div className="text-right mb-2">
+              <a
+                href="/forgot-password"
+                className="text-blue-500 hover:underline text-sm"
+              >
+                Glemt passord?
+              </a>
+            </div>
+          )}
+
           {/* Knapp */}
           <Button
             type="submit"
