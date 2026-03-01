@@ -195,6 +195,17 @@ const LoginPage = () => {
               {isRegister ? "Logg inn" : "Registrer deg"}
             </button>
           </p>
+          <div className="flex flex-col gap-1 text-sm border p-2 border-slate-600">
+            <span className="text-white/50">
+              Hvis det er noe du lurer på send meg en mail:
+            </span>
+            <a
+              href="mailto:sattar_saud@hotmail.com"
+              className="text-blue-500 hover:underline"
+            >
+              sattar_saud@hotmail.com
+            </a>
+          </div>
         </form>
       </div>
     </div>
