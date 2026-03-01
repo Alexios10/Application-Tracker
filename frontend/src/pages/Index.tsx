@@ -82,6 +82,16 @@ const Index = () => {
       result = result.filter((a) => a.company.toLowerCase().startsWith(q));
     }
 
+    // Sorter etter dato (nyeste først). Formatet er DD.MM.YY
+    result = [...result].sort((a, b) => {
+      const parseDate = (d: string) => {
+        const [day, month, year] = d.split(".").map(Number);
+        // Anta 2000-tallet for tosifret årstall
+        return new Date(2000 + year, month - 1, day).getTime();
+      };
+      return parseDate(b.dateSent) - parseDate(a.dateSent);
+    });
+
     return result;
   }, [applications, statusFilter, search]);
 
