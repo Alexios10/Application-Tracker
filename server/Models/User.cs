@@ -8,4 +8,8 @@ public class User : IdentityUser
 {
   public string FullName { get; set; } = string.Empty;
   public bool IsAdmin { get; set; } = false;
+
+  // For reset password
+  public string? ResetPasswordToken { get; set; }
+  public DateTime? ResetPasswordTokenExpires { get; set; }
 }
