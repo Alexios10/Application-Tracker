@@ -12,6 +12,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
@@ -27,6 +28,11 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  function showPasswordToggle() {
+    setShowPassword(!showPassword);
+  }
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,15 +136,23 @@ const ProfilePage = () => {
               </div>
               <div>
                 <label className="block text-sm mb-1 text-slate-200">
-                  Nytt passord (valgfritt)
+                  Nytt passord
                 </label>
-                <input
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
+                <div className="flex justify-between relative items-center">
+                  <input
+                    className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                  <span
+                    className="text-slate-50 absolute right-3 cursor-pointer"
+                    onClick={showPasswordToggle}
+                  >
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                  </span>
+                </div>
               </div>
               {message && (
                 <div className="text-green-400 font-medium text-center">
