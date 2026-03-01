@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Briefcase } from "lucide-react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginPage = () => {
   const { user, login, register } = useAuth();
@@ -12,6 +13,7 @@ const LoginPage = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Skjema-felter
   const [username, setUsername] = useState("");
@@ -22,6 +24,10 @@ const LoginPage = () => {
   // Allerede innlogget? Gå til forsiden
   if (user) {
     return <Navigate to="/" replace />;
+  }
+
+  function showPasswordToggle() {
+    setShowPassword(!showPassword);
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,16 +134,24 @@ const LoginPage = () => {
             <Label htmlFor="password" className="text-slate-300">
               Passord
             </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minst 6 tegn, inkl. et tall"
-              required
-              minLength={6}
-              className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-            />
+            <div className="flex justify-center items-center relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minst 6 tegn, inkl. et tall"
+                required
+                minLength={6}
+                className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
+              />
+              <span
+                className="text-slate-50 absolute right-3 cursor-pointer"
+                onClick={showPasswordToggle}
+              >
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
+              </span>
+            </div>
           </div>
 
           {/* Glemt passord-lenke kun for login */}
