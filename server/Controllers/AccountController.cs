@@ -23,13 +23,13 @@ namespace ApplicationTracker.Api.Controllers
     {
       var normalizedEmail = request.Email?.Trim().ToUpperInvariant();
       Console.WriteLine($"[ForgotPassword] Looking for NormalizedEmail: '{normalizedEmail}'");
-      
+
       var allEmails = await _context.Users.Select(u => u.NormalizedEmail).ToListAsync();
       Console.WriteLine($"[ForgotPassword] All NormalizedEmails in DB: {string.Join(", ", allEmails)}");
-      
+
       var user = await _context.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
       Console.WriteLine($"[ForgotPassword] User found: {user != null}");
-      
+
       if (user == null)
       {
         // Ikke avslør om e-post finnes
