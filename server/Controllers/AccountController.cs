@@ -21,7 +21,8 @@ namespace ApplicationTracker.Api.Controllers
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
-      var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+      var normalizedEmail = request.Email?.ToUpperInvariant();
+      var user = await _context.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
       if (user == null)
       {
         // Ikke avslør om e-post finnes
