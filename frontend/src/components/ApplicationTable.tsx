@@ -236,7 +236,7 @@ const ApplicationTable = ({
       <div className="hidden sm:block w-full overflow-x-auto">
         <Table className="min-w-[700px] w-full table-fixed">
           <TableHeader>
-            <TableRow className="bg-slate-900/80">
+            <TableRow className="bg-slate-900/80 hover:bg-slate-900/80">
               <TableHead className="w-[36px] text-xs font-semibold uppercase tracking-wide text-slate-400">
                 #
               </TableHead>
