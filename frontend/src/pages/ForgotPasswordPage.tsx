@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
 
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5242";
+
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -12,7 +14,7 @@ const ForgotPasswordPage: React.FC = () => {
     setSent(false);
     try {
       // Kall backend for å få reset-lenke
-      const res = await fetch("/api/account/forgot-password", {
+      const res = await fetch(`${API_BASE}/api/account/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

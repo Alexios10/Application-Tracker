@@ -35,7 +35,8 @@ namespace ApplicationTracker.Api.Controllers
       await _context.SaveChangesAsync();
 
       // Returner lenke til frontend
-      var resetLink = $"https://minesoknader.no/reset-password?token={token}";
+      var origin = Request.Headers["Origin"].FirstOrDefault() ?? Request.Headers["Referer"].FirstOrDefault()?.TrimEnd('/') ?? "https://minesoknader.no";
+      var resetLink = $"{origin}/reset-password?token={token}";
       return Ok(new { resetLink });
     }
     [HttpPost("reset-password")]
