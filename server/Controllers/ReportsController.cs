@@ -19,7 +19,7 @@ namespace ApplicationTracker.Api.Controllers
       _context = context;
     }
 
-    // POST: api/reports
+    // POST: api/reportss
     [HttpPost]
     public async Task<IActionResult> CreateReport([FromBody] Report report)
     {
