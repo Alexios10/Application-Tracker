@@ -206,14 +206,11 @@ const LoginPage = () => {
             </button>
           </p>
         </form>
-      </div>
 
-      {/* Footer – fast nederst */}
-      <div className="fixed bottom-4 left-0 right-0 z-50 flex flex-col items-center gap-2 px-4 sm:flex-row sm:justify-between sm:px-6">
         {/* Personvern */}
         <Dialog>
           <DialogTrigger asChild>
-            <button className="flex items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-900/80 px-4 py-2.5 text-xs text-slate-400 backdrop-blur-sm shadow-lg transition-colors hover:text-slate-200 sm:text-sm">
+            <button className="mx-auto flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-300">
               <Shield className="h-3.5 w-3.5" />
               Personvern og rettigheter
             </button>
@@ -282,17 +279,6 @@ const LoginPage = () => {
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Kontaktinfo */}
-        <div className="flex items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-900/80 px-4 py-2.5 text-xs backdrop-blur-sm shadow-lg sm:text-sm">
-          <span className="text-slate-400">Spørsmål?</span>
-          <a
-            href="mailto:sattar_saud@hotmail.com"
-            className="font-medium text-sky-400 hover:text-sky-300 transition-colors"
-          >
-            sattar_saud@hotmail.com
-          </a>
-        </div>
       </div>
     </div>
   );
