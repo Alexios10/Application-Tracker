@@ -4,8 +4,15 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Briefcase } from "lucide-react";
+import { Briefcase, Shield } from "lucide-react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const LoginPage = () => {
   const { user, login, register } = useAuth();
@@ -84,6 +91,9 @@ const LoginPage = () => {
           {/* Registrerings-felter */}
           {isRegister && (
             <>
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+                NB: Veldig viktig at du registrerer riktig e-postadresse
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-slate-300">
                   Fullt navn
@@ -195,18 +205,94 @@ const LoginPage = () => {
               {isRegister ? "Logg inn" : "Registrer deg"}
             </button>
           </p>
-          <div className="flex flex-col gap-1 text-sm border p-2 border-slate-600">
-            <span className="text-white/50">
-              Hvis det er noe du lurer på send meg en mail:
-            </span>
-            <a
-              href="mailto:sattar_saud@hotmail.com"
-              className="text-blue-500 hover:underline"
-            >
-              sattar_saud@hotmail.com
-            </a>
-          </div>
         </form>
+      </div>
+
+      {/* Footer – fast nederst */}
+      <div className="fixed bottom-4 left-0 right-0 z-50 flex flex-col items-center gap-2 px-4 sm:flex-row sm:justify-between sm:px-6">
+        {/* Personvern */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="flex items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-900/80 px-4 py-2.5 text-xs text-slate-400 backdrop-blur-sm shadow-lg transition-colors hover:text-slate-200 sm:text-sm">
+              <Shield className="h-3.5 w-3.5" />
+              Personvern og rettigheter
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-h-[85vh] overflow-y-auto border-slate-700/60 bg-slate-900 text-slate-200 sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold text-slate-50">
+                Personvern og rettigheter
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 text-sm leading-relaxed text-slate-300">
+              <section>
+                <h3 className="mb-1 font-semibold text-slate-100">
+                  Datainnsamling
+                </h3>
+                <p>
+                  Vi lagrer kun informasjon du oppgir ved registrering
+                  (brukernavn, e-postadresse og fullt navn) samt jobbsøknadene
+                  du registrerer. Vi samler ikke inn data fra tredjeparter.
+                </p>
+              </section>
+              <section>
+                <h3 className="mb-1 font-semibold text-slate-100">
+                  Bruk av data
+                </h3>
+                <p>
+                  Dataene brukes utelukkende for å gi deg oversikt over dine
+                  jobbsøknader. Vi selger eller deler aldri dine opplysninger
+                  med andre.
+                </p>
+              </section>
+              <section>
+                <h3 className="mb-1 font-semibold text-slate-100">
+                  Lagring og sikkerhet
+                </h3>
+                <p>
+                  Passord lagres kryptert. All kommunikasjon mellom nettleseren
+                  din og serveren skjer over HTTPS.
+                </p>
+              </section>
+              <section>
+                <h3 className="mb-1 font-semibold text-slate-100">
+                  Dine rettigheter
+                </h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>
+                    Du kan når som helst be om innsyn i dataene vi lagrer om
+                    deg.
+                  </li>
+                  <li>Du kan be om at dataene dine blir slettet.</li>
+                  <li>Du kan oppdatere eller korrigere opplysningene dine.</li>
+                </ul>
+              </section>
+              <section>
+                <h3 className="mb-1 font-semibold text-slate-100">Kontakt</h3>
+                <p>
+                  Har du spørsmål om personvern? Ta kontakt på{" "}
+                  <a
+                    href="mailto:sattar_saud@hotmail.com"
+                    className="text-sky-400 hover:text-sky-300 transition-colors"
+                  >
+                    sattar_saud@hotmail.com
+                  </a>
+                </p>
+              </section>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Kontaktinfo */}
+        <div className="flex items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-900/80 px-4 py-2.5 text-xs backdrop-blur-sm shadow-lg sm:text-sm">
+          <span className="text-slate-400">Spørsmål?</span>
+          <a
+            href="mailto:sattar_saud@hotmail.com"
+            className="font-medium text-sky-400 hover:text-sky-300 transition-colors"
+          >
+            sattar_saud@hotmail.com
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -49,7 +49,10 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-6 rounded-3xl shadow-xl">
+      <DialogContent
+        hideClose
+        className="border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-6 rounded-3xl shadow-xl"
+      >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             value={company}
