@@ -53,16 +53,19 @@ namespace ApplicationTracker.Api.Controllers
       var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "https://minesoknader.no";
       var resetLink = $"{frontendUrl}/reset-password?token={Uri.EscapeDataString(token)}";
 
-      // Send e-post fra backend — token forlater aldri serveren via API
-      try
+      // Send e-post i bakgrunnen — ikke blokker HTTP-responsen
+      _ = Task.Run(async () =>
       {
-        await SendResetEmail(user.Email!, resetLink);
-      }
-      catch (Exception ex)
-      {
-        // Vises i Railway deploy logs
-        Console.WriteLine($"[EMAIL ERROR] {ex.GetType().Name}: {ex.Message}");
-      }
+        try
+        {
+          await SendResetEmail(user.Email!, resetLink);
+          Console.WriteLine($"[EMAIL] Reset-e-post sendt til {user.Email}");
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"[EMAIL ERROR] {ex.GetType().Name}: {ex.Message}");
+        }
+      });
 
       return Ok();
     }
@@ -141,6 +144,7 @@ namespace ApplicationTracker.Api.Controllers
       using var smtp = new SmtpClient("smtp.gmail.com", 587);
       smtp.Credentials = new NetworkCredential(smtpEmail, smtpPassword);
       smtp.EnableSsl = true;
+      smtp.Timeout = 15000; // 15 sekunder timeout i stedet for 100s default
       await smtp.SendMailAsync(message);
     }
   }
