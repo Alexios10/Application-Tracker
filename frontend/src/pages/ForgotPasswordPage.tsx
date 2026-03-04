@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import emailjs from "@emailjs/browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Briefcase, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5242";
+const API_BASE = (
+  import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
+).replace(/\/+$/, "");
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -31,27 +32,7 @@ const ForgotPasswordPage: React.FC = () => {
         return;
       }
 
-      const text = await res.text();
-      if (text) {
-        const data = JSON.parse(text);
-        if (data.resetLink) {
-          const serviceId = email.endsWith("@gmail.com")
-            ? "service_8tiaqax"
-            : "service_xfg6wyn";
-          await emailjs.send(
-            serviceId,
-            "template_5nis3kh",
-            {
-              title: "Tilbakestill passord",
-              name: "mine søknader",
-              time: new Date().toLocaleString(),
-              reset_link: data.resetLink,
-              email: email,
-            },
-            "eps4pw7YWOlJdYiWX",
-          );
-        }
-      }
+      // Backend sender e-post direkte — vi viser bare bekreftelse
       setSent(true);
     } catch (err) {
       setError("Noe gikk galt. Prøv igjen.");

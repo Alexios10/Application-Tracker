@@ -1,9 +1,12 @@
 using ApplicationTracker.Api.Data;
 using ApplicationTracker.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
@@ -19,31 +22,58 @@ namespace ApplicationTracker.Api.Controllers
       _context = context;
     }
 
-    // POST: api/reportss
+    // POST: api/reports — krever innlogging
     [HttpPost]
-    public async Task<IActionResult> CreateReport([FromBody] Report report)
+    [Authorize]
+    public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest request)
     {
-      if (string.IsNullOrWhiteSpace(report.Subject) || string.IsNullOrWhiteSpace(report.Description))
+      if (string.IsNullOrWhiteSpace(request.Subject) || string.IsNullOrWhiteSpace(request.Description))
       {
-        return BadRequest("Subject and Description are required.");
+        return BadRequest("Emne og beskrivelse er påkrevd.");
       }
-      report.CreatedAt = System.DateTime.UtcNow;
+
+      // Hent bruker-ID fra JWT token — kan ikke forfalskes
+      var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+      var report = new Report
+      {
+        Subject = request.Subject.Trim(),
+        Description = request.Description.Trim(),
+        UserId = userId,
+        CreatedAt = System.DateTime.UtcNow
+      };
+
       _context.Reports.Add(report);
       await _context.SaveChangesAsync();
       return Ok(report);
     }
 
-    // GET: api/reports
+    // GET: api/reports — kun admin
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Report>>> GetReports([FromServices] ApplicationDbContext db, [FromServices] UserManager<User> userManager)
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<Report>>> GetReports([FromServices] UserManager<User> userManager)
     {
       var user = await userManager.GetUserAsync(HttpContext.User);
-      if (user == null || !user.IsAdmin)
-      {
+      if (user == null)
+        return Unauthorized();
+
+      if (!user.IsAdmin)
         return Forbid();
-      }
-      var reports = await db.Reports.OrderByDescending(r => r.CreatedAt).ToListAsync();
+
+      var reports = await _context.Reports.OrderByDescending(r => r.CreatedAt).ToListAsync();
       return Ok(reports);
     }
+  }
+
+  // DTO — kun de feltene vi vil akseptere fra brukeren
+  public class CreateReportRequest
+  {
+    [Required]
+    [MaxLength(200)]
+    public string Subject { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(5000)]
+    public string Description { get; set; } = string.Empty;
   }
 }

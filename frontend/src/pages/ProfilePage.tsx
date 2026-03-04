@@ -41,10 +41,14 @@ const ProfilePage = () => {
     setError("");
     // Passordvalidering
     if (password) {
-      const minLen = password.length >= 6;
+      const minLen = password.length >= 8;
       const hasDigit = /\d/.test(password);
-      if (!minLen || !hasDigit) {
-        setError("Passordet må være minst 6 tegn og inneholde minst ett tall.");
+      const hasUpper = /[A-Z]/.test(password);
+      const hasLower = /[a-z]/.test(password);
+      if (!minLen || !hasDigit || !hasUpper || !hasLower) {
+        setError(
+          "Passordet må være minst 8 tegn med stor bokstav, liten bokstav og tall.",
+        );
         setLoading(false);
         return;
       }

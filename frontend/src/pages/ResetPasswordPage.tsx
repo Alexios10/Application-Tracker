@@ -43,7 +43,13 @@ const ResetPasswordPage: React.FC = () => {
       if (res.ok) {
         setSuccess(true);
       } else {
-        setError("Ugyldig eller utløpt lenke.");
+        // Les feilmelding fra backend
+        try {
+          const data = await res.json();
+          setError(data.error || "Ugyldig eller utløpt lenke.");
+        } catch {
+          setError("Ugyldig eller utløpt lenke.");
+        }
       }
     } catch {
       setError("Noe gikk galt. Prøv igjen.");
@@ -131,9 +137,9 @@ const ResetPasswordPage: React.FC = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Minst 6 tegn, inkl. et tall"
+                    placeholder="Minst 8 tegn, stor+liten bokstav og tall"
                     required
-                    minLength={6}
+                    minLength={8}
                     className="border-slate-700/80 bg-slate-900/70 pl-10 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
                   />
                 </div>
@@ -152,7 +158,7 @@ const ResetPasswordPage: React.FC = () => {
                     onChange={(e) => setConfirm(e.target.value)}
                     placeholder="Skriv passordet på nytt"
                     required
-                    minLength={6}
+                    minLength={8}
                     className="border-slate-700/80 bg-slate-900/70 pl-10 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
                   />
                 </div>

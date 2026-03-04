@@ -39,11 +39,28 @@ function saveUser(user: AuthUser) {
   localStorage.setItem("auth_user", JSON.stringify(user));
 }
 
+// Sjekk om JWT-token er utløpt ved å lese exp-claim
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    // exp er i sekunder, Date.now() er i millisekunder
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true; // Ugyldig token = behandle som utløpt
+  }
+}
+
 function loadUser(): AuthUser | null {
   const data = localStorage.getItem("auth_user");
   if (!data) return null;
   try {
-    return JSON.parse(data);
+    const user = JSON.parse(data) as AuthUser;
+    // Sjekk om token er utløpt — logg ut automatisk
+    if (isTokenExpired(user.token)) {
+      localStorage.removeItem("auth_user");
+      return null;
+    }
+    return user;
   } catch {
     return null;
   }

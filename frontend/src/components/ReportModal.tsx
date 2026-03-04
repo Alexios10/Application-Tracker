@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ReportModalProps {
   open: boolean;
@@ -9,6 +10,7 @@ interface ReportModalProps {
 }
 
 export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
+  const { user } = useAuth();
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
     try {
       const res = await fetch(`${API_BASE}/api/reports`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
         body: JSON.stringify({ subject, description }),
       });
       if (!res.ok) throw new Error("Noe gikk galt. Prøv igjen.");
@@ -55,6 +60,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               required
+              maxLength={200}
               className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
             />
             <textarea
@@ -63,6 +69,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
+              maxLength={5000}
               rows={4}
             />
             {error && (

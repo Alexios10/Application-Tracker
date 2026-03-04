@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Application, ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
 import StatsCards from "@/components/StatsCards";
@@ -15,6 +16,7 @@ const API_BASE = (
 ).replace(/\/+$/, "");
 
 const Index = () => {
+  const navigate = useNavigate();
   // Oppdaterer hele søknaden
   const handleEditApplication = async (updated: Application) => {
     try {
@@ -194,7 +196,7 @@ const Index = () => {
             {user?.isAdmin && (
               <Button
                 className="bg-sky-900 text-sky-200 hover:bg-sky-700"
-                onClick={() => (window.location.href = "/admin/reports")}
+                onClick={() => navigate("/admin/reports")}
               >
                 Admin rapporter
               </Button>
