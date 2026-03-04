@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using ApplicationTracker.Api.Data;
 using ApplicationTracker.Api.Models;
@@ -10,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Security.Cryptography;
 using System.ComponentModel.DataAnnotations;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace ApplicationTracker.Api.Controllers
 {
@@ -64,6 +65,8 @@ namespace ApplicationTracker.Api.Controllers
         catch (Exception ex)
         {
           Console.WriteLine($"[EMAIL ERROR] {ex.GetType().Name}: {ex.Message}");
+          if (ex.InnerException != null)
+            Console.WriteLine($"[EMAIL INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
         }
       });
 
@@ -124,12 +127,16 @@ namespace ApplicationTracker.Api.Controllers
       var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD")
           ?? throw new InvalidOperationException("SMTP_PASSWORD env variable is not set.");
 
-      using var message = new MailMessage();
-      message.From = new MailAddress(smtpEmail, "Mine Søknader");
-      message.To.Add(toEmail);
+      Console.WriteLine($"[EMAIL DEBUG] Sending to: {toEmail}, from: {smtpEmail}");
+
+      var message = new MimeMessage();
+      message.From.Add(new MailboxAddress("Mine Søknader", smtpEmail));
+      message.To.Add(MailboxAddress.Parse(toEmail));
       message.Subject = "Tilbakestill passord – Mine Søknader";
-      message.IsBodyHtml = true;
-      message.Body = $@"
+
+      message.Body = new TextPart("html")
+      {
+        Text = $@"
         <div style='font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;'>
           <h2 style='color: #0f172a;'>Tilbakestill passord</h2>
           <p>Du har bedt om å tilbakestille passordet ditt. Klikk på knappen under:</p>
@@ -139,13 +146,15 @@ namespace ApplicationTracker.Api.Controllers
           <p style='margin-top: 16px; color: #64748b; font-size: 14px;'>
             Lenken utløper om 1 time. Hvis du ikke ba om dette, kan du ignorere denne e-posten.
           </p>
-        </div>";
+        </div>"
+      };
 
-      using var smtp = new SmtpClient("smtp.gmail.com", 587);
-      smtp.Credentials = new NetworkCredential(smtpEmail, smtpPassword);
-      smtp.EnableSsl = true;
-      smtp.Timeout = 15000; // 15 sekunder timeout i stedet for 100s default
-      await smtp.SendMailAsync(message);
+      using var smtp = new SmtpClient();
+      smtp.Timeout = 15000;
+      await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+      await smtp.AuthenticateAsync(smtpEmail, smtpPassword);
+      await smtp.SendAsync(message);
+      await smtp.DisconnectAsync(true);
     }
   }
 
