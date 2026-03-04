@@ -60,8 +60,8 @@ namespace ApplicationTracker.Api.Controllers
       }
       catch (Exception ex)
       {
-        // Logg feil internt, men ikke avslør til bruker
-        // I produksjon: bruk ILogger i stedet for Console.WriteLine
+        // Vises i Railway deploy logs
+        Console.WriteLine($"[EMAIL ERROR] {ex.GetType().Name}: {ex.Message}");
       }
 
       return Ok();
