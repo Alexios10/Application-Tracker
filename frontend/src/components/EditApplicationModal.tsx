@@ -59,6 +59,7 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Bedrift"
             required
+            maxLength={200}
             className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100"
           />
           <Input
@@ -66,6 +67,7 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
             onChange={(e) => setPosition(e.target.value)}
             placeholder="Stilling"
             required
+            maxLength={200}
             className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100"
           />
           <Input
@@ -73,6 +75,7 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
             onChange={(e) => setDateSent(e.target.value)}
             placeholder="Dato sendt"
             required
+            maxLength={20}
             className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100"
           />
           <select

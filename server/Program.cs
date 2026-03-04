@@ -8,6 +8,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,12 +47,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // ---------- IDENTITY (brukeradministrasjon) ----------
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
-    // Enkle passordregler — kan strammes inn senere
+    // Sterke passordregler
     options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
+    options.Password.RequiredLength = 8;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
@@ -59,6 +61,11 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
     ?? builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("JWT Key not configured.");
+
+// Sikkerhetskrav: JWT-nøkkel må være minst 32 tegn (256 bits)
+if (jwtKey.Length < 32)
+    throw new InvalidOperationException("JWT Key must be at least 32 characters long for security.");
+
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "ApplicationTracker";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "ApplicationTrackerUsers";
 
@@ -83,15 +90,54 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // ---------- CORS ----------
+var allowedOrigins = new List<string>
+{
+    "https://application-tracker-five-pi.vercel.app",
+    "https://minesoknader.no",
+    "https://www.minesoknader.no"
+};
+
+// Tillat localhost kun under utvikling
+if (builder.Environment.IsDevelopment())
+{
+    allowedOrigins.Add("http://localhost:8080");
+    allowedOrigins.Add("http://localhost:5173");
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://application-tracker-five-pi.vercel.app", "http://localhost:8080", "https://minesoknader.no",
-            "https://www.minesoknader.no")
+        policy.WithOrigins(allowedOrigins.ToArray())
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
+});
+
+// ---------- RATE LIMITING (hindrer brute-force) ----------
+builder.Services.AddRateLimiter(options =>
+{
+    // Standard rate limit for alle endepunkter
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    // Strengere rate limit for auth-endepunkter (login, register, reset)
+    options.AddPolicy("auth", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(5)
+            }));
+
+    options.RejectionStatusCode = 429; // Too Many Requests
 });
 
 // ---------- JSON ----------
@@ -101,6 +147,19 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var app = builder.Build();
+
+// ---------- SIKKERHETSHODER ----------
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    await next();
+});
+
+app.UseRateLimiter();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -133,7 +192,7 @@ string GenerateToken(User user)
         issuer: jwtIssuer,
         audience: jwtAudience,
         claims: claims,
-        expires: DateTime.UtcNow.AddDays(7), // Token varer 7 dager
+        expires: DateTime.UtcNow.AddDays(1), // Token varer 1 dag
         signingCredentials: creds
     );
 
@@ -145,6 +204,15 @@ string GenerateToken(User user)
 // REGISTRERING
 app.MapPost("/api/auth/register", async (UserManager<User> userManager, RegisterRequest request) =>
 {
+    // Input-validering
+    if (string.IsNullOrWhiteSpace(request.Username) || request.Username.Length > 50)
+        return Results.BadRequest(new { error = "Brukernavn er påkrevd (maks 50 tegn)." });
+    if (string.IsNullOrWhiteSpace(request.Email) || request.Email.Length > 100)
+        return Results.BadRequest(new { error = "E-post er påkrevd (maks 100 tegn)." });
+    if (string.IsNullOrWhiteSpace(request.FullName) || request.FullName.Length > 100)
+        return Results.BadRequest(new { error = "Fullt navn er påkrevd (maks 100 tegn)." });
+    if (string.IsNullOrWhiteSpace(request.Password))
+        return Results.BadRequest(new { error = "Passord er påkrevd." });
     // Sjekk om brukernavn allerede er tatt
     var existingUser = await userManager.FindByNameAsync(request.Username);
     if (existingUser is not null)
@@ -161,13 +229,25 @@ app.MapPost("/api/auth/register", async (UserManager<User> userManager, Register
 
     if (!result.Succeeded)
     {
-        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        return Results.BadRequest(new { error = errors });
+        // Oversett vanlige Identity-feilmeldinger til norsk
+        var errorMessages = result.Errors.Select(e => e.Code switch
+        {
+            "PasswordTooShort" => "Passordet må være minst 8 tegn.",
+            "PasswordRequiresUpper" => "Passordet må inneholde minst én stor bokstav (A-Z).",
+            "PasswordRequiresLower" => "Passordet må inneholde minst én liten bokstav (a-z).",
+            "PasswordRequiresDigit" => "Passordet må inneholde minst ett tall (0-9).",
+            "PasswordRequiresNonAlphanumeric" => "Passordet må inneholde minst ett spesialtegn.",
+            "DuplicateUserName" => "Brukernavnet er allerede i bruk.",
+            "DuplicateEmail" => "E-postadressen er allerede i bruk.",
+            "InvalidEmail" => "Ugyldig e-postadresse.",
+            _ => e.Description
+        });
+        return Results.BadRequest(new { error = string.Join(" ", errorMessages) });
     }
 
     var token = GenerateToken(user);
     return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!, user.IsAdmin));
-});
+}).RequireRateLimiting("auth");
 
 // INNLOGGING
 app.MapPost("/api/auth/login", async (UserManager<User> userManager, LoginRequest request) =>
@@ -182,7 +262,7 @@ app.MapPost("/api/auth/login", async (UserManager<User> userManager, LoginReques
 
     var token = GenerateToken(user);
     return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!, user.IsAdmin));
-});
+}).RequireRateLimiting("auth");
 
 // HENT INNLOGGET BRUKER-INFO
 app.MapGet("/api/auth/me", (ClaimsPrincipal user) =>

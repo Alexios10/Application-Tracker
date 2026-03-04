@@ -74,6 +74,7 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
               onChange={(e) => setCompany(e.target.value)}
               placeholder="Bedriftsnavn"
               required
+              maxLength={200}
               className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 placeholder:text-slate-500 focus-visible:ring-sky-400"
             />
           </div>
@@ -87,6 +88,7 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
               onChange={(e) => setPosition(e.target.value)}
               placeholder="Stillingstittel"
               required
+              maxLength={200}
               className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 placeholder:text-slate-500 focus-visible:ring-sky-400"
             />
           </div>
@@ -100,6 +102,7 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
               onChange={(e) => setDateSent(e.target.value)}
               placeholder="DD.MM.ÅÅ"
               required
+              maxLength={20}
               className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 placeholder:text-slate-500 focus-visible:ring-sky-400"
             />
           </div>
