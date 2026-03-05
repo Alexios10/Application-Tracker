@@ -44,10 +44,10 @@ namespace ApplicationTracker.Api.Controllers
         return Ok();
       }
 
-      // Generer kryptografisk sikker token
+      // Generer kryptografisk sikker token og lagre kun hashen i databasen
       var tokenBytes = RandomNumberGenerator.GetBytes(32);
       var token = Convert.ToBase64String(tokenBytes).Replace("+", "-").Replace("/", "_");
-      user.ResetPasswordToken = token;
+      user.ResetPasswordToken = HashToken(token);
       user.ResetPasswordTokenExpires = DateTime.UtcNow.AddHours(1);
       await _context.SaveChangesAsync();
 
@@ -84,8 +84,10 @@ namespace ApplicationTracker.Api.Controllers
       if (request.Password.Length < 8)
         return BadRequest("Passordet må være minst 8 tegn.");
 
+      // Sammenlign med hashet versjon (vi lagrer aldri token i klartekst)
+      var hashedToken = HashToken(request.Token);
       var user = await _context.Users.FirstOrDefaultAsync(
-        u => u.ResetPasswordToken == request.Token && u.ResetPasswordTokenExpires > DateTime.UtcNow);
+        u => u.ResetPasswordToken == hashedToken && u.ResetPasswordTokenExpires > DateTime.UtcNow);
 
       if (user == null)
         return BadRequest("Ugyldig eller utløpt token.");
@@ -162,6 +164,15 @@ namespace ApplicationTracker.Api.Controllers
         throw new Exception($"Resend API feilet ({response.StatusCode}): {body}");
 
       Console.WriteLine($"[EMAIL] Resend response: {body}");
+    }
+
+    /// <summary>
+    /// Hasher en token med SHA-256 slik at vi aldri lagrer klartekst i databasen.
+    /// </summary>
+    private static string HashToken(string token)
+    {
+      var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+      return Convert.ToBase64String(bytes);
     }
   }
 

@@ -290,9 +290,18 @@ app.MapPut("/api/user", async (UserManager<User> userManager, ClaimsPrincipal pr
     if (!updateResult.Succeeded) return Results.BadRequest(new { error = "Kunne ikke oppdatere navn." });
     if (!string.IsNullOrWhiteSpace(req.Password))
     {
-        var token = await userManager.GeneratePasswordResetTokenAsync(user);
-        var passResult = await userManager.ResetPasswordAsync(user, token, req.Password);
-        if (!passResult.Succeeded) return Results.BadRequest(new { error = "Kunne ikke endre passord." });
+        // Krev nåværende passord for å endre til nytt
+        if (string.IsNullOrWhiteSpace(req.CurrentPassword))
+            return Results.BadRequest(new { error = "Nåværende passord er påkrevd for å endre passord." });
+
+        var passResult = await userManager.ChangePasswordAsync(user, req.CurrentPassword, req.Password);
+        if (!passResult.Succeeded)
+        {
+            var msg = passResult.Errors.Any(e => e.Code == "PasswordMismatch")
+                ? "Nåværende passord er feil."
+                : "Kunne ikke endre passord. Sjekk at det nye passordet oppfyller kravene.";
+            return Results.BadRequest(new { error = msg });
+        }
     }
     return Results.Ok();
 }).RequireAuthorization();
@@ -377,4 +386,4 @@ public record RegisterRequest(string Username, string Email, string FullName, st
 public record LoginRequest(string Username, string Password);
 public record AuthResponse(string Token, string FullName, string Username, bool IsAdmin);
 // Enkel DTO for oppdatering av bruker
-public record UpdateUserRequest(string? FullName, string? Password);
+public record UpdateUserRequest(string? FullName, string? Password, string? CurrentPassword);
