@@ -10,7 +10,7 @@ interface ReportModalProps {
 }
 
 export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
-  const { user } = useAuth();
+  const { user, authFetch } = useAuth();
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,11 +27,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
     setError("");
     setSuccess(false);
     try {
-      const res = await fetch(`${API_BASE}/api/reports`, {
+      const res = await authFetch(`${API_BASE}/api/reports`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`,
         },
         body: JSON.stringify({ subject, description }),
       });

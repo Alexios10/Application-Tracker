@@ -17,7 +17,7 @@ const API_BASE = (
 const AdminReportsPage = () => {
   // Tilbake-knapp funksjon
   const handleBack = () => window.history.back();
-  const { user } = useAuth();
+  const { user, authFetch } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,10 +27,9 @@ const AdminReportsPage = () => {
       setLoading(true);
       setError("");
       try {
-        const res = await fetch(`${API_BASE}/api/reports`, {
+        const res = await authFetch(`${API_BASE}/api/reports`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user?.token}`,
           },
         });
         if (!res.ok) throw new Error("Ingen tilgang eller feil ved henting.");
@@ -42,8 +41,8 @@ const AdminReportsPage = () => {
         setLoading(false);
       }
     };
-    if (user?.token) fetchReports();
-  }, [user?.token]);
+    if (user) fetchReports();
+  }, [user]);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">

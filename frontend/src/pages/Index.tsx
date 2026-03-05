@@ -17,14 +17,18 @@ const API_BASE = (
 
 const Index = () => {
   const navigate = useNavigate();
+
   // Oppdaterer hele søknaden
   const handleEditApplication = async (updated: Application) => {
     try {
-      const res = await fetch(`${API_BASE}/api/applications/${updated.id}`, {
-        method: "PUT",
-        headers: authHeaders(),
-        body: JSON.stringify(updated),
-      });
+      const res = await authFetch(
+        `${API_BASE}/api/applications/${updated.id}`,
+        {
+          method: "PUT",
+          headers: authHeaders(),
+          body: JSON.stringify(updated),
+        },
+      );
       if (!res.ok) {
         console.error("Failed to update application", res.statusText);
         return;
@@ -36,7 +40,8 @@ const Index = () => {
       console.error("Error updating application", err);
     }
   };
-  const { user, logout } = useAuth();
+
+  const { user, logout, authFetch } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>(
@@ -44,17 +49,16 @@ const Index = () => {
   );
   const [reportOpen, setReportOpen] = useState(false);
 
-  // Hjelpefunksjon: legg til Authorization-header på alle kall
+  // Hjelpefunksjon: legg til credentials på alle kall som krever autentisering
   const authHeaders = (): HeadersInit => ({
     "Content-Type": "application/json",
-    Authorization: `Bearer ${user?.token}`,
   });
 
   // Hent alle søknader ved innlastning og når token endres (etter login)
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/applications`, {
+        const res = await authFetch(`${API_BASE}/api/applications`, {
           headers: authHeaders(),
         });
         if (!res.ok) {
@@ -69,7 +73,7 @@ const Index = () => {
     };
 
     fetchApplications();
-  }, [user?.token]);
+  }, [user]);
 
   // Filtrer søknader basert på status og søketekst (ser kun på bedrift for søk) - brukMemo for optimalisering
   const filtered = useMemo(() => {
@@ -102,9 +106,10 @@ const Index = () => {
   const pending = applications.filter((a) => a.status === "Sendt").length;
   const ghosted = applications.filter((a) => a.status === "Ghosted").length;
 
+  // Legg til ny søknad - sender hele objektet uten id (backend genererer id) og legger til i state ved suksess
   const handleAdd = async (app: Omit<Application, "id">) => {
     try {
-      const res = await fetch(`${API_BASE}/api/applications`, {
+      const res = await authFetch(`${API_BASE}/api/applications`, {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify(app),
@@ -120,6 +125,7 @@ const Index = () => {
     }
   };
 
+  // Oppdater status på en søknad - finner eksisterende søknad, oppdaterer status, sender PUT til backend og oppdaterer state ved suksess
   const handleUpdateStatus = async (id: number, status: ApplicationStatus) => {
     const existing = applications.find((a) => a.id === id);
     if (!existing) return;
@@ -127,7 +133,7 @@ const Index = () => {
     const updated: Application = { ...existing, status };
 
     try {
-      const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+      const res = await authFetch(`${API_BASE}/api/applications/${id}`, {
         method: "PUT",
         headers: authHeaders(),
         body: JSON.stringify(updated),
@@ -144,9 +150,10 @@ const Index = () => {
     }
   };
 
+  // Slett en søknad - sender DELETE til backend og oppdaterer state ved suksess
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+      const res = await authFetch(`${API_BASE}/api/applications/${id}`, {
         method: "DELETE",
         headers: authHeaders(),
       });

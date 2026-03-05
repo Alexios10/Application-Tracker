@@ -3,12 +3,12 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 
-// Typer for auth-data
+// Typer for auth-data (token lagres i HttpOnly-cookie, ikke i JS)
 interface AuthUser {
-  token: string;
   fullName: string;
   username: string;
   isAdmin?: boolean;
@@ -24,6 +24,7 @@ interface AuthContextType {
     password: string,
   ) => Promise<string | null>;
   logout: () => void;
+  authFetch: (url: string, options?: RequestInit) => Promise<Response>;
   isLoading: boolean;
 }
 
@@ -34,55 +35,82 @@ const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
 ).replace(/\/+$/, "");
 
-// Lagrer brukerdata i localStorage slik at man forblir innlogget
-function saveUser(user: AuthUser) {
-  localStorage.setItem("auth_user", JSON.stringify(user));
-}
-
-// Sjekk om JWT-token er utløpt ved å lese exp-claim
-function isTokenExpired(token: string): boolean {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    // exp er i sekunder, Date.now() er i millisekunder
-    return payload.exp * 1000 < Date.now();
-  } catch {
-    return true; // Ugyldig token = behandle som utløpt
-  }
-}
-
-function loadUser(): AuthUser | null {
-  const data = localStorage.getItem("auth_user");
-  if (!data) return null;
-  try {
-    const user = JSON.parse(data) as AuthUser;
-    // Sjekk om token er utløpt — logg ut automatisk
-    if (isTokenExpired(user.token)) {
-      localStorage.removeItem("auth_user");
-      return null;
-    }
-    return user;
-  } catch {
-    return null;
-  }
-}
-
-function clearUser() {
-  localStorage.removeItem("auth_user");
-}
-
 // Provider-komponent som wrapper hele appen
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Sjekk om bruker allerede er lagret ved oppstart
+  // Sjekk om bruker er innlogget ved oppstart
+  // Prøver /me først, og ved 401 forsøker refresh for å fornye utløpt access-token
   useEffect(() => {
-    const saved = loadUser();
-    if (saved) {
-      setUser(saved);
-    }
-    setIsLoading(false);
+    const checkSession = async () => {
+      try {
+        let res = await fetch(`${API_BASE}/api/auth/me`, {
+          credentials: "include",
+        });
+
+        // Hvis access-token er utløpt, prøv å fornye med refresh-token
+        if (res.status === 401) {
+          const refreshRes = await fetch(`${API_BASE}/api/auth/refresh`, {
+            method: "POST",
+            credentials: "include",
+          });
+          if (refreshRes.ok) {
+            res = await fetch(`${API_BASE}/api/auth/me`, {
+              credentials: "include",
+            });
+          }
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          setUser({
+            fullName: data.fullName,
+            username: data.username,
+            isAdmin: data.isAdmin ?? false,
+          });
+        }
+      } catch {
+        // Nettverksfeil — bruker forblir utlogget
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkSession();
   }, []);
+
+  // Fetch-wrapper: ved 401, prøv å fornye token og kjør kallet på nytt
+  const authFetch = useCallback(
+    async (url: string, options: RequestInit = {}): Promise<Response> => {
+      const res = await fetch(url, { ...options, credentials: "include" });
+
+      if (res.status !== 401) return res;
+
+      // Forsøk å fornye access-token med refresh-token
+      const refreshRes = await fetch(`${API_BASE}/api/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!refreshRes.ok) {
+        // Refresh feilet — logg ut brukeren
+        setUser(null);
+        return res;
+      }
+
+      // Oppdater bruker-data fra refresh-responsen
+      const data = await refreshRes.json();
+      setUser({
+        fullName: data.fullName,
+        username: data.username,
+        isAdmin: data.isAdmin ?? false,
+      });
+
+      // Kjør det opprinnelige kallet på nytt med ny access-token
+      return fetch(url, { ...options, credentials: "include" });
+    },
+    [],
+  );
 
   // Innlogging — returnerer feilmelding eller null ved suksess
   const login = async (
@@ -93,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
@@ -102,14 +131,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return data.error || "Innlogging feilet.";
       }
 
-      const authUser: AuthUser = {
-        token: data.token,
+      setUser({
         fullName: data.fullName,
         username: data.username,
         isAdmin: data.isAdmin ?? false,
-      };
-      setUser(authUser);
-      saveUser(authUser);
+      });
       return null; // Ingen feil
     } catch {
       return "Kunne ikke koble til serveren.";
@@ -127,6 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username, email, fullName, password }),
       });
 
@@ -136,27 +163,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return data.error || "Registrering feilet.";
       }
 
-      const authUser: AuthUser = {
-        token: data.token,
+      setUser({
         fullName: data.fullName,
         username: data.username,
         isAdmin: data.isAdmin ?? false,
-      };
-      setUser(authUser);
-      saveUser(authUser);
+      });
       return null;
     } catch {
       return "Kunne ikke koble til serveren.";
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await fetch(`${API_BASE}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {});
     setUser(null);
-    clearUser();
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, authFetch, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
