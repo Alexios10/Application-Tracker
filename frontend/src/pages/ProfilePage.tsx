@@ -158,23 +158,25 @@ const ProfilePage = () => {
                   required
                 />
               </div>
-              <div className="flex justify-between relative items-center">
+              <div>
                 <label className="block text-sm mb-1 text-slate-200">
                   Nåværende passord
                 </label>
-                <input
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                  type={showCurrentPassword ? "text" : "password"}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
-                <span
-                  className="text-slate-50 absolute right-3 cursor-pointer"
-                  onClick={showCurrentPasswordToggle}
-                >
-                  {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
-                </span>
+                <div className="flex justify-between relative items-center">
+                  <input
+                    className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
+                    type={showCurrentPassword ? "text" : "password"}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                  <span
+                    className="text-slate-50 absolute right-3 cursor-pointer"
+                    onClick={showCurrentPasswordToggle}
+                  >
+                    {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
+                  </span>
+                </div>
               </div>
               <div>
                 <label className="block text-sm mb-1 text-slate-200">
