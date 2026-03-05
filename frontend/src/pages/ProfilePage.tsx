@@ -22,6 +22,7 @@ const ProfilePage = () => {
   // Tilbake-knapp funksjon
   const handleBack = () => window.history.back();
   const { user, logout } = useAuth();
+
   const [fullName, setFullName] = useState(user?.fullName || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
@@ -29,10 +30,15 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
-  function showPasswordToggle() {
-    setShowPassword(!showPassword);
+  function showNewPasswordToggle() {
+    setShowNewPassword(!showNewPassword);
+  }
+
+  function showCurrentPasswordToggle() {
+    setShowCurrentPassword(!showCurrentPassword);
   }
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -158,16 +164,16 @@ const ProfilePage = () => {
                 </label>
                 <input
                   className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                  type={showPassword ? "text" : "password"}
+                  type={showCurrentPassword ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="••••••••"
                 />
                 <span
                   className="text-slate-50 absolute right-3 cursor-pointer"
-                  onClick={showPasswordToggle}
+                  onClick={showCurrentPasswordToggle}
                 >
-                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                  {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
                 </span>
               </div>
               <div>
@@ -177,16 +183,16 @@ const ProfilePage = () => {
                 <div className="flex justify-between relative items-center">
                   <input
                     className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                    type={showPassword ? "text" : "password"}
+                    type={showNewPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                   />
                   <span
                     className="text-slate-50 absolute right-3 cursor-pointer"
-                    onClick={showPasswordToggle}
+                    onClick={showNewPasswordToggle}
                   >
-                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    {showNewPassword ? <FaEye /> : <FaEyeSlash />}
                   </span>
                 </div>
               </div>
