@@ -195,10 +195,10 @@ const Index = () => {
           <div className="flex items-center gap-4 self-start sm:self-auto">
             <div className="hidden text-right text-xs text-slate-400/80 sm:block">
               <p className="font-medium text-slate-200/90">
-                Hei, {user?.fullName} · {totalSent} søknader
-              </p>
-              <p>
-                {pending} venter svar · {rejected} avslag · {ghosted} ghosted
+                Hei,{" "}
+                <span className="font-semibold text-slate-100">
+                  {user?.fullName}
+                </span>
               </p>
             </div>
             <AddApplicationDialog onAdd={handleAdd} />
