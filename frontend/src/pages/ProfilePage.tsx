@@ -152,7 +152,7 @@ const ProfilePage = () => {
                   required
                 />
               </div>
-              <div>
+              <div className="flex justify-between relative items-center">
                 <label className="block text-sm mb-1 text-slate-200">
                   Nåværende passord
                 </label>
