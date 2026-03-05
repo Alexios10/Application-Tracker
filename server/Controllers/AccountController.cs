@@ -150,8 +150,9 @@ namespace ApplicationTracker.Api.Controllers
       };
 
       using var smtp = new SmtpClient();
-      smtp.Timeout = 15000;
-      await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+      smtp.Timeout = 30000;
+      // Port 465 med direkte SSL — noen PaaS-leverandører blokkerer 587/StartTls
+      await smtp.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
       await smtp.AuthenticateAsync(smtpEmail, smtpPassword);
       await smtp.SendAsync(message);
       await smtp.DisconnectAsync(true);
