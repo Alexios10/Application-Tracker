@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Briefcase, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import {
+  Briefcase,
+  Mail,
+  ArrowLeft,
+  CheckCircle2,
+  AlertTriangle,
+} from "lucide-react";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
@@ -75,6 +81,13 @@ const ForgotPasswordPage: React.FC = () => {
                 Hvis e-postadressen er registrert, har vi sendt en lenke for å
                 tilbakestille passordet ditt.
               </p>
+              <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+                <p className="text-sm text-amber-300">
+                  Sjekk søppelpost/spam-mappen din hvis du ikke finner e-posten
+                  i innboksen.
+                </p>
+              </div>
               <a
                 href="/login"
                 className="inline-flex items-center gap-2 text-sm font-medium text-sky-400 hover:text-sky-300"
