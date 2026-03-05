@@ -79,7 +79,7 @@ const StatsCards = ({
         </div>
       </div>
 
-      {/* Avslag */}
+      {/* Avslag  */}
       <div
         className={`rounded-2xl flex border bg-gradient-to-br from-red-500/10 via-slate-900/40 to-slate-900/70 p-5 text-slate-100 shadow-lg cursor-pointer transition-transform hover:scale-[1.01] ${selectedCard === "rejected" ? "ring-2 ring-offset-2 ring-offset-slate-950 ring-red-400" : "border-red-500/25"}`}
         onClick={() => onCardClick?.("rejected")}
