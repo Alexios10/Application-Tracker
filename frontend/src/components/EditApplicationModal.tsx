@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Label } from "./ui/label";
 import { Application, ApplicationStatus } from "@/types/application";
 
 interface EditApplicationModalProps {
@@ -78,17 +86,28 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
             maxLength={20}
             className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100"
           />
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as ApplicationStatus)}
-            className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100"
-          >
-            {statuses.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+          <div className="space-y-2">
+            <Label className="text-slate-300 text-sm">Status</Label>
+            <Select
+              value={status}
+              onValueChange={(v) => setStatus(v as ApplicationStatus)}
+            >
+              <SelectTrigger className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus:ring-sky-400">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border border-slate-700 bg-slate-900 text-slate-100">
+                {statuses.map((s) => (
+                  <SelectItem
+                    key={s}
+                    value={s}
+                    className="text-slate-100 focus:bg-slate-800 focus:text-slate-50"
+                  >
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <DialogFooter className="flex justify-end gap-2 pt-2">
             <Button
               type="button"
