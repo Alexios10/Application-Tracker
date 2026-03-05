@@ -214,7 +214,7 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="grid flex-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.8fr)]">
+        <main className="grid flex-1 gap-6 min-[1120px]:grid-cols-[minmax(0,1fr)_minmax(0,2.8fr)]">
           {/* Venstre seksjon */}
           <section className="space-y-6">
             <div className="overflow-hidden rounded-3xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-5 shadow-[0_18px_60px_rgba(15,23,42,0.9)]">
