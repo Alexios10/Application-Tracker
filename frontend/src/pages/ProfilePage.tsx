@@ -23,6 +23,7 @@ const ProfilePage = () => {
   const handleBack = () => window.history.back();
   const { user, logout } = useAuth();
   const [fullName, setFullName] = useState(user?.fullName || "");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -41,6 +42,11 @@ const ProfilePage = () => {
     setError("");
     // Passordvalidering
     if (password) {
+      if (!currentPassword) {
+        setError("Du må skrive inn nåværende passord for å endre passord.");
+        setLoading(false);
+        return;
+      }
       const minLen = password.length >= 8;
       const hasDigit = /\d/.test(password);
       const hasUpper = /[A-Z]/.test(password);
@@ -60,11 +66,19 @@ const ProfilePage = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.token}`,
         },
-        body: JSON.stringify({ fullName, password: password || undefined }),
+        body: JSON.stringify({
+          fullName,
+          password: password || undefined,
+          currentPassword: currentPassword || undefined,
+        }),
       });
-      if (!res.ok) throw new Error("Kunne ikke oppdatere profil.");
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Kunne ikke oppdatere profil.");
+      }
       setMessage("Profil oppdatert!");
       setPassword("");
+      setCurrentPassword("");
     } catch (err: any) {
       setError(err.message || "Ukjent feil");
     } finally {
@@ -136,6 +150,18 @@ const ProfilePage = () => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1 text-slate-200">
+                  Nåværende passord
+                </label>
+                <input
+                  className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
                 />
               </div>
               <div>
