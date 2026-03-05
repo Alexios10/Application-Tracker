@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +87,18 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
+
+    // Les JWT fra HttpOnly-cookie i stedet for Authorization-header
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var cookie = context.Request.Cookies["access_token"];
+            if (!string.IsNullOrEmpty(cookie))
+                context.Token = cookie;
+            return Task.CompletedTask;
+        }
+    };
 });
 builder.Services.AddAuthorization();
 
@@ -110,7 +123,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(allowedOrigins.ToArray())
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials(); // Nødvendig for å sende HttpOnly-cookies
     });
 });
 
@@ -156,6 +170,16 @@ app.Use(async (context, next) =>
     context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
     context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
     context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    context.Response.Headers["Content-Security-Policy"] =
+        "default-src 'self'; " +
+        "script-src 'self'; " +
+        "style-src 'self' 'unsafe-inline'; " +   // Tailwind bruker inline styles
+        "img-src 'self' data:; " +
+        "font-src 'self'; " +
+        "connect-src 'self'; " +
+        "frame-ancestors 'none'; " +
+        "base-uri 'self'; " +
+        "form-action 'self';";
     await next();
 });
 
@@ -192,17 +216,71 @@ string GenerateToken(User user)
         issuer: jwtIssuer,
         audience: jwtAudience,
         claims: claims,
-        expires: DateTime.UtcNow.AddDays(1), // Token varer 1 dag
+        expires: DateTime.UtcNow.AddMinutes(15), // Kort levetid — refresh-token brukes for å fornye
         signingCredentials: creds
     );
 
     return new JwtSecurityTokenHandler().WriteToken(token);
 }
 
+// Setter JWT i en HttpOnly-cookie (utilgjengelig for JavaScript)
+void SetAuthCookie(HttpContext context, string token)
+{
+    context.Response.Cookies.Append("access_token", token, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        Path = "/",
+        Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+    });
+}
+
+// Setter refresh-token i en egen HttpOnly-cookie (lengre levetid)
+void SetRefreshCookie(HttpContext context, string refreshToken)
+{
+    context.Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        Path = "/api/auth",  // Kun tilgjengelig for auth-endepunkter
+        Expires = DateTimeOffset.UtcNow.AddDays(7)
+    });
+}
+
+// Genererer en kryptografisk sikker refresh-token
+string GenerateRefreshToken()
+{
+    var bytes = RandomNumberGenerator.GetBytes(32);
+    return Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_");
+}
+
+// Hasher token med SHA-256 (vi lagrer aldri klartekst i DB)
+string HashToken(string token)
+{
+    var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+    return Convert.ToBase64String(bytes);
+}
+
+// Genererer og lagrer refresh-token for en bruker, setter begge cookies
+async Task SetAuthAndRefreshCookies(HttpContext context, User user, ApplicationDbContext db)
+{
+    var accessToken = GenerateToken(user);
+    SetAuthCookie(context, accessToken);
+
+    var refreshToken = GenerateRefreshToken();
+    user.RefreshToken = HashToken(refreshToken);
+    user.RefreshTokenExpires = DateTime.UtcNow.AddDays(7);
+    await db.SaveChangesAsync();
+
+    SetRefreshCookie(context, refreshToken);
+}
+
 // ========== AUTH-ENDEPUNKTER ==========
 
 // REGISTRERING
-app.MapPost("/api/auth/register", async (UserManager<User> userManager, RegisterRequest request) =>
+app.MapPost("/api/auth/register", async (HttpContext context, UserManager<User> userManager, ApplicationDbContext db, RegisterRequest request) =>
 {
     // Input-validering
     if (string.IsNullOrWhiteSpace(request.Username) || request.Username.Length > 50)
@@ -245,12 +323,12 @@ app.MapPost("/api/auth/register", async (UserManager<User> userManager, Register
         return Results.BadRequest(new { error = string.Join(" ", errorMessages) });
     }
 
-    var token = GenerateToken(user);
-    return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!, user.IsAdmin));
+    await SetAuthAndRefreshCookies(context, user, db);
+    return Results.Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
 }).RequireRateLimiting("auth");
 
 // INNLOGGING
-app.MapPost("/api/auth/login", async (UserManager<User> userManager, LoginRequest request) =>
+app.MapPost("/api/auth/login", async (HttpContext context, UserManager<User> userManager, ApplicationDbContext db, LoginRequest request) =>
 {
     var user = await userManager.FindByNameAsync(request.Username);
     if (user is null)
@@ -260,18 +338,71 @@ app.MapPost("/api/auth/login", async (UserManager<User> userManager, LoginReques
     if (!validPassword)
         return Results.BadRequest(new { error = "Feil brukernavn eller passord." });
 
-    var token = GenerateToken(user);
-    return Results.Ok(new AuthResponse(token, user.FullName, user.UserName!, user.IsAdmin));
+    await SetAuthAndRefreshCookies(context, user, db);
+    return Results.Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
 }).RequireRateLimiting("auth");
 
-// HENT INNLOGGET BRUKER-INFO
-app.MapGet("/api/auth/me", (ClaimsPrincipal user) =>
+// HENT INNLOGGET BRUKER-INFO (brukes ved oppstart for å sjekke om cookie er gyldig)
+app.MapGet("/api/auth/me", async (ClaimsPrincipal principal, UserManager<User> userManager) =>
 {
-    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-    var fullName = user.FindFirstValue("fullName");
-    var username = user.FindFirstValue(ClaimTypes.Name);
-    return Results.Ok(new { userId, fullName, username });
+    var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is null) return Results.Unauthorized();
+    var user = await userManager.FindByIdAsync(userId);
+    if (user is null) return Results.Unauthorized();
+    return Results.Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
 }).RequireAuthorization();
+
+// FORNY TOKENS — bruker refresh-token for å få ny access-token
+app.MapPost("/api/auth/refresh", async (HttpContext context, ApplicationDbContext db) =>
+{
+    var refreshCookie = context.Request.Cookies["refresh_token"];
+    if (string.IsNullOrEmpty(refreshCookie))
+        return Results.Unauthorized();
+
+    // Finn brukeren med matchende hashet refresh-token
+    var hashedToken = HashToken(refreshCookie);
+    var user = await db.Users.FirstOrDefaultAsync(
+        u => u.RefreshToken == hashedToken && u.RefreshTokenExpires > DateTime.UtcNow);
+
+    if (user is null)
+        return Results.Unauthorized();
+
+    // Rotasjon: generer nye tokens (gammel refresh-token ugyldiggjøres)
+    await SetAuthAndRefreshCookies(context, user, db);
+    return Results.Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
+}).RequireRateLimiting("auth");
+
+// UTLOGGING — fjern cookies og revokér refresh-token i DB
+app.MapPost("/api/auth/logout", async (HttpContext context, ApplicationDbContext db, ClaimsPrincipal principal) =>
+{
+    // Revokér refresh-token i databasen hvis bruker er innlogget
+    var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is not null)
+    {
+        var user = await db.Users.FindAsync(userId);
+        if (user is not null)
+        {
+            user.RefreshToken = null;
+            user.RefreshTokenExpires = null;
+            await db.SaveChangesAsync();
+        }
+    }
+
+    // Slett begge cookies
+    context.Response.Cookies.Delete("access_token", new CookieOptions
+    {
+        Path = "/",
+        Secure = true,
+        SameSite = SameSiteMode.None
+    });
+    context.Response.Cookies.Delete("refresh_token", new CookieOptions
+    {
+        Path = "/api/auth",
+        Secure = true,
+        SameSite = SameSiteMode.None
+    });
+    return Results.Ok();
+});
 
 // ========== APPLICATION-ENDEPUNKTER (beskyttet per bruker) ==========
 
@@ -384,6 +515,6 @@ app.Run();
 // ---------- DTO-er (Data Transfer Objects) ----------
 public record RegisterRequest(string Username, string Email, string FullName, string Password);
 public record LoginRequest(string Username, string Password);
-public record AuthResponse(string Token, string FullName, string Username, bool IsAdmin);
+public record AuthResponse(string FullName, string Username, bool IsAdmin);
 // Enkel DTO for oppdatering av bruker
 public record UpdateUserRequest(string? FullName, string? Password, string? CurrentPassword);

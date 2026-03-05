@@ -21,7 +21,7 @@ const API_BASE = (
 const ProfilePage = () => {
   // Tilbake-knapp funksjon
   const handleBack = () => window.history.back();
-  const { user, logout } = useAuth();
+  const { user, logout, authFetch } = useAuth();
 
   const [fullName, setFullName] = useState(user?.fullName || "");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -66,11 +66,10 @@ const ProfilePage = () => {
       }
     }
     try {
-      const res = await fetch(`${API_BASE}/api/user`, {
+      const res = await authFetch(`${API_BASE}/api/user`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`,
         },
         body: JSON.stringify({
           fullName,
@@ -96,11 +95,10 @@ const ProfilePage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API_BASE}/api/user`, {
+      const res = await authFetch(`${API_BASE}/api/user`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`,
         },
       });
       if (!res.ok) throw new Error("Kunne ikke slette bruker.");

@@ -12,4 +12,8 @@ public class User : IdentityUser
   // For reset password
   public string? ResetPasswordToken { get; set; }
   public DateTime? ResetPasswordTokenExpires { get; set; }
+
+  // For token refresh/revokering
+  public string? RefreshToken { get; set; }
+  public DateTime? RefreshTokenExpires { get; set; }
 }
