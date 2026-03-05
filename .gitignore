@@ -30,6 +30,5 @@ appsettings.Production.json
 appsettings.Staging.json
 appsettings.json
 
-
 bin
 obj
