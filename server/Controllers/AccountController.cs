@@ -1,5 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ApplicationTracker.Api.Data;
 using ApplicationTracker.Api.Models;
@@ -8,9 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Security.Cryptography;
 using System.ComponentModel.DataAnnotations;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
 
 namespace ApplicationTracker.Api.Controllers
 {
@@ -117,26 +118,26 @@ namespace ApplicationTracker.Api.Controllers
     }
 
     /// <summary>
-    /// Sender e-post via Gmail SMTP. Krever env-variabler:
-    /// SMTP_EMAIL = din gmail-adresse (f.eks. minesoknader@gmail.com)
-    /// SMTP_PASSWORD = Google App Password (16 tegn, uten mellomrom)
+    /// Sender e-post via Resend HTTP API. Krever env-variabel:
+    /// RESEND_API_KEY = din Resend API-nøkkel (re_...)
+    /// RESEND_FROM = avsender-e-post (f.eks. noreply@minesoknader.no)
     /// </summary>
+    private static readonly HttpClient _httpClient = new();
+
     private static async Task SendResetEmail(string toEmail, string resetLink)
     {
-      var smtpEmail = Environment.GetEnvironmentVariable("SMTP_EMAIL") ?? "minesoknader@gmail.com";
-      var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD")
-          ?? throw new InvalidOperationException("SMTP_PASSWORD env variable is not set.");
+      var apiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY")
+          ?? throw new InvalidOperationException("RESEND_API_KEY env variable is not set.");
+      var fromEmail = Environment.GetEnvironmentVariable("RESEND_FROM") ?? "Mine Søknader <onboarding@resend.dev>";
 
-      Console.WriteLine($"[EMAIL DEBUG] Sending to: {toEmail}, from: {smtpEmail}");
+      Console.WriteLine($"[EMAIL DEBUG] Sending to: {toEmail}, from: {fromEmail}");
 
-      var message = new MimeMessage();
-      message.From.Add(new MailboxAddress("Mine Søknader", smtpEmail));
-      message.To.Add(MailboxAddress.Parse(toEmail));
-      message.Subject = "Tilbakestill passord – Mine Søknader";
-
-      message.Body = new TextPart("html")
+      var payload = new
       {
-        Text = $@"
+        from = fromEmail,
+        to = new[] { toEmail },
+        subject = "Tilbakestill passord – Mine Søknader",
+        html = $@"
         <div style='font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;'>
           <h2 style='color: #0f172a;'>Tilbakestill passord</h2>
           <p>Du har bedt om å tilbakestille passordet ditt. Klikk på knappen under:</p>
@@ -149,13 +150,18 @@ namespace ApplicationTracker.Api.Controllers
         </div>"
       };
 
-      using var smtp = new SmtpClient();
-      smtp.Timeout = 30000;
-      // Port 465 med direkte SSL — noen PaaS-leverandører blokkerer 587/StartTls
-      await smtp.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-      await smtp.AuthenticateAsync(smtpEmail, smtpPassword);
-      await smtp.SendAsync(message);
-      await smtp.DisconnectAsync(true);
+      var json = JsonSerializer.Serialize(payload);
+      using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails");
+      request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+      request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+      var response = await _httpClient.SendAsync(request);
+      var body = await response.Content.ReadAsStringAsync();
+
+      if (!response.IsSuccessStatusCode)
+        throw new Exception($"Resend API feilet ({response.StatusCode}): {body}");
+
+      Console.WriteLine($"[EMAIL] Resend response: {body}");
     }
   }
 
