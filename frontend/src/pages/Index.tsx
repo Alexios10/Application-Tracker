@@ -104,6 +104,8 @@ const Index = () => {
   const totalSent = applications.length;
   const rejected = applications.filter((a) => a.status === "Avslag").length;
   const pending = applications.filter((a) => a.status === "Sendt").length;
+  const interview = applications.filter((a) => a.status === "Intervju").length;
+  const offer = applications.filter((a) => a.status === "Tilbud").length;
   const ghosted = applications.filter((a) => a.status === "Ghosted").length;
 
   // Legg til ny søknad - sender hele objektet uten id (backend genererer id) og legger til i state ved suksess
@@ -220,6 +222,8 @@ const Index = () => {
                 total={totalSent}
                 rejected={rejected}
                 pending={pending}
+                interview={interview}
+                offer={offer}
                 ghosted={ghosted}
                 selectedCard={
                   statusFilter === "all"
@@ -228,9 +232,13 @@ const Index = () => {
                       ? "rejected"
                       : statusFilter === "Sendt"
                         ? "pending"
-                        : statusFilter === "Ghosted"
-                          ? "ghosted"
-                          : "total"
+                        : statusFilter === "Intervju"
+                          ? "interview"
+                          : statusFilter === "Tilbud"
+                            ? "offer"
+                            : statusFilter === "Ghosted"
+                              ? "ghosted"
+                              : "total"
                 }
                 onCardClick={(card) => {
                   if (card === "total") {
@@ -239,6 +247,10 @@ const Index = () => {
                     setStatusFilter("Avslag");
                   } else if (card === "pending") {
                     setStatusFilter("Sendt");
+                  } else if (card === "interview") {
+                    setStatusFilter("Intervju");
+                  } else if (card === "offer") {
+                    setStatusFilter("Tilbud");
                   } else if (card === "ghosted") {
                     setStatusFilter("Ghosted");
                   }
