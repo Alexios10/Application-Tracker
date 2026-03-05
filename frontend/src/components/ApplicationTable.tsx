@@ -65,7 +65,7 @@ const ApplicationTable = ({
 
   // Track screen size to distinguish mobile vs desktop
   useEffect(() => {
-    const mql = window.matchMedia("(max-width: 639px)");
+    const mql = window.matchMedia("(max-width: 799px)");
     const onChange = () => setIsMobile(mql.matches);
     onChange();
     mql.addEventListener("change", onChange);
@@ -120,7 +120,7 @@ const ApplicationTable = ({
         }}
       />
       {/* Mobile card layout */}
-      <div className="flex flex-col divide-y divide-slate-800/80 sm:hidden">
+      <div className="flex flex-col divide-y divide-slate-800/80 min-[800px]:hidden">
         {applications.map((app, index) => (
           <div
             key={app.id}
@@ -233,7 +233,7 @@ const ApplicationTable = ({
       </div>
 
       {/* Desktop table layout */}
-      <div className="hidden sm:block w-full overflow-x-auto">
+      <div className="hidden min-[800px]:block w-full overflow-x-auto">
         <Table className="min-w-[700px] w-full table-fixed">
           <TableHeader>
             <TableRow className="bg-slate-900/80 hover:bg-slate-900/80">
