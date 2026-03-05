@@ -158,11 +158,17 @@ const ProfilePage = () => {
                 </label>
                 <input
                   className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="••••••••"
                 />
+                <span
+                  className="text-slate-50 absolute right-3 cursor-pointer"
+                  onClick={showPasswordToggle}
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </span>
               </div>
               <div>
                 <label className="block text-sm mb-1 text-slate-200">
