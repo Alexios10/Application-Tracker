@@ -47,7 +47,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-6 rounded-3xl shadow-[0_18px_60px_rgba(15,23,42,0.9)]">
+      <DialogContent
+        hideClose
+        className="border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-6 rounded-3xl shadow-[0_18px_60px_rgba(15,23,42,0.9)]"
+      >
         {success ? (
           <div className="text-green-400 font-medium text-center py-6">
             Takk for tilbakemeldingen!
