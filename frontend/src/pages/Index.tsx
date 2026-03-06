@@ -272,7 +272,7 @@ const Index = () => {
                   {filtered.length} synlig nå
                 </span>
               </div>
-              <div className="relative">
+              <div className="relative flex items-center gap-2">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                 <Input
                   placeholder="Søk etter bedrift eller stilling..."
@@ -280,6 +280,15 @@ const Index = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   className="border-slate-700/80 bg-slate-900/70 pl-9 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
                 />
+                {/* vi vil vise X bare når noen starter å skrive */}
+                {search && (
+                  <button
+                    className="text-slate-500 hover:text-slate-300 absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                    onClick={() => setSearch("")}
+                  >
+                    X
+                  </button>
+                )}
               </div>
             </div>
             <div className="flex flex-col items-center sm:items-start gap-2 w-full">
