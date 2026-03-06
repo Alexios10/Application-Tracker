@@ -280,7 +280,6 @@ const Index = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   className="border-slate-700/80 bg-slate-900/70 pl-9 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
                 />
-                {/* vi vil vise X bare når noen starter å skrive */}
                 {search && (
                   <button
                     className="text-slate-500 hover:text-slate-300 absolute right-3 top-1/2 -translate-y-1/2 text-sm"
