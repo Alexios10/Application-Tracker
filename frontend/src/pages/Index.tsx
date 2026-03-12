@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Briefcase, Search } from "lucide-react";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { ReportModal } from "@/components/ReportModal";
+import { motion } from "motion/react";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
@@ -173,11 +174,26 @@ const Index = () => {
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
       <div className="mx-auto flex min-h-screen flex-col px-4 py-8 sm:px-6 lg:px-10 xl:px-16">
         {/* Header */}
-        <header className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between"
+        >
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 15,
+                delay: 0.2,
+              }}
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40"
+            >
               <Briefcase className="h-5 w-5 text-slate-950" />
-            </div>
+            </motion.div>
 
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300/80">
@@ -212,11 +228,16 @@ const Index = () => {
             )}
             <ProfileMenu />
           </div>
-        </header>
+        </motion.header>
 
         <main className="grid flex-1 gap-6 min-[1120px]:grid-cols-[minmax(0,1fr)_minmax(0,2.8fr)]">
           {/* Venstre seksjon */}
-          <section className="space-y-6">
+          <motion.section
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="space-y-6"
+          >
             <div className="overflow-hidden rounded-3xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-5 shadow-[0_18px_60px_rgba(15,23,42,0.9)]">
               <StatsCards
                 total={totalSent}
@@ -302,10 +323,15 @@ const Index = () => {
                 Rapporter feil/ønske
               </Button>
             </div>
-          </section>
+          </motion.section>
 
           {/* Høyre seksjon */}
-          <section className="flex w-full min-w-0 flex-col overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950/85 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.9)] sm:p-5">
+          <motion.section
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex w-full min-w-0 flex-col overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950/85 p-4 shadow-[0_18px_60px_rgba(15,23,42,0.9)] sm:p-5"
+          >
             <div className="mb-3 flex items-center justify-between gap-2">
               <div>
                 <h2 className="text-sm font-medium text-slate-100">
@@ -324,7 +350,7 @@ const Index = () => {
                 onEdit={handleEditApplication}
               />
             </div>
-          </section>
+          </motion.section>
         </main>
 
         <ReportModal open={reportOpen} onClose={() => setReportOpen(false)} />

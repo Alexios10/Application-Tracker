@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Briefcase, Shield } from "lucide-react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Dialog,
   DialogContent,
@@ -60,12 +61,32 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4">
-      <div className="w-full max-w-md space-y-8">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md space-y-8"
+      >
         {/* Logo/Header */}
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-center"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 200,
+              damping: 15,
+              delay: 0.2,
+            }}
+            className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40"
+          >
             <Briefcase className="h-7 w-7 text-slate-950" />
-          </div>
+          </motion.div>
           <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-50">
             Jobbsøknad Tracker
           </h1>
@@ -74,10 +95,13 @@ const LoginPage = () => {
               ? "Opprett en ny konto for å komme i gang"
               : "Logg inn for å se søknadene dine"}
           </p>
-        </div>
+        </motion.div>
 
         {/* Skjema */}
-        <form
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           onSubmit={handleSubmit}
           className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur"
         >
@@ -89,40 +113,48 @@ const LoginPage = () => {
           )}
 
           {/* Registrerings-felter */}
-          {isRegister && (
-            <>
-              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-                NB: Veldig viktig at du registrerer riktig e-postadresse
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-slate-300">
-                  Fullt navn
-                </Label>
-                <Input
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Ola Nordmann"
-                  required
-                  className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-300">
-                  E-post
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ola@eksempel.no"
-                  required
-                  className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                />
-              </div>
-            </>
-          )}
+          <AnimatePresence>
+            {isRegister && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-5 overflow-hidden"
+              >
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+                  NB: Veldig viktig at du registrerer riktig e-postadresse
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName" className="text-slate-300">
+                    Fullt navn
+                  </Label>
+                  <Input
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Ola Nordmann"
+                    required
+                    className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-slate-300">
+                    E-post
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ola@eksempel.no"
+                    required
+                    className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Brukernavn */}
           <div className="space-y-2">
@@ -205,81 +237,89 @@ const LoginPage = () => {
               {isRegister ? "Logg inn" : "Registrer deg"}
             </button>
           </p>
-        </form>
+        </motion.form>
 
         {/* Personvern */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <button className="mx-auto flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-300">
-              <Shield className="h-3.5 w-3.5" />
-              Personvern og rettigheter
-            </button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[85vh] overflow-y-auto border-slate-700/60 bg-slate-900 text-slate-200 sm:max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-semibold text-slate-50">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="mx-auto flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-300">
+                <Shield className="h-3.5 w-3.5" />
                 Personvern og rettigheter
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 text-sm leading-relaxed text-slate-300">
-              <section>
-                <h3 className="mb-1 font-semibold text-slate-100">
-                  Datainnsamling
-                </h3>
-                <p>
-                  Vi lagrer kun informasjon du oppgir ved registrering
-                  (brukernavn, e-postadresse og fullt navn) samt jobbsøknadene
-                  du registrerer. Vi samler ikke inn data fra tredjeparter.
-                </p>
-              </section>
-              <section>
-                <h3 className="mb-1 font-semibold text-slate-100">
-                  Bruk av data
-                </h3>
-                <p>
-                  Dataene brukes utelukkende for å gi deg oversikt over dine
-                  jobbsøknader. Vi selger eller deler aldri dine opplysninger
-                  med andre.
-                </p>
-              </section>
-              <section>
-                <h3 className="mb-1 font-semibold text-slate-100">
-                  Lagring og sikkerhet
-                </h3>
-                <p>
-                  Passord lagres kryptert. All kommunikasjon mellom nettleseren
-                  din og serveren skjer over HTTPS.
-                </p>
-              </section>
-              <section>
-                <h3 className="mb-1 font-semibold text-slate-100">
-                  Dine rettigheter
-                </h3>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>
-                    Du kan når som helst be om innsyn i dataene vi lagrer om
-                    deg.
-                  </li>
-                  <li>Du kan be om at dataene dine blir slettet.</li>
-                  <li>Du kan oppdatere eller korrigere opplysningene dine.</li>
-                </ul>
-              </section>
-              <section>
-                <h3 className="mb-1 font-semibold text-slate-100">Kontakt</h3>
-                <p>
-                  Har du spørsmål om personvern? Ta kontakt på{" "}
-                  <a
-                    href="mailto:sattar_saud@hotmail.com"
-                    className="text-sky-400 hover:text-sky-300 transition-colors"
-                  >
-                    sattar_saud@hotmail.com
-                  </a>
-                </p>
-              </section>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[85vh] overflow-y-auto border-slate-700/60 bg-slate-900 text-slate-200 sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold text-slate-50">
+                  Personvern og rettigheter
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 text-sm leading-relaxed text-slate-300">
+                <section>
+                  <h3 className="mb-1 font-semibold text-slate-100">
+                    Datainnsamling
+                  </h3>
+                  <p>
+                    Vi lagrer kun informasjon du oppgir ved registrering
+                    (brukernavn, e-postadresse og fullt navn) samt jobbsøknadene
+                    du registrerer. Vi samler ikke inn data fra tredjeparter.
+                  </p>
+                </section>
+                <section>
+                  <h3 className="mb-1 font-semibold text-slate-100">
+                    Bruk av data
+                  </h3>
+                  <p>
+                    Dataene brukes utelukkende for å gi deg oversikt over dine
+                    jobbsøknader. Vi selger eller deler aldri dine opplysninger
+                    med andre.
+                  </p>
+                </section>
+                <section>
+                  <h3 className="mb-1 font-semibold text-slate-100">
+                    Lagring og sikkerhet
+                  </h3>
+                  <p>
+                    Passord lagres kryptert. All kommunikasjon mellom
+                    nettleseren din og serveren skjer over HTTPS.
+                  </p>
+                </section>
+                <section>
+                  <h3 className="mb-1 font-semibold text-slate-100">
+                    Dine rettigheter
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>
+                      Du kan når som helst be om innsyn i dataene vi lagrer om
+                      deg.
+                    </li>
+                    <li>Du kan be om at dataene dine blir slettet.</li>
+                    <li>
+                      Du kan oppdatere eller korrigere opplysningene dine.
+                    </li>
+                  </ul>
+                </section>
+                <section>
+                  <h3 className="mb-1 font-semibold text-slate-100">Kontakt</h3>
+                  <p>
+                    Har du spørsmål om personvern? Ta kontakt på{" "}
+                    <a
+                      href="mailto:sattar_saud@hotmail.com"
+                      className="text-sky-400 hover:text-sky-300 transition-colors"
+                    >
+                      sattar_saud@hotmail.com
+                    </a>
+                  </p>
+                </section>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };
