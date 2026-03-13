@@ -63,7 +63,7 @@ const ApplicationTable = ({
   const editRef = useRef<HTMLDivElement>(null);
   const editRefMobile = useRef<HTMLDivElement>(null);
 
-  // Track screen size to distinguish mobile vs desktop
+  // Sjekker om vi er på mobil for å tilpasse dropdown-opplevelsen
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 799px)");
     const onChange = () => setIsMobile(mql.matches);
@@ -72,7 +72,7 @@ const ApplicationTable = ({
     return () => mql.removeEventListener("change", onChange);
   }, []);
 
-  // Auto-open the Select dropdown when editingId changes (all screen sizes)
+  // Auto-åpne dropdown når man klikker på status, og auto-lukk når man klikker på en status eller utenfor
   useEffect(() => {
     if (editingId !== null) {
       const timer = setTimeout(() => setSelectOpen(true), 50);
@@ -85,6 +85,7 @@ const ApplicationTable = ({
   // Lukk status dropdown når man klikker utenfor
   useEffect(() => {
     if (!editingId) return;
+
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;

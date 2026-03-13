@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,12 +26,26 @@ const ProfilePage = () => {
   const [fullName, setFullName] = useState(user?.fullName || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
+  const [hasChanges, setHasChanges] = useState(false);
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+
+  // Se om det er noen endringer i formfeltene sammenlignet med brukerdataen
+  useEffect(() => {
+    if (!user) {
+      setHasChanges(false);
+      return;
+    }
+    const nameChanged = fullName.trim() !== user.fullName;
+    const passwordChanged = password.trim() !== "";
+    const currentPasswordChanged = currentPassword.trim() !== "";
+    setHasChanges(nameChanged || passwordChanged || currentPasswordChanged);
+  }, [fullName, password, currentPassword, user]);
 
   function showNewPasswordToggle() {
     setShowNewPassword(!showNewPassword);
@@ -166,7 +180,6 @@ const ProfilePage = () => {
                     type={showCurrentPassword ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="••••••••"
                   />
                   <span
                     className="text-slate-50 absolute right-3 cursor-pointer"
@@ -186,7 +199,6 @@ const ProfilePage = () => {
                     type={showNewPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
                   />
                   <span
                     className="text-slate-50 absolute right-3 cursor-pointer"
@@ -206,15 +218,17 @@ const ProfilePage = () => {
                   {error}
                 </div>
               )}
+
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !hasChanges}
                 className="w-full bg-sky-900 text-sky-200 hover:bg-sky-700"
               >
                 {loading ? "Lagrer..." : "Lagre endringer"}
               </Button>
             </form>
             <hr className="my-6 border-slate-700" />
+
             {/* Delete user confirmation modal */}
             <AlertDialog
               open={deleteDialogOpen}

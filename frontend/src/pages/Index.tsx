@@ -128,8 +128,9 @@ const Index = () => {
     }
   };
 
-  // Oppdater status på en søknad - finner eksisterende søknad, oppdaterer status, sender PUT til backend og oppdaterer state ved suksess
+  // Oppdater status på en søknad
   const handleUpdateStatus = async (id: number, status: ApplicationStatus) => {
+    // Finn eksisterende søknad for å beholde andre felt uendret når vi oppdaterer status
     const existing = applications.find((a) => a.id === id);
     if (!existing) return;
 
@@ -153,7 +154,7 @@ const Index = () => {
     }
   };
 
-  // Slett en søknad - sender DELETE til backend og oppdaterer state ved suksess
+  // Slett en søknad
   const handleDelete = async (id: number) => {
     try {
       const res = await authFetch(`${API_BASE}/api/applications/${id}`, {
