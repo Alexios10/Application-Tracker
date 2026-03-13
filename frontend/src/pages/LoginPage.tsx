@@ -54,7 +54,16 @@ const LoginPage = () => {
     if (result) {
       setError(result);
     } else {
-      navigate("/");
+      if (isRegister) {
+        // Bytt tilbake til login etter registrering
+        setIsRegister(false);
+        setFullName("");
+        setEmail("");
+        setPassword("");
+        navigate(`/login?username=${encodeURIComponent(username)}`);
+      } else {
+        navigate("/");
+      }
     }
     setLoading(false);
   };
