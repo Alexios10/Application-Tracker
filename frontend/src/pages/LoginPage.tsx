@@ -165,7 +165,7 @@ const LoginPage = () => {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="brukernavn"
+              placeholder={isRegister ? "Brukernavn" : ""}
               required
               className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
             />
@@ -182,7 +182,7 @@ const LoginPage = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minst 6 tegn, inkl. et tall"
+                placeholder={isRegister ? "Minst 6 tegn, inkl. et tall" : ""}
                 required
                 minLength={6}
                 className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
