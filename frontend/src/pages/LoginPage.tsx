@@ -120,7 +120,7 @@ const LoginPage = () => {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-5 overflow-hidden"
+                className="space-y-5"
               >
                 <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
                   NB: Veldig viktig at du registrerer riktig e-postadresse
