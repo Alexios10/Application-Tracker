@@ -163,11 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return data.error || "Registrering feilet.";
       }
 
-      setUser({
-        fullName: data.fullName,
-        username: data.username,
-        isAdmin: data.isAdmin ?? false,
-      });
+      // Do not log in user after registration
       return null;
     } catch {
       return "Kunne ikke koble til serveren.";
