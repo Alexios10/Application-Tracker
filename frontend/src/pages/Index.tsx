@@ -304,7 +304,7 @@ const Index = () => {
                 />
                 {search && (
                   <button
-                    className="text-slate-500 hover:text-slate-300 absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                    className="rounded-full w-8 h-8 hover:bg-slate-600 hover:text-slate-300 absolute right-3 top-1/2 -translate-y-1/2 text-sm transition-all"
                     onClick={() => setSearch("")}
                   >
                     X
