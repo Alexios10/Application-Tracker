@@ -23,7 +23,7 @@ const ProfilePage = () => {
   const handleBack = () => window.history.back();
   const { user, logout, authFetch } = useAuth();
 
-  const [fullName, setFullName] = useState(user?.fullName || "");
+  const [fullName, setFullName] = useState(user?.username || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
@@ -41,11 +41,11 @@ const ProfilePage = () => {
       setHasChanges(false);
       return;
     }
-    const nameChanged = fullName.trim() !== user.fullName;
+    const usernameChanged = fullName.trim() !== user.username;
     const passwordChanged = password.trim() !== "";
-    const currentPasswordChanged = currentPassword.trim() !== "";
-    setHasChanges(nameChanged || passwordChanged || currentPasswordChanged);
-  }, [fullName, password, currentPassword, user]);
+    // Endringsknappen skal kun være aktiv hvis brukernavn eller nytt passord faktisk er endret
+    setHasChanges(usernameChanged || passwordChanged);
+  }, [fullName, password, user]);
 
   function showNewPasswordToggle() {
     setShowNewPassword(!showNewPassword);
@@ -60,10 +60,25 @@ const ProfilePage = () => {
     setLoading(true);
     setMessage("");
     setError("");
-    // Passordvalidering
-    if (password) {
+
+    // Sjekk om det faktisk er en endring
+    const usernameChanged = fullName.trim() !== user?.username;
+    const passwordChanged = password.trim() !== "";
+    if (!usernameChanged && !passwordChanged) {
+      setError("Ingen endring å lagre.");
+      setLoading(false);
+      return;
+    }
+
+    // Passordvalidering hvis nytt passord
+    if (passwordChanged) {
       if (!currentPassword) {
         setError("Du må skrive inn nåværende passord for å endre passord.");
+        setLoading(false);
+        return;
+      }
+      if (password === currentPassword) {
+        setError("Det nye passordet kan ikke være likt det gamle passordet.");
         setLoading(false);
         return;
       }
@@ -79,6 +94,7 @@ const ProfilePage = () => {
         return;
       }
     }
+
     try {
       const res = await authFetch(`${API_BASE}/api/user`, {
         method: "PUT",
@@ -86,9 +102,9 @@ const ProfilePage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fullName,
-          password: password || undefined,
-          currentPassword: currentPassword || undefined,
+          username: usernameChanged ? fullName : undefined,
+          password: passwordChanged ? password : undefined,
+          currentPassword: passwordChanged ? currentPassword : undefined,
         }),
       });
       if (!res.ok) {
@@ -161,7 +177,7 @@ const ProfilePage = () => {
             <form onSubmit={handleUpdate} className="space-y-6">
               <div>
                 <label className="block text-sm mb-1 text-slate-200">
-                  Fullt navn
+                  Brukernavn
                 </label>
                 <input
                   className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
