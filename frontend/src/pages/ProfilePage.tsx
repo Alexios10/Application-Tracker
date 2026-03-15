@@ -41,10 +41,10 @@ const ProfilePage = () => {
       setHasChanges(false);
       return;
     }
-    const usernameChanged = fullName.trim() !== user.username;
+    const fullNameChanged = fullName.trim() !== user.fullName;
     const passwordChanged = password.trim() !== "";
-    // Endringsknappen skal kun være aktiv hvis brukernavn eller nytt passord faktisk er endret
-    setHasChanges(usernameChanged || passwordChanged);
+    // Endringsknappen skal kun være aktiv hvis fullName eller nytt passord faktisk er endret
+    setHasChanges(fullNameChanged || passwordChanged);
   }, [fullName, password, user]);
 
   function showNewPasswordToggle() {
@@ -62,9 +62,9 @@ const ProfilePage = () => {
     setError("");
 
     // Sjekk om det faktisk er en endring
-    const usernameChanged = fullName.trim() !== user?.username;
+    const fullNameChanged = fullName.trim() !== user?.fullName;
     const passwordChanged = password.trim() !== "";
-    if (!usernameChanged && !passwordChanged) {
+    if (!fullNameChanged && !passwordChanged) {
       setError("Ingen endring å lagre.");
       setLoading(false);
       return;
@@ -102,7 +102,7 @@ const ProfilePage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: usernameChanged ? fullName : undefined,
+          fullName,
           password: passwordChanged ? password : undefined,
           currentPassword: passwordChanged ? currentPassword : undefined,
         }),
