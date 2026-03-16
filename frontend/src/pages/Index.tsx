@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Application, ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
 import StatsCards from "@/components/StatsCards";
-import ApplicationTable from "@/components/ApplicationTable";
+import ApplicationTable from "@/components/application-table/ApplicationTable";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
