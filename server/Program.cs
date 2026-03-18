@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
+using ApplicationTracker.Api.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -511,10 +512,3 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
-
-// ---------- DTO-er (Data Transfer Objects) ----------
-public record RegisterRequest(string Username, string Email, string FullName, string Password);
-public record LoginRequest(string Username, string Password);
-public record AuthResponse(string FullName, string Username, bool IsAdmin);
-// Enkel DTO for oppdatering av bruker
-public record UpdateUserRequest(string? FullName, string? Password, string? CurrentPassword);
