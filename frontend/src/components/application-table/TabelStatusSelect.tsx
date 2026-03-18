@@ -30,14 +30,14 @@ export const StatusSelect = ({
   onOpenChange,
   onValueChange,
 }: StatusSelectProps) => (
-  <div ref={refProp} className="flex h-8 w-full items-center">
+  <div ref={refProp} className="flex h-8 w-fit items-center">
     <Select
       open={open}
       onOpenChange={onOpenChange}
       value={status}
       onValueChange={(v) => onValueChange(v as ApplicationStatus)}
     >
-      <SelectTrigger className="h-7 w-full text-xs border-slate-700 bg-slate-900 text-slate-100">
+      <SelectTrigger className="h-7 w-fit text-xs border-slate-700 bg-slate-900 text-slate-100">
         <SelectValue />
       </SelectTrigger>
       <SelectContent className="status-select-dropdown border-slate-700 bg-slate-900 text-slate-100">

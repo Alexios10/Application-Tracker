@@ -88,7 +88,7 @@ const ApplicationTable = ({
         {applications.map((app, index) => (
           <div
             key={app.id}
-            className="group flex flex-col gap-2 px-4 py-4 bg-slate-900/60 rounded-xl m-2 shadow-md transition-colors hover:bg-slate-900/80"
+            className="group flex flex-col gap-2 px-4 py-4 bg-slate-900/60 rounded-xl m-2 shadow-md transition-colors hover:bg-slate-900/80 relative"
           >
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="min-w-0 flex-1">
@@ -123,25 +123,38 @@ const ApplicationTable = ({
               <span className="shrink-0 text-slate-500">·</span>
               <span className="shrink-0">{app.dateSent}</span>
               <span className="shrink-0">·</span>
-              {editingId === app.id ? (
-                <StatusSelect
-                  refProp={editRefMobile}
-                  open={isMobile && selectOpen}
-                  status={app.status}
-                  onOpenChange={(open) => {
-                    setSelectOpen(open);
-                    if (!open) setEditingId(null);
-                  }}
-                  onValueChange={(v) => handleStatusChange(app.id, v)}
-                />
-              ) : (
-                <button
-                  onClick={() => setEditingId(app.id)}
-                  className="cursor-pointer"
-                >
-                  <StatusBadge status={app.status} />
-                </button>
-              )}
+              <div style={{ minHeight: "2rem", position: "relative" }}>
+                {editingId === app.id ? (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: 0,
+                      zIndex: 10,
+                      width: "100%",
+                    }}
+                  >
+                    <StatusSelect
+                      refProp={editRefMobile}
+                      open={isMobile && selectOpen}
+                      status={app.status}
+                      onOpenChange={(open) => {
+                        setSelectOpen(open);
+                        if (!open) setEditingId(null);
+                      }}
+                      onValueChange={(v) => handleStatusChange(app.id, v)}
+                    />
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setEditingId(app.id)}
+                    className="cursor-pointer"
+                    style={{ minHeight: "2rem", width: "100%" }}
+                  >
+                    <StatusBadge status={app.status} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -208,12 +221,16 @@ const ApplicationTable = ({
                       onValueChange={(v) => handleStatusChange(app.id, v)}
                     />
                   ) : (
-                    <button
+                    <div
                       onClick={() => setEditingId(app.id)}
-                      className="flex h-8 w-full cursor-pointer items-center justify-start"
+                      className="flex h-8 w-fit items-center justify-start select-none transition-colors cursor-pointer rounded-lg px-2"
+                      style={{ minHeight: "2rem" }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label="Endre status"
                     >
                       <StatusBadge status={app.status} />
-                    </button>
+                    </div>
                   )}
                 </TableCell>
 
