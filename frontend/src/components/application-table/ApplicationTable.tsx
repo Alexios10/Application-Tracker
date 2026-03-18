@@ -95,7 +95,10 @@ const ApplicationTable = ({
                 <span className="text-xs text-slate-500 mr-2">
                   #{index + 1}
                 </span>
-                <span className="text-base font-semibold text-slate-100">
+                <span
+                  className="text-base font-semibold text-slate-100 truncate min-w-0 max-w-[100px] inline-block align-bottom"
+                  title={app.company}
+                >
                   {app.company}
                 </span>
               </div>
@@ -118,42 +121,61 @@ const ApplicationTable = ({
                 />
               </div>
             </div>
+
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mb-2">
-              <span className="truncate max-w-[120px]">{app.position}</span>
-              <span className="shrink-0 text-slate-500">·</span>
-              <span className="shrink-0">{app.dateSent}</span>
-              <span className="shrink-0">·</span>
-              <div style={{ minHeight: "2rem", position: "relative" }}>
-                {editingId === app.id ? (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 0,
-                      zIndex: 10,
-                      width: "100%",
-                    }}
-                  >
-                    <StatusSelect
-                      refProp={editRefMobile}
-                      open={isMobile && selectOpen}
-                      status={app.status}
-                      onOpenChange={(open) => {
-                        setSelectOpen(open);
-                        if (!open) setEditingId(null);
+              <div className="flex flex-nowrap items-center gap-3">
+                <span className="truncate max-w-[40px] flex-shrink min-w-0">
+                  {app.position}
+                </span>
+                <span className="shrink-0 text-slate-500">·</span>
+                <span className="shrink-0">{app.dateSent}</span>
+                <span className="shrink-0">·</span>
+                <div
+                  style={{
+                    minHeight: "2rem",
+                    position: "relative",
+                    flexShrink: 0,
+                    width: "fit-content",
+                  }}
+                >
+                  {editingId === app.id ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        zIndex: 10,
+                        width: "100%",
+                        minWidth: "80px",
+                        maxWidth: "120px",
                       }}
-                      onValueChange={(v) => handleStatusChange(app.id, v)}
-                    />
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setEditingId(app.id)}
-                    className="cursor-pointer"
-                    style={{ minHeight: "2rem", width: "100%" }}
-                  >
-                    <StatusBadge status={app.status} />
-                  </button>
-                )}
+                    >
+                      <StatusSelect
+                        refProp={editRefMobile}
+                        open={isMobile && selectOpen}
+                        status={app.status}
+                        onOpenChange={(open) => {
+                          setSelectOpen(open);
+                          if (!open) setEditingId(null);
+                        }}
+                        onValueChange={(v) => handleStatusChange(app.id, v)}
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setEditingId(app.id)}
+                      className="cursor-pointer"
+                      style={{
+                        minHeight: "2rem",
+                        minWidth: "80px",
+                        maxWidth: "120px",
+                        width: "100%",
+                      }}
+                    >
+                      <StatusBadge status={app.status} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
