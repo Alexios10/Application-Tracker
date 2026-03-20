@@ -52,20 +52,23 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-950 font-semibold shadow-lg shadow-emerald-500/20 hover:from-sky-400 hover:to-emerald-300">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 px-5 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-cyan-500/20 hover:opacity-90 transition-opacity">
+          <Plus className="h-4 w-4" />
           Legg til søknad
         </Button>
       </DialogTrigger>
-      <DialogContent className="border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-6 rounded-3xl shadow-xl sm:max-w-md">
+      <DialogContent className="border border-slate-800/70 bg-[#10121a] p-6 rounded-2xl shadow-2xl sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-slate-100 text-lg font-semibold">
             Ny søknad
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-2">
-            <Label htmlFor="company" className="text-slate-300 text-sm">
+            <Label
+              htmlFor="company"
+              className="text-slate-400 text-xs font-semibold uppercase tracking-wider"
+            >
               Bedrift
             </Label>
             <Input
@@ -75,11 +78,14 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
               placeholder="Bedriftsnavn"
               required
               maxLength={200}
-              className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 placeholder:text-slate-500 focus-visible:ring-sky-400"
+              className="rounded-lg border border-slate-700/80 bg-slate-900/80 text-slate-100 placeholder:text-slate-500 focus-visible:ring-cyan-500"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="position" className="text-slate-300 text-sm">
+            <Label
+              htmlFor="position"
+              className="text-slate-400 text-xs font-semibold uppercase tracking-wider"
+            >
               Stilling
             </Label>
             <Input
@@ -89,11 +95,14 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
               placeholder="Stillingstittel"
               required
               maxLength={200}
-              className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 placeholder:text-slate-500 focus-visible:ring-sky-400"
+              className="rounded-lg border border-slate-700/80 bg-slate-900/80 text-slate-100 placeholder:text-slate-500 focus-visible:ring-cyan-500"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="date" className="text-slate-300 text-sm">
+            <Label
+              htmlFor="date"
+              className="text-slate-400 text-xs font-semibold uppercase tracking-wider"
+            >
               Dato sendt
             </Label>
             <Input
@@ -103,16 +112,18 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
               placeholder="DD.MM.ÅÅ"
               required
               maxLength={20}
-              className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 placeholder:text-slate-500 focus-visible:ring-sky-400"
+              className="rounded-lg border border-slate-700/80 bg-slate-900/80 text-slate-100 placeholder:text-slate-500 focus-visible:ring-cyan-500"
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-slate-300 text-sm">Status</Label>
+            <Label className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              Status
+            </Label>
             <Select
               value={status}
               onValueChange={(v) => setStatus(v as ApplicationStatus)}
             >
-              <SelectTrigger className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus:ring-sky-400">
+              <SelectTrigger className="rounded-lg border border-slate-700/80 bg-slate-900/80 text-slate-100 focus:ring-cyan-500">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="border border-slate-700 bg-slate-900 text-slate-100">
@@ -130,7 +141,7 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
           </div>
           <Button
             type="submit"
-            className="w-full bg-sky-900 text-sky-200 hover:bg-sky-700 font-medium"
+            className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 text-slate-950 font-semibold hover:opacity-90 transition-opacity mt-2"
           >
             Legg til
           </Button>
