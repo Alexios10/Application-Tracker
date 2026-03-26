@@ -1,50 +1,56 @@
 import {
   LayoutDashboard,
-  Trello,
-  Calendar,
-  FileText,
   Settings,
   HelpCircle,
   LogOut,
   BarChart2,
   X,
+  Search,
+  Building2,
+  DollarSign,
+  Star,
+  Pen,
+  List,
 } from "lucide-react";
 import { Application } from "@/types/application";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 
 const NAV_ITEMS = [
   { label: "Oversikt", icon: LayoutDashboard, key: "oversikt" },
-  { label: "Board", icon: Trello, key: "board" },
-  { label: "Planlegger", icon: Calendar, key: "planlegger" },
-  { label: "Dokumenter", icon: FileText, key: "dokumenter" },
-  { label: "Innstillinger", icon: Settings, key: "innstillinger" },
+  { label: "Kommer mer snart", icon: Pen, key: "soknadsrapport" },
+  // { label: "Finn jobber", icon: Search, key: "finn_jobber" },
+  // { label: "Se bedrifter", icon: Building2, key: "se_bedrifter" },
+  // { label: "Lønnssjekk", icon: DollarSign, key: "lonnssjekk" },
+  // { label: "Lagrede jobber", icon: Star, key: "lagrede_jobber" },
+  // { label: "Skriv anmeldelse", icon: Pen, key: "skriv_anmeldelse" },
+  // { label: "Lønnsbidrag", icon: BarChart2, key: "lonnsbidrag" },
+  // { label: "Innstillinger", icon: Settings, key: "innstillinger" },
 ];
 
 interface Props {
   onAdd: (app: Omit<Application, "id">) => void;
   onReport: () => void;
   onLogout: () => void;
-  onClose?: () => void; // only passed when used as a mobile drawer
+  onClose?: () => void; // Valgfri, kun nødvendig for mobilskuffen for å lukke den etter handling
 }
 
 export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
   return (
     <div className="flex h-full flex-col py-6">
-      {/* Brand */}
       <div className="mb-8 flex items-center justify-between px-5">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-teal-500 shadow-lg shadow-cyan-500/30">
-            <BarChart2 className="h-4 w-4 text-slate-950" />
+            <List className="h-4 w-4 text-slate-950" />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-50">Pulse Console</p>
+            <p className="text-sm font-bold text-slate-50">Mine Søknader</p>
             <p className="text-[10px] font-medium uppercase tracking-widest text-slate-500">
-              Career Cockpit
+              Verktøy
             </p>
           </div>
         </div>
 
-        {/* Close button — only visible in drawer */}
+        {/* Lukk knapp — kun synlig i skuffen */}
         {onClose && (
           <button
             onClick={onClose}
@@ -55,7 +61,7 @@ export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
         )}
       </div>
 
-      {/* Nav links */}
+      {/* Nav lenker */}
       <nav className="flex-1 space-y-0.5 px-3">
         {NAV_ITEMS.map((item) => {
           const isActive = item.key === "oversikt";
@@ -86,7 +92,7 @@ export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-medium uppercase tracking-wider text-slate-500 hover:bg-slate-800/60 hover:text-slate-300 transition-colors"
         >
           <HelpCircle className="h-4 w-4 shrink-0" />
-          Hjelpesenter
+          Rapporter problem
         </button>
         <button
           onClick={onLogout}
