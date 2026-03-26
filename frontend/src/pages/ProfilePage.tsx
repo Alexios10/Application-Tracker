@@ -13,21 +13,33 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  ChevronLeft,
+  LogOut,
+  Monitor,
+  Smartphone,
+  Shield,
+  User,
+} from "lucide-react";
+import { Sidebar } from "@/components/Sidebar";
+import { MobileDrawer } from "@/components/MobileDrawer";
+import { Topbar } from "@/components/Topbar";
+import { useApplications } from "@/hooks/useApplications";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
 ).replace(/\/+$/, "");
 
 const ProfilePage = () => {
-  // Tilbake-knapp funksjon
   const handleBack = () => window.history.back();
   const { user, logout, authFetch } = useAuth();
+  const { addApplication } = useApplications();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [fullName, setFullName] = useState(user?.username || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,7 +47,6 @@ const ProfilePage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
-  // Se om det er noen endringer i formfeltene sammenlignet med brukerdataen
   useEffect(() => {
     if (!user) {
       setHasChanges(false);
@@ -43,17 +54,8 @@ const ProfilePage = () => {
     }
     const fullNameChanged = fullName.trim() !== user.fullName;
     const passwordChanged = password.trim() !== "";
-    // Endringsknappen skal kun være aktiv hvis fullName eller nytt passord faktisk er endret
     setHasChanges(fullNameChanged || passwordChanged);
   }, [fullName, password, user]);
-
-  function showNewPasswordToggle() {
-    setShowNewPassword(!showNewPassword);
-  }
-
-  function showCurrentPasswordToggle() {
-    setShowCurrentPassword(!showCurrentPassword);
-  }
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +63,6 @@ const ProfilePage = () => {
     setMessage("");
     setError("");
 
-    // Sjekk om det faktisk er en endring
     const fullNameChanged = fullName.trim() !== user?.fullName;
     const passwordChanged = password.trim() !== "";
     if (!fullNameChanged && !passwordChanged) {
@@ -70,7 +71,6 @@ const ProfilePage = () => {
       return;
     }
 
-    // Passordvalidering hvis nytt passord
     if (passwordChanged) {
       if (!currentPassword) {
         setError("Du må skrive inn nåværende passord for å endre passord.");
@@ -98,9 +98,7 @@ const ProfilePage = () => {
     try {
       const res = await authFetch(`${API_BASE}/api/user`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName,
           password: passwordChanged ? password : undefined,
@@ -127,9 +125,7 @@ const ProfilePage = () => {
     try {
       const res = await authFetch(`${API_BASE}/api/user`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
       if (!res.ok) throw new Error("Kunne ikke slette bruker.");
       logout();
@@ -141,147 +137,179 @@ const ProfilePage = () => {
     }
   };
 
+  const { applications } = useApplications();
+
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
-      <div className="mx-auto flex min-h-screen flex-col px-4 py-8 sm:px-6 lg:px-10 xl:px-16">
-        <header className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40">
-              <span className="font-bold text-slate-950 text-lg">👤</span>
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300/80">
-                Profil
-              </p>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-                Min profil
+    <div className="flex h-screen bg-[#0f1117] text-slate-50 overflow-hidden">
+      {/* ── Sidebar ── */}
+      <aside className="hidden lg:block w-64 shrink-0 border-r border-slate-800/60">
+        <Sidebar onAdd={addApplication} onReport={() => {}} onLogout={logout} />
+      </aside>
+
+      {/* ── Mobile Drawer ── */}
+      <MobileDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onAdd={addApplication}
+        onReport={() => {}}
+        onLogout={logout}
+      />
+
+      {/* ── Main ── */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
+        <main className="flex-1 overflow-y-auto px-6 py-6">
+          <div className="flex flex-col lg:flex-row gap-5 max-w-5xl mx-auto justify-center min-h-[60vh]">
+            {/* Venstre side: Skjema */}
+            <div className="flex-1 rounded-2xl bg-[#181c24] border border-slate-800/60 p-6">
+              <h1 className="text-2xl font-bold mb-6 tracking-tight">
+                Brukerprofil
               </h1>
-              <p className="mt-1 text-sm text-slate-300/80">
-                Oppdater navn eller passord, eller slett brukeren din.
-              </p>
+              <form onSubmit={handleUpdate} className="space-y-5">
+                <div>
+                  <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
+                    Brukernavn
+                  </label>
+                  <div className="relative">
+                    <input
+                      className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                    />
+                    <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
+                      Nåværende passord
+                    </label>
+                    <div className="relative">
+                      <input
+                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 pr-10 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                      />
+                      <span
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors"
+                        onClick={() =>
+                          setShowCurrentPassword(!showCurrentPassword)
+                        }
+                      >
+                        {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
+                      Nytt passord
+                    </label>
+                    <div className="relative">
+                      <input
+                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 pr-10 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                        type={showNewPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <span
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? <FaEye /> : <FaEyeSlash />}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {message && (
+                  <p className="text-green-400 text-sm font-medium text-center">
+                    {message}
+                  </p>
+                )}
+                {error && (
+                  <p className="text-red-400 text-sm font-medium text-center">
+                    {error}
+                  </p>
+                )}
+
+                <div className="flex items-center gap-3 pt-1">
+                  <Button
+                    type="submit"
+                    disabled={loading || !hasChanges}
+                    className="flex-1 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {loading ? "Lagrer..." : "Lagre endringer"}
+                  </Button>
+                  <AlertDialog
+                    open={deleteDialogOpen}
+                    onOpenChange={setDeleteDialogOpen}
+                  >
+                    <AlertDialogTrigger asChild>
+                      <button
+                        type="button"
+                        disabled={loading}
+                        className="flex items-center gap-2 text-sm text-red-500/80 hover:text-red-400 transition-colors px-2 py-2 rounded-xl hover:bg-red-500/10"
+                      >
+                        <LogOut className="h-3.5 w-3.5" />
+                        <span className="text-[11px] font-semibold uppercase tracking-widest">
+                          Slett bruker
+                        </span>
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-400">
+                          Dette vil slette brukeren din permanent. Denne
+                          handlingen kan ikke angres.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
+                          Avbryt
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-600 text-white hover:bg-red-500"
+                          onClick={handleDelete}
+                        >
+                          Slett
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </form>
+            </div>
+
+            {/* Høyre side: Brukerinformasjon */}
+            <div className="w-full lg:w-64 space-y-4 shrink-0 self-start">
+              <div className="rounded-2xl bg-[#181c24] border border-slate-800/60 p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-400 to-teal-600 flex items-center justify-center text-lg font-bold text-slate-900 shrink-0">
+                    {(user?.fullName || user?.username || "U")[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-100 text-sm">
+                      {user?.fullName || user?.username}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-500">
+                      Aktive søknader
+                    </span>
+                    <span className="text-xs font-semibold text-cyan-400">
+                      {applications.length}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </header>
-        <main className="flex-1 flex flex-col items-center justify-center">
-          <section className="w-full max-w-lg rounded-3xl border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.9)]">
-            <div className="flex justify-end mb-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="bg-slate-900/80 border-slate-700 text-slate-200 hover:bg-slate-400 px-4 py-2"
-                onClick={handleBack}
-              >
-                ← Tilbake
-              </Button>
-            </div>
-            <form onSubmit={handleUpdate} className="space-y-6">
-              <div>
-                <label className="block text-sm mb-1 text-slate-200">
-                  Brukernavn
-                </label>
-                <input
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1 text-slate-200">
-                  Nåværende passord
-                </label>
-                <div className="flex justify-between relative items-center">
-                  <input
-                    className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                    type={showCurrentPassword ? "text" : "password"}
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                  />
-                  <span
-                    className="text-slate-50 absolute right-3 cursor-pointer"
-                    onClick={showCurrentPasswordToggle}
-                  >
-                    {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
-                  </span>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm mb-1 text-slate-200">
-                  Nytt passord
-                </label>
-                <div className="flex justify-between relative items-center">
-                  <input
-                    className="w-full rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100 focus-visible:ring-2 focus-visible:ring-sky-400"
-                    type={showNewPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <span
-                    className="text-slate-50 absolute right-3 cursor-pointer"
-                    onClick={showNewPasswordToggle}
-                  >
-                    {showNewPassword ? <FaEye /> : <FaEyeSlash />}
-                  </span>
-                </div>
-              </div>
-              {message && (
-                <div className="text-green-400 font-medium text-center">
-                  {message}
-                </div>
-              )}
-              {error && (
-                <div className="text-red-400 font-medium text-center">
-                  {error}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                disabled={loading || !hasChanges}
-                className="w-full bg-sky-900 text-sky-200 hover:bg-sky-700"
-              >
-                {loading ? "Lagrer..." : "Lagre endringer"}
-              </Button>
-            </form>
-            <hr className="my-6 border-slate-700" />
-
-            {/* Delete user confirmation modal */}
-            <AlertDialog
-              open={deleteDialogOpen}
-              onOpenChange={setDeleteDialogOpen}
-            >
-              <AlertDialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  disabled={loading}
-                  className="w-full"
-                >
-                  Slett bruker
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                  <AlertDialogDescription className="text-slate-400">
-                    Dette vil slette brukeren din permanent. Denne handlingen
-                    kan ikke angres.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
-                    Avbryt
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    onClick={handleDelete}
-                  >
-                    Slett
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </section>
         </main>
       </div>
     </div>
