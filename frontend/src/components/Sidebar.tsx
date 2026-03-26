@@ -1,40 +1,33 @@
 import {
   LayoutDashboard,
-  Settings,
   HelpCircle,
   LogOut,
-  BarChart2,
-  X,
-  Search,
-  Building2,
-  DollarSign,
-  Star,
   Pen,
   List,
+  User,
+  X,
 } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Application } from "@/types/application";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 
 const NAV_ITEMS = [
-  { label: "Oversikt", icon: LayoutDashboard, key: "oversikt" },
-  { label: "Kommer mer snart", icon: Pen, key: "soknadsrapport" },
-  // { label: "Finn jobber", icon: Search, key: "finn_jobber" },
-  // { label: "Se bedrifter", icon: Building2, key: "se_bedrifter" },
-  // { label: "Lønnssjekk", icon: DollarSign, key: "lonnssjekk" },
-  // { label: "Lagrede jobber", icon: Star, key: "lagrede_jobber" },
-  // { label: "Skriv anmeldelse", icon: Pen, key: "skriv_anmeldelse" },
-  // { label: "Lønnsbidrag", icon: BarChart2, key: "lonnsbidrag" },
-  // { label: "Innstillinger", icon: Settings, key: "innstillinger" },
+  { label: "Oversikt", icon: LayoutDashboard, path: "/" },
+  { label: "Profil", icon: User, path: "/profile" },
+  { label: "Kommer mer snart", icon: Pen, path: null },
 ];
 
 interface Props {
   onAdd: (app: Omit<Application, "id">) => void;
   onReport: () => void;
   onLogout: () => void;
-  onClose?: () => void; // Valgfri, kun nødvendig for mobilskuffen for å lukke den etter handling
+  onClose?: () => void;
 }
 
 export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <div className="flex h-full flex-col py-6">
       <div className="mb-8 flex items-center justify-between px-5">
@@ -50,7 +43,6 @@ export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
           </div>
         </div>
 
-        {/* Lukk knapp — kun synlig i skuffen */}
         {onClose && (
           <button
             onClick={onClose}
@@ -61,18 +53,25 @@ export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
         )}
       </div>
 
-      {/* Nav lenker */}
       <nav className="flex-1 space-y-0.5 px-3">
         {NAV_ITEMS.map((item) => {
-          const isActive = item.key === "oversikt";
+          const isActive = item.path === location.pathname;
           return (
             <button
-              key={item.key}
-              onClick={onClose}
+              key={item.label}
+              disabled={!item.path}
+              onClick={() => {
+                if (item.path) {
+                  navigate(item.path);
+                  onClose?.();
+                }
+              }}
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                 isActive
                   ? "bg-cyan-500/10 text-sm font-medium text-cyan-400"
-                  : "text-xs font-medium uppercase tracking-wider text-slate-500 hover:bg-slate-800/60 hover:text-slate-300"
+                  : item.path
+                    ? "text-xs font-medium uppercase tracking-wider text-slate-500 hover:bg-slate-800/60 hover:text-slate-300"
+                    : "text-xs font-medium uppercase tracking-wider text-slate-700 cursor-not-allowed"
               }`}
             >
               <item.icon className="h-4 w-4 shrink-0" />
@@ -82,7 +81,6 @@ export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
         })}
       </nav>
 
-      {/* Bottom actions */}
       <div className="mt-auto space-y-1 px-3">
         <div className="w-full [&>button]:w-full [&>button]:justify-center pb-1">
           <AddApplicationDialog onAdd={onAdd} />
