@@ -1,7 +1,11 @@
 import { Bell, Settings2, Menu } from "lucide-react";
 import { ProfileMenu } from "@/components/ProfileMenu";
 
-const TAB_LABELS = ["Dashbord", "Søknader", "Intervjuer", "Tilbud"];
+const TAB_LABELS = [
+  "Søknader",
+  "Intervjuer (kommer snart)",
+  "Tilbud (kommer snart)",
+];
 
 interface Props {
   onOpenDrawer: () => void;
@@ -11,7 +15,7 @@ export function Topbar({ onOpenDrawer }: Props) {
   return (
     <header className="flex items-center justify-between border-b border-slate-800/60 bg-[#10121a]/80 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
       <div className="flex items-center gap-3 sm:gap-6">
-        {/* Hamburger — only on mobile/tablet */}
+        {/* Hamburger — bare synlig på mobil */}
         <button
           onClick={onOpenDrawer}
           aria-label="Åpne meny"
@@ -20,11 +24,11 @@ export function Topbar({ onOpenDrawer }: Props) {
           <Menu className="h-5 w-5" />
         </button>
 
-        <span className="text-base font-bold text-cyan-400 tracking-tight sm:text-lg">
-          Jobbsøknad Tracker
-        </span>
+        {/* <span className="text-base font-bold text-cyan-400 tracking-tight sm:text-lg">
+          Mine Søknader
+        </span> */}
 
-        {/* Tab nav — hidden on smallest screens */}
+        {/* Tab nav —  skjult på minste skjermer */}
         <nav className="hidden items-center gap-4 md:flex lg:gap-6">
           {TAB_LABELS.map((label, i) => (
             <button
