@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Calendar } from "./ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { format, parse } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -35,16 +39,25 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
 }) => {
   const [company, setCompany] = useState(application?.company || "");
   const [position, setPosition] = useState(application?.position || "");
-  const [dateSent, setDateSent] = useState(application?.dateSent || "");
+  const [dateSent, setDateSent] = useState<Date | undefined>(
+    application?.dateSent
+      ? parse(application.dateSent, "dd.MM.yy", new Date())
+      : undefined,
+  );
   const [status, setStatus] = useState<ApplicationStatus>(
     application?.status || "Sendt",
   );
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   // Oppdater felter hvis application endres
   React.useEffect(() => {
     setCompany(application?.company || "");
     setPosition(application?.position || "");
-    setDateSent(application?.dateSent || "");
+    setDateSent(
+      application?.dateSent
+        ? parse(application.dateSent, "dd.MM.yy", new Date())
+        : undefined,
+    );
     setStatus(application?.status || "Sendt");
   }, [application]);
 
@@ -52,7 +65,14 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ ...application, company, position, dateSent, status });
+    if (!dateSent) return;
+    onSave({
+      ...application,
+      company,
+      position,
+      dateSent: format(dateSent, "dd.MM.yy"),
+      status,
+    });
   };
 
   return (
@@ -78,14 +98,34 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
             maxLength={200}
             className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100"
           />
-          <Input
-            value={dateSent}
-            onChange={(e) => setDateSent(e.target.value)}
-            placeholder="Dato sendt"
-            required
-            maxLength={20}
-            className="rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-slate-100"
-          />
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className={
+                  "w-full justify-start text-left font-normal rounded-lg border border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" +
+                  (!dateSent ? " text-slate-500" : "")
+                }
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateSent instanceof Date && !isNaN(dateSent.getTime())
+                  ? format(dateSent, "dd.MM.yyyy")
+                  : "Velg dato"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-white dark:bg-slate-800 border-slate-700">
+              <Calendar
+                mode="single"
+                selected={dateSent}
+                onSelect={(date) => {
+                  setDateSent(date ?? undefined);
+                  if (date) setCalendarOpen(false);
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
           <div className="space-y-2">
             <Label className="text-slate-300 text-sm">Status</Label>
             <Select

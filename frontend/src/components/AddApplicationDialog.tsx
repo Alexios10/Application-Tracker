@@ -9,6 +9,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -33,18 +41,24 @@ const statuses: ApplicationStatus[] = [
 
 const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
   const [open, setOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
-  const [dateSent, setDateSent] = useState("");
+  const [dateSent, setDateSent] = useState<Date | undefined>(undefined);
   const [status, setStatus] = useState<ApplicationStatus>("Sendt");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!company || !position || !dateSent) return;
-    onAdd({ company, position, dateSent, status });
+    onAdd({
+      company,
+      position,
+      dateSent: format(dateSent, "dd.MM.yy"),
+      status,
+    });
     setCompany("");
     setPosition("");
-    setDateSent("");
+    setDateSent(undefined);
     setStatus("Sendt");
     setOpen(false);
   };
@@ -99,21 +113,35 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
             />
           </div>
           <div className="space-y-2">
-            <Label
-              htmlFor="date"
-              className="text-slate-400 text-xs font-semibold uppercase tracking-wider"
-            >
+            <Label className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
               Dato sendt
             </Label>
-            <Input
-              id="date"
-              value={dateSent}
-              onChange={(e) => setDateSent(e.target.value)}
-              placeholder="DD.MM.ÅÅ"
-              required
-              maxLength={20}
-              className="rounded-lg border border-slate-700/80 bg-slate-900/80 text-slate-100 placeholder:text-slate-500 focus-visible:ring-cyan-500"
-            />
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={
+                    "w-full justify-start text-left font-normal rounded-lg border border-slate-700/80 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" +
+                    (!dateSent ? " text-slate-500" : "")
+                  }
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateSent ? format(dateSent, "dd.MM.yyyy") : "Velg dato"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-white dark:bg-slate-800 border-slate-700">
+                <Calendar
+                  mode="single"
+                  selected={dateSent}
+                  onSelect={(date) => {
+                    setDateSent(date ?? undefined);
+                    if (date) setCalendarOpen(false);
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="space-y-2">
             <Label className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
