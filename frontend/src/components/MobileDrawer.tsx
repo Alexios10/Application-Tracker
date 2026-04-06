@@ -65,6 +65,7 @@ export function MobileDrawer({
               onReport={onReport}
               onLogout={onLogout}
               onClose={onClose}
+              alwaysExpanded
             />
           </motion.div>
         </>

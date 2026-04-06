@@ -52,7 +52,7 @@ const Index = () => {
   return (
     <div className="flex h-screen bg-[#0d0f14] text-slate-100 overflow-hidden">
       {/* Skrivebords sidepanel — skjult på mobil/nettbrett */}
-      <aside className="hidden lg:flex w-[220px] shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
+      <aside className="hidden lg:flex shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar
           onAdd={addApplication}
           onReport={() => setReportOpen(true)}
