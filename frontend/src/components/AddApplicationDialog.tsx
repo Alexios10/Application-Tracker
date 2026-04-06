@@ -21,6 +21,7 @@ import { Plus } from "lucide-react";
 
 interface AddApplicationDialogProps {
   onAdd: (app: Omit<Application, "id">) => void;
+  collapsed?: boolean;
 }
 
 const statuses: ApplicationStatus[] = [
@@ -31,7 +32,10 @@ const statuses: ApplicationStatus[] = [
   "Ghosted",
 ];
 
-const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
+const AddApplicationDialog = ({
+  onAdd,
+  collapsed,
+}: AddApplicationDialogProps) => {
   const [open, setOpen] = useState(false);
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
@@ -52,9 +56,12 @@ const AddApplicationDialog = ({ onAdd }: AddApplicationDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-950 font-semibold shadow-lg shadow-emerald-500/20 hover:from-sky-400 hover:to-emerald-300">
-          <Plus className="mr-2 h-4 w-4" />
-          Legg til søknad
+        <Button
+          title={collapsed ? "Legg til søknad" : undefined}
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 px-5 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-cyan-500/20 hover:opacity-90 transition-opacity"
+        >
+          <Plus className="h-4 w-4" />
+          {!collapsed && "Legg til søknad"}
         </Button>
       </DialogTrigger>
       <DialogContent className="border border-slate-800/70 bg-gradient-to-b from-slate-900/80 via-slate-950/90 to-slate-950/95 p-6 rounded-3xl shadow-xl sm:max-w-md">
