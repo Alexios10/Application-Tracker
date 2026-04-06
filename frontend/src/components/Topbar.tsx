@@ -1,4 +1,5 @@
 import { Bell, Settings2, Menu } from "lucide-react";
+import { ProfileMenu } from "@/components/ProfileMenu";
 
 const TAB_LABELS = [
   "Søknader",
@@ -45,6 +46,7 @@ export function Topbar({ onOpenDrawer }: Props) {
         <button className="hidden rounded-lg p-2 text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition-colors sm:flex">
           <Settings2 className="h-4 w-4" />
         </button>
+        <ProfileMenu />
       </div>
     </header>
   );
