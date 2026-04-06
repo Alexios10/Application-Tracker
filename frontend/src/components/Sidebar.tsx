@@ -68,7 +68,7 @@ export function Sidebar({ onAdd, onReport, onLogout, onClose }: Props) {
               }}
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                 isActive
-                  ? "bg-cyan-500/10 text-sm font-medium text-cyan-400"
+                  ? "bg-cyan-500/10 text-xs font-medium uppercase tracking-wider text-cyan-400"
                   : item.path
                     ? "text-xs font-medium uppercase tracking-wider text-slate-500 hover:bg-slate-800/60 hover:text-slate-300"
                     : "text-xs font-medium uppercase tracking-wider text-slate-700 cursor-not-allowed"
