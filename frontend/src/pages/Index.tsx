@@ -21,7 +21,7 @@ const Index = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
-  // Alle datahenting og mutasjoner relatert til s├©knader h├Ñndteres i denne hooken
+  // Alle datahenting og mutasjoner relatert til søknader håndteres i denne hooken
   const {
     applications,
     addApplication,
@@ -30,7 +30,7 @@ const Index = () => {
     deleteApplication,
   } = useApplications();
 
-  // Alle filtrering, s├©k og paginering for s├©knadslisten
+  // Alle filtrering, søk og paginering for søknadslisten
   const {
     search,
     setSearch,
@@ -43,7 +43,7 @@ const Index = () => {
     paginated,
   } = useFilteredApplications(applications);
 
-  // Antall per status for statuskortene - basert p├Ñ den fullstendige s├©knadslisten, ikke bare den filtrerte/paginerte
+  // Antall per status for statuskortene - basert på den fullstendige søknadslisten, ikke bare den filtrerte/paginerte
   const countByFilter = (filter: string) =>
     filter === "all"
       ? applications.length
@@ -51,7 +51,7 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-[#0d0f14] text-slate-100 overflow-hidden">
-      {/* Skrivebords sidepanel ÔÇö skjult p├Ñ mobil/nettbrett */}
+      {/* Skrivebords sidepanel – skjult på mobil/nettbrett */}
       <aside className="hidden lg:flex shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar
           onAdd={addApplication}
@@ -60,7 +60,7 @@ const Index = () => {
         />
       </aside>
 
-      {/* Mobilskuff ÔÇö skjult p├Ñ skrivebord */}
+      {/* Mobilskuff – skjult på skrivebord */}
       <MobileDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -81,7 +81,7 @@ const Index = () => {
                 Oversikt
               </h1>
               <p className="mt-1 text-sm text-slate-400">
-                Velkommen tilbake. Her er status p├Ñ dine aktive jobbs├©knader.
+                Velkommen tilbake. Her er status på dine aktive jobbsøknader.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -112,7 +112,7 @@ const Index = () => {
             ))}
           </div>
 
-          {/* S├©knadstabell med s├©k og paginering */}
+          {/* Søknadstabell med søk og paginering */}
           <ApplicationListPanel
             applications={paginated}
             totalCount={filtered.length}
