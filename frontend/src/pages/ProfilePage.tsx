@@ -142,7 +142,7 @@ const ProfilePage = () => {
   return (
     <div className="flex h-screen bg-[#0f1117] text-slate-50 overflow-hidden">
       {/* ── Sidebar ── */}
-      <aside className="hidden lg:block w-64 shrink-0 border-r border-slate-800/60">
+      <aside className="hidden lg:flex shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar onAdd={addApplication} onReport={() => {}} onLogout={logout} />
       </aside>
 
