@@ -45,6 +45,7 @@ export function Sidebar({
     <motion.div
       className="flex h-full flex-col py-6 overflow-hidden"
       onMouseEnter={() => !alwaysExpanded && setHovered(true)}
+      onMouseMove={() => !alwaysExpanded && !hovered && setHovered(true)}
       onMouseLeave={() => !alwaysExpanded && setHovered(false)}
       animate={{ width: expanded ? 220 : 60 }}
       transition={{ duration: 0.22, ease: "easeInOut" }}
