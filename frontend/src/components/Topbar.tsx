@@ -13,7 +13,7 @@ interface Props {
 
 export function Topbar({ onOpenDrawer }: Props) {
   return (
-    <header className="flex items-center justify-between border-b border-slate-800/60 bg-[#10121a]/80 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
+    <header className="flex items-center justify-between border-b border-slate-800/60 bg-[#10121a] px-4 py-3 sm:px-6 lg:px-8">
       <div className="flex items-center gap-3 sm:gap-6">
         <button
           onClick={onOpenDrawer}

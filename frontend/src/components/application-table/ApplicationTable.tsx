@@ -69,7 +69,7 @@ const ApplicationTable = ({
   };
 
   return (
-    <div className="h-[40rem] w-full overflow-y-auto rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl backdrop-blur">
+    <div className="h-[40rem] w-full overflow-y-auto rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl">
       <EditApplicationModal
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
