@@ -119,11 +119,6 @@ namespace ApplicationTracker.Api.Controllers
       return Ok();
     }
 
-    /// <summary>
-    /// Sender e-post via Resend HTTP API. Krever env-variabel:
-    /// RESEND_API_KEY = din Resend API-nøkkel (re_...)
-    /// RESEND_FROM = avsender-e-post (f.eks. noreply@minesoknader.no)
-    /// </summary>
     private static readonly HttpClient _httpClient = new();
 
     private static async Task SendResetEmail(string toEmail, string resetLink)
