@@ -141,12 +141,12 @@ const ProfilePage = () => {
 
   return (
     <div className="flex h-screen bg-[#0f1117] text-slate-50 overflow-hidden">
-      {/* ÔöÇÔöÇ Sidebar ÔöÇÔöÇ */}
+      {/*  Sidebar  */}
       <aside className="hidden lg:flex shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar onAdd={addApplication} onReport={() => {}} onLogout={logout} />
       </aside>
 
-      {/* ÔöÇÔöÇ Mobile Drawer ÔöÇÔöÇ */}
+      {/*  Mobile Drawer  */}
       <MobileDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -155,7 +155,7 @@ const ProfilePage = () => {
         onLogout={logout}
       />
 
-      {/* ÔöÇÔöÇ Main ÔöÇÔöÇ */}
+      {/*  Main  */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
         <main className="flex-1 overflow-y-auto px-6 py-6">
@@ -184,7 +184,7 @@ const ProfilePage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
-                      N├Ñv├ªrende passord
+                      Nåværende passord
                     </label>
                     <div className="relative">
                       <input
@@ -284,7 +284,7 @@ const ProfilePage = () => {
               </form>
             </div>
 
-            {/* H├©yre side: Brukerinformasjon */}
+            {/* Høyre side: Brukerinformasjon */}
             <div className="w-full lg:w-64 space-y-4 shrink-0 self-start">
               <div className="rounded-2xl bg-[#181c24] border border-slate-800/60 p-5">
                 <div className="flex items-center gap-3 mb-4">
@@ -300,7 +300,7 @@ const ProfilePage = () => {
                 <div className="space-y-2.5">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-slate-500">
-                      Aktive s├©knader
+                      Aktive søknader
                     </span>
                     <span className="text-xs font-semibold text-cyan-400">
                       {applications.length}
