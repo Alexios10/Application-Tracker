@@ -70,8 +70,7 @@ public class AuthController : ControllerBase
       return BadRequest(new { error = string.Join(" ", errorMessages) });
     }
 
-    await _tokenService.SetAuthAndRefreshCookies(HttpContext, user, _db);
-    return Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
+    return Ok(new { message = "Bruker registrert." });
   }
 
   // INNLOGGING

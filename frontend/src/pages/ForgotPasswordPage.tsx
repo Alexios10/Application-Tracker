@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,13 +89,13 @@ const ForgotPasswordPage: React.FC = () => {
                   i innboksen.
                 </p>
               </div>
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="inline-flex items-center gap-2 text-sm font-medium text-sky-400 hover:text-sky-300"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Tilbake til innlogging
-              </a>
+              </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -126,12 +127,12 @@ const ForgotPasswordPage: React.FC = () => {
 
               <p className="text-center text-sm text-slate-400">
                 Husker du passordet?{" "}
-                <a
-                  href="/login"
+                <Link
+                  to="/login"
                   className="font-medium text-sky-400 hover:text-sky-300"
                 >
                   Logg inn
-                </a>
+                </Link>
               </p>
             </form>
           )}
