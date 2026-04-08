@@ -13,7 +13,12 @@ using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Legg til controller-tjenester
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Gjør at enums serialiseres/deserialiseres som tekst (f.eks. "Sendt") i stedet for tall
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // ---------- PORT (Railway) ----------
 var port = Environment.GetEnvironmentVariable("PORT");
