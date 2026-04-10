@@ -320,7 +320,7 @@ const LoginPage = () => {
                       href="mailto:sattar_saud@hotmail.com"
                       className="text-sky-400 hover:text-sky-300 transition-colors"
                     >
-                      sattar_saud@hotmail.com
+                      minesoknader@gmail.com
                     </a>
                   </p>
                 </section>
