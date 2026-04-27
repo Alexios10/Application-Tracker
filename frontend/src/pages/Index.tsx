@@ -51,8 +51,8 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-[#0d0f14] text-slate-100 overflow-hidden">
-      {/* Skrivebords sidepanel – skjult på mobil/nettbrett */}
-      <aside className="hidden lg:flex shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
+      {/* Skrivebords sidepanel – fast posisjonert slik at den overlapper innholdet */}
+      <aside className="hidden lg:block fixed left-0 top-0 h-full z-40 border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar
           onAdd={addApplication}
           onReport={() => setReportOpen(true)}
@@ -69,8 +69,8 @@ const Index = () => {
         onLogout={logout}
       />
 
-      {/* Hovedinnhold */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      {/* Hovedinnhold – pl-[60px] på stor skjerm for å gi plass til kollapset sidebar */}
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0 lg:pl-[60px]">
         <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
 
         <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
