@@ -141,8 +141,8 @@ const ProfilePage = () => {
 
   return (
     <div className="flex h-screen bg-[#0f1117] text-slate-50 overflow-hidden">
-      {/*  Sidebar  */}
-      <aside className="hidden lg:flex shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
+      {/* Skrivebords sidepanel – fast posisjonert slik at den overlapper innholdet */}
+      <aside className="hidden lg:block fixed left-0 top-0 h-full z-40 border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar onAdd={addApplication} onReport={() => {}} onLogout={logout} />
       </aside>
 
@@ -155,8 +155,8 @@ const ProfilePage = () => {
         onLogout={logout}
       />
 
-      {/*  Main  */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      {/* Hovedinnhold – pl-[60px] på stor skjerm for å gi plass til kollapset sidebar */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden lg:pl-[60px]">
         <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
         <main className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col lg:flex-row gap-5 max-w-5xl mx-auto justify-center min-h-[60vh]">
