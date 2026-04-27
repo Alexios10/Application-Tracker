@@ -1,5 +1,4 @@
 import {
-  Send,
   Clock,
   XCircle,
   MessageSquare,
@@ -20,13 +19,6 @@ export interface StatConfig {
 
 // Legg til flere stat configs her hvis vi vil ha flere stat cards, eller endre eksisterende
 export const STAT_CONFIGS: StatConfig[] = [
-  {
-    label: "Sendt",
-    icon: Send,
-    color: "text-cyan-400",
-    bg: "bg-cyan-900/30",
-    filter: "all",
-  },
   {
     label: "Venter",
     icon: Clock,

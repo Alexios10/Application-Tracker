@@ -51,8 +51,8 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-[#0d0f14] text-slate-100 overflow-hidden">
-      {/* Skrivebords sidepanel – skjult på mobil/nettbrett */}
-      <aside className="hidden lg:flex shrink-0 flex-col border-r border-slate-800/60 bg-[#10121a]">
+      {/* Skrivebords sidepanel – fast posisjonert slik at den overlapper innholdet */}
+      <aside className="hidden lg:block fixed left-0 top-0 h-full z-40 border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar
           onAdd={addApplication}
           onReport={() => setReportOpen(true)}
@@ -69,17 +69,22 @@ const Index = () => {
         onLogout={logout}
       />
 
-      {/* Hovedinnhold */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      {/* Hovedinnhold – pl-[60px] på stor skjerm for å gi plass til kollapset sidebar */}
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0 lg:pl-[60px]">
         <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
 
         <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
           {/* Sideoverskrift */}
           <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-50 sm:text-3xl">
-                Oversikt
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-bold text-slate-50 sm:text-3xl">
+                  Oversikt
+                </h1>
+                <span className="rounded-full bg-cyan-900/40 border border-cyan-700/40 px-3 py-0.5 text-sm font-semibold text-cyan-300">
+                  {applications.length} søknader totalt
+                </span>
+              </div>
               <p className="mt-1 text-sm text-slate-400">
                 Velkommen tilbake. Her er status på dine aktive jobbsøknader.
               </p>
