@@ -77,9 +77,14 @@ const Index = () => {
           {/* Sideoverskrift */}
           <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-50 sm:text-3xl">
-                Oversikt
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-bold text-slate-50 sm:text-3xl">
+                  Oversikt
+                </h1>
+                <span className="rounded-full bg-cyan-900/40 border border-cyan-700/40 px-3 py-0.5 text-sm font-semibold text-cyan-300">
+                  {applications.length} søknader totalt
+                </span>
+              </div>
               <p className="mt-1 text-sm text-slate-400">
                 Velkommen tilbake. Her er status på dine aktive jobbsøknader.
               </p>
