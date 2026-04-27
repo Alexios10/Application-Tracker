@@ -48,7 +48,7 @@ export const STAT_CONFIGS: StatConfig[] = [
     filter: "Tilbud",
   },
   {
-    label: "Ghostet",
+    label: "Ghosted",
     icon: EyeOff,
     color: "text-slate-400",
     bg: "bg-slate-800/50",
