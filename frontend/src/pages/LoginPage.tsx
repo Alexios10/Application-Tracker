@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Briefcase, Shield } from "lucide-react";
+import { Briefcase, CheckCircle2, Shield } from "lucide-react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -28,6 +28,31 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
+
+  useEffect(() => {
+    const title = isRegister
+      ? "Registrer deg | Mine Søknader"
+      : "Mine Søknader | Hold oversikt over jobbsøknader";
+    const description = isRegister
+      ? "Opprett konto i Mine Søknader for å samle og følge opp jobbsøknader og intervjuer på ett sted."
+      : "Mine Søknader er en jobbsøknad-tracker som hjelper deg å organisere søknader, intervjuer og status i én enkel oversikt.";
+
+    document.title = title;
+
+    const updateMeta = (selector: string, content: string) => {
+      const element = document.querySelector(selector);
+
+      if (element) {
+        element.setAttribute("content", content);
+      }
+    };
+
+    updateMeta('meta[name="description"]', description);
+    updateMeta('meta[property="og:title"]', title);
+    updateMeta('meta[property="og:description"]', description);
+    updateMeta('meta[name="twitter:title"]', title);
+    updateMeta('meta[name="twitter:description"]', description);
+  }, [isRegister]);
 
   // Allerede innlogget? Gå til forsiden
   if (user) {
@@ -74,179 +99,206 @@ const LoginPage = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md space-y-8"
+        className="w-full max-w-5xl space-y-8"
       >
-        {/* Logo/Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-center"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{
-              type: "spring",
-              stiffness: 200,
-              damping: 15,
-              delay: 0.2,
-            }}
-            className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40"
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,420px)] lg:items-start">
+          <motion.section
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="rounded-3xl border border-slate-800/70 bg-slate-900/40 p-8 shadow-xl backdrop-blur"
           >
-            <Briefcase className="h-7 w-7 text-slate-950" />
-          </motion.div>
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-50">
-            Jobbsøknad Tracker
-          </h1>
-          <p className="mt-2 text-sm text-slate-400">
-            {isRegister
-              ? "Opprett en ny konto for å komme i gang"
-              : "Logg inn for å se søknadene dine"}
-          </p>
-        </motion.div>
-
-        {/* Skjema */}
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          onSubmit={handleSubmit}
-          className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur"
-        >
-          {/* Feilmelding */}
-          {error && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-              {error}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 15,
+                delay: 0.2,
+              }}
+              className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40"
+            >
+              <Briefcase className="h-7 w-7 text-slate-950" />
+            </motion.div>
+            <h1 className="mt-6 max-w-xl text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
+              Hold oversikt over hele jobbsøkerløpet ditt på ett sted
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+              Mine Søknader er en enkel jobbsøknad-tracker for deg som vil samle
+              søknader, følge intervjuinvitasjoner og ha kontroll på hvor i
+              prosessen hver stilling befinner seg.
+            </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {[
+                "Samle alle jobbsøknader i én oversikt",
+                "Følg status fra sendt til intervju og tilbud",
+                "Hold orden på datoer, selskaper og neste steg",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-2xl border border-slate-800/80 bg-slate-950/40 p-4 text-sm text-slate-300"
+                >
+                  <CheckCircle2 className="mb-3 h-5 w-5 text-emerald-300" />
+                  <p>{item}</p>
+                </div>
+              ))}
             </div>
-          )}
+          </motion.section>
 
-          {/* Registrerings-felter */}
-          <AnimatePresence>
-            {isRegister && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-5"
-              >
-                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-                  NB: Veldig viktig at du registrerer riktig e-postadresse
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-slate-300">
-                    Fullt navn
-                  </Label>
-                  <Input
-                    id="fullName"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ola Nordmann"
-                    required
-                    className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-300">
-                    E-post
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ola@eksempel.no"
-                    required
-                    className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                  />
-                </div>
-              </motion.div>
+          {/* Skjema */}
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            onSubmit={handleSubmit}
+            className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur"
+          >
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-50">
+                {isRegister ? "Opprett konto" : "Logg inn"}
+              </h2>
+              <p className="mt-2 text-sm text-slate-400">
+                {isRegister
+                  ? "Opprett en ny konto for å komme i gang"
+                  : "Logg inn for å se søknadene dine"}
+              </p>
+            </div>
+
+            {/* Feilmelding */}
+            {error && (
+              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </div>
             )}
-          </AnimatePresence>
 
-          {/* Brukernavn */}
-          <div className="space-y-2">
-            <Label htmlFor="username" className="text-slate-300">
-              Brukernavn
-            </Label>
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder={isRegister ? "Brukernavn" : ""}
-              required
-              className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-            />
-          </div>
+            {/* Registrerings-felter */}
+            <AnimatePresence>
+              {isRegister && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-5"
+                >
+                  <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+                    NB: Veldig viktig at du registrerer riktig e-postadresse
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName" className="text-slate-300">
+                      Fullt navn
+                    </Label>
+                    <Input
+                      id="fullName"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Ola Nordmann"
+                      required
+                      className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-slate-300">
+                      E-post
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="ola@eksempel.no"
+                      required
+                      className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          {/* Passord */}
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-slate-300">
-              Passord
-            </Label>
-            <div className="flex justify-center items-center relative">
+            {/* Brukernavn */}
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-slate-300">
+                Brukernavn
+              </Label>
               <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={isRegister ? "Minst 6 tegn, inkl. et tall" : ""}
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder={isRegister ? "Brukernavn" : ""}
                 required
-                minLength={6}
                 className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
               />
-              <span
-                className="text-slate-50 absolute right-3 cursor-pointer"
-                onClick={showPasswordToggle}
-              >
-                {showPassword ? <FaEye /> : <FaEyeSlash />}
-              </span>
             </div>
-          </div>
 
-          {/* Glemt passord-lenke kun for login */}
-          {!isRegister && (
-            <div className="text-right mb-2">
-              <a
-                href="/forgot-password"
-                className="text-blue-500 hover:underline text-sm"
-              >
-                Glemt passord?
-              </a>
+            {/* Passord */}
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-slate-300">
+                Passord
+              </Label>
+              <div className="flex justify-center items-center relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={isRegister ? "Minst 6 tegn, inkl. et tall" : ""}
+                  required
+                  minLength={6}
+                  className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
+                />
+                <span
+                  className="text-slate-50 absolute right-3 cursor-pointer"
+                  onClick={showPasswordToggle}
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </span>
+              </div>
             </div>
-          )}
 
-          {/* Knapp */}
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-sky-500 to-emerald-400 font-semibold text-slate-950 hover:from-sky-400 hover:to-emerald-300"
-          >
-            {loading
-              ? "Vennligst vent..."
-              : isRegister
-                ? "Opprett konto"
-                : "Logg inn"}
-          </Button>
+            {/* Glemt passord-lenke kun for login */}
+            {!isRegister && (
+              <div className="text-right mb-2">
+                <a
+                  href="/forgot-password"
+                  className="text-blue-500 hover:underline text-sm"
+                >
+                  Glemt passord?
+                </a>
+              </div>
+            )}
 
-          {/* Bytt mellom login/register */}
-          <p className="text-center text-sm text-slate-400">
-            {isRegister
-              ? "Har du allerede en konto? "
-              : "Har du ikke en konto? "}
-            <button
-              type="button"
-              onClick={() => {
-                setIsRegister(!isRegister);
-                setError("");
-              }}
-              className="font-medium text-sky-400 hover:text-sky-300"
+            {/* Knapp */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-sky-500 to-emerald-400 font-semibold text-slate-950 hover:from-sky-400 hover:to-emerald-300"
             >
-              {isRegister ? "Logg inn" : "Registrer deg"}
-            </button>
-          </p>
-        </motion.form>
+              {loading
+                ? "Vennligst vent..."
+                : isRegister
+                  ? "Opprett konto"
+                  : "Logg inn"}
+            </Button>
+
+            {/* Bytt mellom login/register */}
+            <p className="text-center text-sm text-slate-400">
+              {isRegister
+                ? "Har du allerede en konto? "
+                : "Har du ikke en konto? "}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRegister(!isRegister);
+                  setError("");
+                }}
+                className="font-medium text-sky-400 hover:text-sky-300"
+              >
+                {isRegister ? "Logg inn" : "Registrer deg"}
+              </button>
+            </p>
+          </motion.form>
+        </div>
 
         {/* Personvern */}
         <motion.div
