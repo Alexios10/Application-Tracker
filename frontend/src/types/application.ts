@@ -11,4 +11,5 @@ export interface Application {
   position: string;
   dateSent: string;
   status: ApplicationStatus;
+  note?: string;
 }

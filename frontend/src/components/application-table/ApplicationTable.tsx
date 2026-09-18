@@ -10,8 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { MessageSquareText, Pencil } from "lucide-react";
 import { EditApplicationModal } from "../EditApplicationModal";
+import { ApplicationDetailsModal } from "../ApplicationDetailsModal";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { StatusSelect } from "@/components/application-table/TabelStatusSelect";
 import { DeleteDialog } from "@/components/application-table/TableDeleteDialog";
@@ -32,6 +33,7 @@ const ApplicationTable = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editApp, setEditApp] = useState<Application | null>(null);
+  const [detailsApp, setDetailsApp] = useState<Application | null>(null);
   const [selectOpen, setSelectOpen] = useState(false);
   const isMobile = useIsMobile();
   const editRef = useRef<HTMLDivElement>(null);
@@ -68,8 +70,35 @@ const ApplicationTable = ({
     setEditingId(null);
   };
 
+  const openDetails = (app: Application) => {
+    setDetailsApp(app);
+  };
+
+  const handleDetailsKeyDown = (
+    event: React.KeyboardEvent,
+    app: Application,
+  ) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    openDetails(app);
+  };
+
+  const hasNote = (app: Application) => (app.note?.trim().length ?? 0) > 0;
+
   return (
     <div className="h-[40rem] w-full overflow-y-auto rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl">
+      <ApplicationDetailsModal
+        open={detailsApp !== null}
+        application={detailsApp}
+        onClose={() => setDetailsApp(null)}
+        onSaveNote={(updated) => {
+          setDetailsApp(updated);
+          if (typeof onEdit === "function") {
+            onEdit(updated);
+          }
+        }}
+      />
+
       <EditApplicationModal
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
@@ -88,7 +117,11 @@ const ApplicationTable = ({
         {applications.map((app, index) => (
           <div
             key={app.id}
-            className="group flex flex-col gap-2 px-4 py-4 bg-slate-900/60 rounded-xl m-2 shadow-md transition-colors hover:bg-slate-900/80 relative"
+            className="group flex flex-col gap-2 px-4 py-4 bg-slate-900/60 rounded-xl m-2 shadow-md transition-colors hover:bg-slate-900/80 relative cursor-pointer"
+            onClick={() => openDetails(app)}
+            onKeyDown={(event) => handleDetailsKeyDown(event, app)}
+            role="button"
+            tabIndex={0}
           >
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="min-w-0 flex-1">
@@ -101,8 +134,17 @@ const ApplicationTable = ({
                 >
                   {app.company}
                 </span>
+                {hasNote(app) && (
+                  <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-cyan-700/40 bg-cyan-950/50 px-2 py-0.5 text-[11px] font-medium text-cyan-300">
+                    <MessageSquareText className="h-3 w-3" />
+                    Notat
+                  </span>
+                )}
               </div>
-              <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2"
+                onClick={(event) => event.stopPropagation()}
+              >
                 <Button
                   variant="ghost"
                   size="icon"
@@ -131,6 +173,7 @@ const ApplicationTable = ({
                 <span className="shrink-0">{app.dateSent}</span>
                 <span className="shrink-0">·</span>
                 <div
+                  onClick={(event) => event.stopPropagation()}
                   style={{
                     minHeight: "2rem",
                     position: "relative",
@@ -211,15 +254,30 @@ const ApplicationTable = ({
             {applications.map((app, index) => (
               <TableRow
                 key={app.id}
-                className="border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/80 transition-colors"
+                className="cursor-pointer border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/80 transition-colors"
+                onClick={() => openDetails(app)}
+                onKeyDown={(event) => handleDetailsKeyDown(event, app)}
+                role="button"
+                tabIndex={0}
               >
                 <TableCell className="text-xs text-slate-500 py-4 text-center">
                   {index + 1}
                 </TableCell>
                 <TableCell className="text-sm font-medium text-slate-100 py-4">
-                  <span className="line-clamp-2 break-words">
-                    {app.company}
-                  </span>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className="line-clamp-2 break-words">
+                      {app.company}
+                    </span>
+                    {hasNote(app) && (
+                      <span
+                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-cyan-700/40 bg-cyan-950/50 px-2 py-0.5 text-[11px] font-medium text-cyan-300"
+                        title="Har notat"
+                      >
+                        <MessageSquareText className="h-3 w-3" />
+                        Notat
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className="text-sm text-slate-400 py-4">
                   <span className="line-clamp-2 break-words">
@@ -230,7 +288,10 @@ const ApplicationTable = ({
                   {app.dateSent}
                 </TableCell>
 
-                <TableCell className="py-4">
+                <TableCell
+                  className="py-4"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   {editingId === app.id ? (
                     <StatusSelect
                       refProp={editRef}
@@ -256,7 +317,10 @@ const ApplicationTable = ({
                   )}
                 </TableCell>
 
-                <TableCell className="py-4 text-center">
+                <TableCell
+                  className="py-4 text-center"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <div className="flex items-center justify-center gap-2">
                     <Button
                       variant="ghost"
