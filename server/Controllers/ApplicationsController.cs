@@ -61,6 +61,7 @@ public class ApplicationsController : ControllerBase
     existing.Position = updated.Position;
     existing.DateSent = updated.DateSent;
     existing.Status = updated.Status;
+    existing.Note = updated.Note;
 
     await _db.SaveChangesAsync();
     return NoContent();

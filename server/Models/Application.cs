@@ -28,6 +28,9 @@ public class Application
 
   public ApplicationStatus Status { get; set; }
 
+  [MaxLength(1000)]
+  public string Note { get; set; } = string.Empty;
+
   // Kobling til brukeren som eier søknaden
   public string? UserId { get; set; }
   public User? User { get; set; }
