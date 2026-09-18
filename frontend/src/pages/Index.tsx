@@ -9,7 +9,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { ReportModal } from "@/components/ReportModal";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { Button } from "@/components/ui/button";
-import { BarChart2 } from "lucide-react";
+import { BarChart2, Sparkles } from "lucide-react";
 import { MobileDrawer } from "@/components/MobileDrawer";
 import { Topbar } from "@/components/Topbar";
 import { StatCard } from "@/components/StatCard";
@@ -75,7 +75,7 @@ const Index = () => {
 
         <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
           {/* Sideoverskrift */}
-          <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="mb-5 flex flex-col gap-3 sm:mb-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-slate-50 sm:text-3xl">
@@ -89,6 +89,20 @@ const Index = () => {
                 Velkommen tilbake. Her er status på dine aktive jobbsøknader.
               </p>
             </div>
+
+            <div className="flex min-w-0 flex-1 justify-start">
+              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-cyan-700/40 bg-cyan-950/50 px-3 py-2 text-sm text-cyan-200 shadow-lg shadow-cyan-950/20">
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-cyan-300" />
+                </span>
+                <Sparkles className="h-4 w-4 shrink-0" />
+                <span className="truncate font-medium">
+                  Nytt: legg notater på søknader
+                </span>
+              </div>
+            </div>
+
             <div className="flex shrink-0 items-center gap-2">
               {user?.isAdmin && (
                 <Button
