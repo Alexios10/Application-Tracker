@@ -16,6 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Gjør [Fact], Assert osv. tilgjengelig i alle testfiler -->
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\server\ApplicationTracker.Api.csproj" />
   </ItemGroup>
 
