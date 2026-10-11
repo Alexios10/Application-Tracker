@@ -31,7 +31,7 @@ appsettings.json
 bin
 obj
 
-# Lokale SQLite-filer (prosjektet bruker PostgreSQL)
+# Local SQLite files (the project uses PostgreSQL)
 *.db
 *.db-wal
 *.db-shm

@@ -8,15 +8,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ApplicationTracker.Api.Tests;
 
-// Starter hele API-et i minnet, med en egen tom in-memory database per instans.
-// Hver test lager sin egen TestApi, så testene påvirker ikke hverandre.
+// Runs the whole API in memory, with its own empty in-memory database per instance.
+// Each test creates its own TestApi, so tests never affect each other.
 public class TestApi : WebApplicationFactory<Program>
 {
   public const string Password = "Passord123";
 
   public TestApi()
   {
-    // Program.cs og TokenService leser JWT_KEY fra miljøvariabel
+    // Program.cs and TokenService read JWT_KEY from an environment variable
     Environment.SetEnvironmentVariable("JWT_KEY", "test-nokkel-som-er-minst-32-tegn-lang");
   }
 
@@ -26,17 +26,17 @@ public class TestApi : WebApplicationFactory<Program>
 
     builder.ConfigureServices(services =>
     {
-      // Bytt ut PostgreSQL med en in-memory database
+      // Replace PostgreSQL with an in-memory database
       services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
       services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(databaseName));
     });
   }
 
-  // Cookies er satt med Secure = true, så klienten må bruke https
+  // Cookies are set with Secure = true, so the client must use https
   public HttpClient NewClient() =>
     CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
 
-  // Registrerer en bruker og returnerer en klient som er logget inn
+  // Registers a user and returns a client that is logged in
   public async Task<HttpClient> LoggedInClient(string username, string fullName = "Test Bruker")
   {
     var client = NewClient();

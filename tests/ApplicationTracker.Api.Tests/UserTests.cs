@@ -15,7 +15,7 @@ public class UserTests
     var update = await client.PutAsJsonAsync("/api/user", new { fullName = "Ola Nordmann" });
     Assert.Equal(HttpStatusCode.OK, update.StatusCode);
 
-    // Brukeren skal fortsatt kunne logge inn med det gamle brukernavnet
+    // The user must still be able to log in with the original username
     var freshClient = api.NewClient();
     var login = await freshClient.PostAsJsonAsync("/api/auth/login", new { username = "ola", password = TestApi.Password });
     Assert.Equal(HttpStatusCode.OK, login.StatusCode);

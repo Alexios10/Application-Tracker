@@ -3,8 +3,8 @@ using ApplicationTracker.Api.Models;
 
 namespace ApplicationTracker.Api.DTOs;
 
-// Feltene klienten har lov til å sende når en søknad opprettes eller oppdateres.
-// Id og UserId er bevisst utelatt — de settes alltid av serveren.
+// The fields a client is allowed to send when creating or updating an application.
+// Id and UserId are left out on purpose - the server always sets them.
 public class ApplicationRequest
 {
   [Required]

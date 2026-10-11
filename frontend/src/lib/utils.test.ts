@@ -2,19 +2,19 @@ import { describe, it, expect } from "vitest";
 import { getErrorMessage } from "./utils";
 
 describe("getErrorMessage", () => {
-  it("returnerer meldingen fra en Error", () => {
+  it("returns the message from an Error", () => {
     expect(getErrorMessage(new Error("Noe gikk galt"))).toBe("Noe gikk galt");
   });
 
-  it("bruker standardtekst når feilen ikke er en Error", () => {
+  it("falls back to the default text when the error is not an Error", () => {
     expect(getErrorMessage("bare en streng")).toBe("Ukjent feil");
   });
 
-  it("bruker standardtekst når Error mangler melding", () => {
+  it("falls back to the default text when the Error has no message", () => {
     expect(getErrorMessage(new Error(""))).toBe("Ukjent feil");
   });
 
-  it("kan få egen standardtekst", () => {
+  it("accepts a custom fallback text", () => {
     expect(getErrorMessage(null, "Kunne ikke lagre")).toBe("Kunne ikke lagre");
   });
 });
