@@ -42,7 +42,7 @@ public class ApplicationsController : ControllerBase
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-    // Id og UserId settes alltid av serveren, aldri av klienten
+    // Id and UserId are always set by the server, never by the client
     var application = new Application
     {
       Company = request.Company,
@@ -103,7 +103,7 @@ public class ApplicationsController : ControllerBase
     var user = await _userManager.FindByIdAsync(userId);
     if (user is null) return NotFound();
 
-    // Endrer kun visningsnavnet. UserName er det brukeren logger inn med og skal ikke endres her.
+    // Only the display name changes. UserName is what the user logs in with and must not change here.
     if (!string.IsNullOrWhiteSpace(req.FullName))
     {
       var fullName = req.FullName.Trim();

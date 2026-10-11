@@ -200,12 +200,12 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    // Testene bruker en in-memory database, som ikke støtter migrasjoner
+    // The tests use an in-memory database, which does not support migrations
     if (db.Database.IsRelational())
         db.Database.Migrate();
 }
 
 app.Run();
 
-// Gjør Program synlig for integrasjonstestene (WebApplicationFactory<Program>)
+// Makes Program visible to the integration tests (WebApplicationFactory<Program>)
 public partial class Program { }

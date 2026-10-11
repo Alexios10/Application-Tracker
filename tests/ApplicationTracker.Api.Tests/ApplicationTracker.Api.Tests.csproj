@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Gjør [Fact], Assert osv. tilgjengelig i alle testfiler -->
+    <!-- Makes [Fact], Assert etc. available in every test file -->
     <Using Include="Xunit" />
   </ItemGroup>
 
