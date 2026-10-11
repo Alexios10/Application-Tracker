@@ -61,7 +61,7 @@ cd Application-Tracker
 ### 2. Backend setup
 
 ```bash
-cd server
+cd backend
 ```
 
 Create an `appsettings.Development.json` (already gitignored) with your local database connection:
@@ -111,12 +111,12 @@ Application-Tracker/
 │       ├── hooks/          # Custom React hooks
 │       ├── pages/          # Page-level components
 │       └── types/          # TypeScript types
-├── server/                 # ASP.NET Core backend
+├── backend/                # ASP.NET Core backend
 │   ├── Controllers/        # API endpoints
 │   ├── Data/               # EF Core DbContext
 │   ├── Migrations/         # Database migrations
 │   └── Models/             # Entity models & DTOs
-└── tests/                  # Backend tests (same folder structure as server/)
+└── tests/                  # Backend tests (same folder structure as backend/)
 ```
 
 ---
@@ -138,9 +138,9 @@ All tests also run automatically on every pull request (see `.github/workflows/c
 
 - **Frontend:** next to the file they test, with `.test.ts` / `.test.tsx` at the end.
   Example: `src/hooks/useFilteredApplications.ts` → `src/hooks/useFilteredApplications.test.ts`
-- **Backend:** in `tests/ApplicationTracker.Api.Tests/`, in the same folder structure as `server/`,
+- **Backend:** in `tests/ApplicationTracker.Api.Tests/`, in the same folder structure as `backend/`,
   one test file per class with `Tests` at the end.
-  Example: `server/Controllers/AuthController.cs` → `tests/ApplicationTracker.Api.Tests/Controllers/AuthControllerTests.cs`
+  Example: `backend/Controllers/AuthController.cs` → `tests/ApplicationTracker.Api.Tests/Controllers/AuthControllerTests.cs`
 - Shared test setup goes in `tests/ApplicationTracker.Api.Tests/Helpers/`.
 
 ---

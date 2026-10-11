@@ -15,7 +15,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Kjør som ikke-root bruker for sikkerhet
+# Run as a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser
 USER appuser
 
