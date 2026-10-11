@@ -11,7 +11,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Application } from "@/types/application";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 
 const NAV_ITEMS = [
   { label: "Oversikt", icon: LayoutDashboard, path: "/" },

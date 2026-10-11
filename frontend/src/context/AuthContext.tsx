@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api";
 import {
   createContext,
   useContext,
@@ -30,10 +31,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 export { AuthContext };
-
-const API_BASE = (
-  import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
-).replace(/\/+$/, "");
 
 // Provider-komponent som wrapper hele appen
 export function AuthProvider({ children }: { children: ReactNode }) {

@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api";
 import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
@@ -16,10 +17,6 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-
-  const API_BASE = (
-    import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
-  ).replace(/\/+$/, "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

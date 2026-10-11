@@ -1,10 +1,7 @@
+import { API_BASE } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { Application, ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
-
-const API_BASE = (
-  import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
-).replace(/\/+$/, "");
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 

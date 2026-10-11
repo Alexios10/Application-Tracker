@@ -1,11 +1,10 @@
+import { API_BASE } from "@/lib/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Briefcase, Lock, CheckCircle2, XCircle } from "lucide-react";
-
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5242";
 
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();

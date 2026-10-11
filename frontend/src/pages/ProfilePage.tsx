@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+﻿import { API_BASE } from "@/lib/api";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,10 +26,6 @@ import { Sidebar } from "@/components/Sidebar";
 import { MobileDrawer } from "@/components/MobileDrawer";
 import { Topbar } from "@/components/Topbar";
 import { useApplications } from "@/hooks/useApplications";
-
-const API_BASE = (
-  import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
-).replace(/\/+$/, "");
 
 const ProfilePage = () => {
   const handleBack = () => window.history.back();
