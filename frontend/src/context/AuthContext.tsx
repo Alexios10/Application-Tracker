@@ -8,7 +8,7 @@ import {
 } from "react";
 
 // Typer for auth-data (token lagres i HttpOnly-cookie, ikke i JS)
-interface AuthUser {
+export interface AuthUser {
   fullName: string;
   username: string;
   isAdmin?: boolean;
@@ -24,6 +24,7 @@ interface AuthContextType {
     password: string,
   ) => Promise<string | null>;
   logout: () => void;
+  updateUser: (user: AuthUser) => void;
   authFetch: (url: string, options?: RequestInit) => Promise<Response>;
   isLoading: boolean;
 }
@@ -176,7 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, authFetch, isLoading }}
+      value={{ user, login, register, logout, updateUser: setUser, authFetch, isLoading }}
     >
       {children}
     </AuthContext.Provider>

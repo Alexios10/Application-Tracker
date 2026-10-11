@@ -1,31 +1,39 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { API_BASE } from "@/lib/api";
-import { useState, useEffect } from "react";
 import { Application, ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
-// This hook owns all data fetching and mutation logic.
-// Components just call these functions — they don't care about fetch/API details.
+// This hook owns all data fetching and mutation logic for applications.
+// React Query keeps one shared copy of the list, so every page that calls
+// this hook reuses the same data instead of fetching it again.
 export function useApplications() {
   const { user, authFetch } = useAuth();
-  const [applications, setApplications] = useState<Application[]>([]);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await authFetch(`${API_BASE}/api/applications`, {
-          headers: JSON_HEADERS,
-        });
-        if (!res.ok) return;
-        const data: Application[] = await res.json();
-        setApplications(data);
-      } catch (err) {
-        console.error("Failed to load applications", err);
-      }
-    }
-    load();
-  }, [user, authFetch]);
+  // The username is part of the key, so a different user never sees cached data from the previous one
+  const queryKey = ["applications", user?.username];
+
+  const { data: applications = [], isLoading, isError } = useQuery({
+    queryKey,
+    enabled: !!user,
+    queryFn: async (): Promise<Application[]> => {
+      const res = await authFetch(`${API_BASE}/api/applications`, {
+        headers: JSON_HEADERS,
+      });
+      if (!res.ok) throw new Error("Kunne ikke hente søknadene.");
+      return res.json();
+    },
+  });
+
+  // Updates the cached list directly, so we don't need to fetch everything again after a change
+  function updateCache(change: (current: Application[]) => Application[]) {
+    queryClient.setQueryData<Application[]>(queryKey, (current = []) =>
+      change(current),
+    );
+  }
 
   async function addApplication(app: Omit<Application, "id">) {
     try {
@@ -34,30 +42,27 @@ export function useApplications() {
         headers: JSON_HEADERS,
         body: JSON.stringify(app),
       });
-      if (!res.ok) return;
+      if (!res.ok) throw new Error();
       const created: Application = await res.json();
-      setApplications((prev) => [created, ...prev]);
-    } catch (err) {
-      console.error("Failed to add application", err);
+      updateCache((current) => [created, ...current]);
+    } catch {
+      toast.error("Kunne ikke legge til søknaden.");
     }
   }
 
   async function updateApplication(updated: Application) {
     try {
-      const res = await authFetch(
-        `${API_BASE}/api/applications/${updated.id}`,
-        {
-          method: "PUT",
-          headers: JSON_HEADERS,
-          body: JSON.stringify(updated),
-        },
+      const res = await authFetch(`${API_BASE}/api/applications/${updated.id}`, {
+        method: "PUT",
+        headers: JSON_HEADERS,
+        body: JSON.stringify(updated),
+      });
+      if (!res.ok) throw new Error();
+      updateCache((current) =>
+        current.map((a) => (a.id === updated.id ? updated : a)),
       );
-      if (!res.ok) return;
-      setApplications((prev) =>
-        prev.map((a) => (a.id === updated.id ? updated : a)),
-      );
-    } catch (err) {
-      console.error("Failed to update application", err);
+    } catch {
+      toast.error("Kunne ikke lagre endringen.");
     }
   }
 
@@ -73,15 +78,17 @@ export function useApplications() {
         method: "DELETE",
         headers: JSON_HEADERS,
       });
-      if (!res.ok) return;
-      setApplications((prev) => prev.filter((a) => a.id !== id));
-    } catch (err) {
-      console.error("Failed to delete application", err);
+      if (!res.ok) throw new Error();
+      updateCache((current) => current.filter((a) => a.id !== id));
+    } catch {
+      toast.error("Kunne ikke slette søknaden.");
     }
   }
 
   return {
     applications,
+    isLoading,
+    isError,
     addApplication,
     updateApplication,
     updateStatus,

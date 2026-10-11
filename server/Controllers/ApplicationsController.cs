@@ -103,7 +103,7 @@ public class ApplicationsController : ControllerBase
     var user = await _userManager.FindByIdAsync(userId);
     if (user is null) return NotFound();
 
-    // Only the display name changes. UserName is what the user logs in with and must not change here.
+    // FullName is the display name, UserName is what the user logs in with
     if (!string.IsNullOrWhiteSpace(req.FullName))
     {
       var fullName = req.FullName.Trim();
@@ -111,6 +111,23 @@ public class ApplicationsController : ControllerBase
         return BadRequest(new { error = "Fullt navn kan maks være 100 tegn." });
 
       user.FullName = fullName;
+    }
+
+    if (!string.IsNullOrWhiteSpace(req.Username) && req.Username.Trim() != user.UserName)
+    {
+      var username = req.Username.Trim();
+      if (username.Length > 50)
+        return BadRequest(new { error = "Brukernavnet kan maks være 50 tegn." });
+
+      // SetUserNameAsync checks that the username is valid and not already taken
+      var usernameResult = await _userManager.SetUserNameAsync(user, username);
+      if (!usernameResult.Succeeded)
+      {
+        var msg = usernameResult.Errors.Any(e => e.Code == "DuplicateUserName")
+            ? "Brukernavnet er allerede i bruk."
+            : "Brukernavnet kan bare inneholde bokstaver (a-z), tall og tegnene - . _ @ +";
+        return BadRequest(new { error = msg });
+      }
     }
 
     var updateResult = await _userManager.UpdateAsync(user);
@@ -132,7 +149,7 @@ public class ApplicationsController : ControllerBase
       }
     }
 
-    return Ok();
+    return Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
   }
 
   // SLETT BRUKER
