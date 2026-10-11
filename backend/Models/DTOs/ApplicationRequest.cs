@@ -22,4 +22,12 @@ public class ApplicationRequest
 
   [MaxLength(1000)]
   public string? Note { get; set; }
+
+  // Only http(s) links are allowed, so a link like "javascript:..." can never be saved
+  [MaxLength(500)]
+  [RegularExpression(@"^https?://\S+$", ErrorMessage = "Lenken må starte med http:// eller https://")]
+  public string? JobUrl { get; set; }
+
+  [MaxLength(20)]
+  public string? Deadline { get; set; }
 }

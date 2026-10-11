@@ -42,6 +42,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(a => a.UserId)
                 .HasColumnName("user_id");
 
+            entity.Property(a => a.JobUrl)
+                .HasColumnName("job_url");
+
+            entity.Property(a => a.Deadline)
+                .HasColumnName("deadline");
+
             // Relationship: each application belongs to one user
             entity.HasOne(a => a.User)
                 .WithMany()

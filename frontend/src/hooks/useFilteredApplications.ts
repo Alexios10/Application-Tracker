@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Application } from "@/types/application";
+import { sortNewestFirst } from "@/lib/applications";
 import { StatFilter } from "@/constants/status";
 
 const ITEMS_PER_PAGE = 10;
@@ -33,13 +34,7 @@ export function useFilteredApplications(applications: Application[]) {
       );
     }
 
-    return [...result].sort((a, b) => {
-      const toDate = (d: string) => {
-        const [day, month, year] = d.split(".").map(Number);
-        return new Date(2000 + year, month - 1, day).getTime();
-      };
-      return toDate(b.dateSent) - toDate(a.dateSent);
-    });
+    return sortNewestFirst(result);
   }, [applications, statusFilter, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));

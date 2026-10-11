@@ -47,6 +47,8 @@ public class ApplicationsController : ControllerBase
       DateSent = request.DateSent,
       Status = request.Status,
       Note = request.Note ?? string.Empty,
+      JobUrl = EmptyToNull(request.JobUrl),
+      Deadline = EmptyToNull(request.Deadline),
       UserId = userId
     };
 
@@ -70,6 +72,8 @@ public class ApplicationsController : ControllerBase
     existing.DateSent = updated.DateSent;
     existing.Status = updated.Status;
     existing.Note = updated.Note ?? string.Empty;
+    existing.JobUrl = EmptyToNull(updated.JobUrl);
+    existing.Deadline = EmptyToNull(updated.Deadline);
 
     await _db.SaveChangesAsync();
     return NoContent();
@@ -89,4 +93,8 @@ public class ApplicationsController : ControllerBase
     await _db.SaveChangesAsync();
     return NoContent();
   }
+
+  // Optional text fields are stored as null instead of an empty string
+  private static string? EmptyToNull(string? value) =>
+    string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

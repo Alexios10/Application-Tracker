@@ -12,7 +12,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const links = [
     { to: "/", label: "Oversikt" },
-    { to: "/profile", label: "Profil" },
     ...(user?.isAdmin ? [{ to: "/admin/reports", label: "Rapporter" }] : []),
   ];
 

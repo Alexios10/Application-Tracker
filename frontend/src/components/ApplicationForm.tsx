@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format, parse } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { Application, ApplicationStatus } from "@/types/application";
 import { STATUSES } from "@/constants/status";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,14 @@ export function ApplicationForm({
   const [status, setStatus] = useState<ApplicationStatus>(
     initial?.status ?? "Sendt",
   );
+  const [jobUrl, setJobUrl] = useState(initial?.jobUrl ?? "");
+  const [deadline, setDeadline] = useState<Date | undefined>(
+    initial?.deadline
+      ? parse(initial.deadline, DATE_FORMAT, new Date())
+      : undefined,
+  );
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [deadlineOpen, setDeadlineOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +67,8 @@ export function ApplicationForm({
       position: position.trim(),
       dateSent: format(dateSent, DATE_FORMAT),
       status,
+      jobUrl: jobUrl.trim() || null,
+      deadline: deadline ? format(deadline, DATE_FORMAT) : null,
     });
   };
 
@@ -132,6 +141,69 @@ export function ApplicationForm({
               ))}
             </SelectContent>
           </Select>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="jobUrl">
+          Lenke til annonsen{" "}
+          <span className="font-normal text-muted-foreground">(valgfritt)</span>
+        </Label>
+        <Input
+          id="jobUrl"
+          type="url"
+          inputMode="url"
+          value={jobUrl}
+          onChange={(e) => setJobUrl(e.target.value)}
+          placeholder="https://"
+          pattern="https?://.+"
+          title="Lenken må starte med http:// eller https://"
+          maxLength={500}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label>
+          Søknadsfrist{" "}
+          <span className="font-normal text-muted-foreground">(valgfritt)</span>
+        </Label>
+        <div className="flex gap-2">
+          <Popover open={deadlineOpen} onOpenChange={setDeadlineOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className={`flex-1 justify-start font-normal ${deadline ? "" : "text-muted-foreground"}`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                {deadline
+                  ? format(deadline, "d. MMMM yyyy", { locale: nb })
+                  : "Ingen frist valgt"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                locale={nb}
+                selected={deadline}
+                onSelect={(date) => {
+                  setDeadline(date ?? undefined);
+                  setDeadlineOpen(false);
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          {deadline && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setDeadline(undefined)}
+              aria-label="Fjern søknadsfrist"
+              title="Fjern søknadsfrist"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
       <div className="flex justify-end gap-2 pt-2">

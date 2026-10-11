@@ -43,6 +43,16 @@ namespace ApplicationTracker.Api.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("date_sent");
 
+                    b.Property<string>("Deadline")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("deadline");
+
+                    b.Property<string>("JobUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("job_url");
+
                     b.Property<string>("Note")
                         .IsRequired()
                         .HasMaxLength(1000)

@@ -3,6 +3,7 @@ import { useFilteredApplications } from "@/hooks/useFilteredApplications";
 import { AppLayout } from "@/components/AppLayout";
 import AddApplicationDialog from "@/components/AddApplicationDialog";
 import { StatusOverview } from "@/components/StatusOverview";
+import { ExportMenu } from "@/components/ExportMenu";
 import { ApplicationListPanel } from "@/components/ApplicationListPanel";
 
 const Index = () => {
@@ -41,7 +42,10 @@ const Index = () => {
             {applications.length === 1 ? "søknad" : "søknader"}
           </p>
         </div>
-        <AddApplicationDialog onAdd={addApplication} />
+        <div className="flex gap-2">
+          <ExportMenu applications={applications} />
+          <AddApplicationDialog onAdd={addApplication} />
+        </div>
       </div>
 
       {applications.length > 0 && (

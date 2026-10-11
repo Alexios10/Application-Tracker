@@ -84,3 +84,30 @@
     }
   }
 }
+
+/* Printing: hide everything except the printable list (PrintableList.tsx) */
+.print-only {
+  display: none;
+}
+
+@media print {
+  /* Hides the app and anything else on the page, e.g. a menu that is still closing */
+  body > *:not(.print-only) {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+    padding: 12mm;
+  }
+
+  body {
+    background: white;
+  }
+
+  /* No page margin means the browser has no room for its own header and footer
+     (date, page title and web address), so the margin is added as padding above instead */
+  @page {
+    margin: 0;
+  }
+}
