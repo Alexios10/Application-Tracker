@@ -1,10 +1,12 @@
-import { Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Application, ApplicationStatus } from "@/types/application";
 import ApplicationTable from "@/components/application-table/ApplicationTable";
 
 interface Props {
   applications: Application[]; // already filtered + paginated
+  hasApplications: boolean; // false when the user has no applications at all
+  isLoading: boolean;
   totalCount: number; // total after filtering (for "showing X of Y")
   page: number;
   totalPages: number;
@@ -18,6 +20,8 @@ interface Props {
 
 export function ApplicationListPanel({
   applications,
+  hasApplications,
+  isLoading,
   totalCount,
   page,
   totalPages,
@@ -31,68 +35,84 @@ export function ApplicationListPanel({
   const from = totalCount === 0 ? 0 : (page - 1) * 10 + 1;
   const to = Math.min(page * 10, totalCount);
 
-  return (
-    <div className="rounded-2xl border border-slate-800/60 bg-slate-900/60">
-      {/* Toolbar */}
-      <div className="flex flex-col gap-3 border-b border-slate-800/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
-        <h2 className="text-base font-semibold text-slate-100 sm:text-lg">
-          Søknadsliste
-        </h2>
+  if (isLoading) {
+    return <p className="py-10 text-muted-foreground">Henter søknadene...</p>;
+  }
 
-        <div className="relative w-full sm:w-64">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+  if (!hasApplications) {
+    return (
+      <div className="rounded-xl border border-dashed bg-card px-6 py-12 text-center">
+        <p className="font-medium">Du har ingen søknader ennå</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Legg til den første søknaden din, så får du oversikten her.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border bg-card">
+      <div className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:w-72">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Søk i søknader"
+            placeholder="Søk etter bedrift eller stilling"
+            aria-label="Søk i søknader"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="border-slate-700/80 bg-slate-950/70 pl-9 text-sm text-slate-100 placeholder:text-slate-500 focus-visible:ring-cyan-500"
+            className="pl-9 pr-9"
           />
           {search && (
             <button
               onClick={() => onSearchChange("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+              aria-label="Tøm søket"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
             >
-              ✕
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
+        <p className="tabular text-sm text-muted-foreground">
+          Viser {from}–{to} av {totalCount}
+        </p>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {applications.length === 0 ? (
+        <p className="px-4 py-10 text-center text-sm text-muted-foreground">
+          Ingen søknader passer søket eller filteret.
+        </p>
+      ) : (
         <ApplicationTable
           applications={applications}
           onUpdateStatus={onUpdateStatus}
           onDelete={onDelete}
           onEdit={onEdit}
         />
-      </div>
+      )}
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-slate-800/60 px-4 py-3 sm:px-6">
-        <p className="text-xs text-slate-500">
-          Viser {from}–{to} av {totalCount} søknader
-        </p>
-        <div className="flex items-center gap-2">
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
           <button
             disabled={page === 1}
             onClick={() => onPageChange(page - 1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            aria-label="Forrige side"
+            className="flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
           >
-            ‹
+            <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="text-xs text-slate-500">
-            {page} / {totalPages}
+          <span className="tabular min-w-[3.5rem] text-center text-sm text-muted-foreground">
+            {page} av {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => onPageChange(page + 1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            aria-label="Neste side"
+            className="flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
           >
-            ›
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

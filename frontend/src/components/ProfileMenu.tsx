@@ -1,80 +1,88 @@
 import { useState, useRef, useEffect } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { User, LogOut } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { LifeBuoy, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
-export function ProfileMenu() {
+export function ProfileMenu({ onReport }: { onReport: () => void }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Close the menu when clicking outside it or pressing Escape
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, []);
+
+  const itemClass =
+    "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm hover:bg-muted";
 
   return (
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="rounded-full border-2 border-slate-700 bg-transparent focus:outline-none focus:ring-2 focus:ring-sky-400"
-        title="Profilmeny"
+        aria-label="Åpne brukermeny"
+        aria-expanded={open}
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-sm font-semibold text-primary-foreground"
       >
-        <Avatar>
-          <AvatarFallback className="bg-transparent">
-            {user?.fullName?.[0]?.toUpperCase() || "P"}
-          </AvatarFallback>
-        </Avatar>
+        {user?.fullName?.[0]?.toUpperCase() || "?"}
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              transition: { duration: 0.18, ease: "easeOut" },
+      {open && (
+        <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border bg-popover p-1 shadow-lg">
+          <div className="px-3 py-2">
+            <p className="truncate text-sm font-medium">{user?.fullName}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {user?.username}
+            </p>
+          </div>
+          <div className="my-1 border-t" />
+          <button
+            className={itemClass}
+            onClick={() => {
+              navigate("/profile");
+              setOpen(false);
             }}
-            exit={{
-              opacity: 0,
-              y: -8,
-              transition: { duration: 0.12, ease: "easeIn" },
-            }}
-            className="absolute right-0 mt-2 w-48 rounded-lg border border-slate-700 bg-slate-900 p-1 text-slate-100 shadow-xl z-50"
           >
-            <button
-              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm cursor-pointer hover:bg-slate-800"
-              onClick={() => {
-                navigate("/profile");
-                setOpen(false);
-              }}
-            >
-              <User className="h-4 w-4 text-slate-400" />
-              Min profil
-            </button>
-            <div className="my-1 border-t border-slate-700/80" />
-            <button
-              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm cursor-pointer text-rose-400 hover:bg-slate-800"
-              onClick={() => {
-                logout();
-                setOpen(false);
-              }}
-            >
-              <LogOut className="h-4 w-4" />
-              Logg ut
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <User className="h-4 w-4 text-muted-foreground" />
+            Min profil
+          </button>
+          <button
+            className={itemClass}
+            onClick={() => {
+              onReport();
+              setOpen(false);
+            }}
+          >
+            <LifeBuoy className="h-4 w-4 text-muted-foreground" />
+            Rapporter et problem
+          </button>
+          <div className="my-1 border-t" />
+          <button
+            className={itemClass}
+            onClick={() => {
+              logout();
+              setOpen(false);
+            }}
+          >
+            <LogOut className="h-4 w-4 text-muted-foreground" />
+            Logg ut
+          </button>
+        </div>
+      )}
     </div>
   );
 }

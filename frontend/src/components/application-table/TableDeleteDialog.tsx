@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
 type DeleteDialogProps = {
@@ -20,33 +19,29 @@ type DeleteDialogProps = {
 export const DeleteDialog = ({ company, onDelete }: DeleteDialogProps) => (
   <AlertDialog>
     <AlertDialogTrigger asChild>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+      <button
+        aria-label={`Slett søknaden til ${company}`}
+        title="Slett søknad"
+        className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
       >
-        <Trash2 className="h-5 w-5" />
-      </Button>
+        <Trash2 className="h-4 w-4" />
+      </button>
     </AlertDialogTrigger>
 
-    <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
+    <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-        <AlertDialogDescription className="text-slate-400">
-          Dette vil slette søknaden til{" "}
-          <span className="font-medium text-slate-200">{company}</span>{" "}
-          permanent. Denne handlingen kan ikke angres.
+        <AlertDialogTitle>Slette søknaden til {company}?</AlertDialogTitle>
+        <AlertDialogDescription>
+          Søknaden og notatet blir slettet for godt. Dette kan ikke angres.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
-          Avbryt
-        </AlertDialogCancel>
+        <AlertDialogCancel>Avbryt</AlertDialogCancel>
         <AlertDialogAction
           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           onClick={onDelete}
         >
-          Slett
+          Slett søknad
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
