@@ -23,7 +23,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Skjema-felter
+  // Form fields
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -55,7 +55,7 @@ const LoginPage = () => {
     updateMeta('meta[name="twitter:description"]', description);
   }, [isRegister]);
 
-  // Allerede innlogget? Gå til forsiden
+  // Already logged in? Go to the front page
   if (user) {
     return <Navigate to="/" replace />;
   }
@@ -81,7 +81,7 @@ const LoginPage = () => {
       setError(result);
     } else {
       if (isRegister) {
-        // Bytt tilbake til login etter registrering
+        // Switch back to login after registration
         setIsRegister(false);
         setFullName("");
         setEmail("");
@@ -147,7 +147,7 @@ const LoginPage = () => {
             </div>
           </motion.section>
 
-          {/* Skjema */}
+          {/* Form */}
           <motion.form
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -166,14 +166,14 @@ const LoginPage = () => {
               </p>
             </div>
 
-            {/* Feilmelding */}
+            {/* Error message */}
             {error && (
               <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                 {error}
               </div>
             )}
 
-            {/* Registrerings-felter */}
+            {/* Registration fields */}
             <AnimatePresence>
               {isRegister && (
                 <motion.div
@@ -217,7 +217,7 @@ const LoginPage = () => {
               )}
             </AnimatePresence>
 
-            {/* Brukernavn */}
+            {/* Username */}
             <div className="space-y-2">
               <Label htmlFor="username" className="text-slate-300">
                 Brukernavn
@@ -232,7 +232,7 @@ const LoginPage = () => {
               />
             </div>
 
-            {/* Passord */}
+            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password" className="text-slate-300">
                 Passord
@@ -278,7 +278,7 @@ const LoginPage = () => {
               </div>
             )}
 
-            {/* Knapp */}
+            {/* Submit button */}
             <Button
               type="submit"
               disabled={loading}
@@ -291,7 +291,7 @@ const LoginPage = () => {
                   : "Logg inn"}
             </Button>
 
-            {/* Bytt mellom login/register */}
+            {/* Switch between login/register */}
             <p className="text-center text-sm text-slate-400">
               {isRegister
                 ? "Har du allerede en konto? "
@@ -310,7 +310,7 @@ const LoginPage = () => {
           </motion.form>
         </div>
 
-        {/* Personvern */}
+        {/* Privacy */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

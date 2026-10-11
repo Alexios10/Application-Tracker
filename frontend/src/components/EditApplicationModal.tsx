@@ -49,7 +49,7 @@ export const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
   );
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  // Oppdater felter hvis application endres
+  // Update the fields when the application changes
   React.useEffect(() => {
     setCompany(application?.company || "");
     setPosition(application?.position || "");

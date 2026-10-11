@@ -31,7 +31,7 @@ public class Application
   [MaxLength(1000)]
   public string Note { get; set; } = string.Empty;
 
-  // Kobling til brukeren som eier søknaden
+  // Link to the user who owns the application
   public string? UserId { get; set; }
   public User? User { get; set; }
 }

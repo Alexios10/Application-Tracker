@@ -19,7 +19,7 @@ public class ApplicationsController : ControllerBase
     _db = db;
   }
 
-  // HENT EGNE SØKNADER
+  // Get the logged-in user's applications
   [HttpGet("api/applications")]
   public async Task<IActionResult> GetApplications()
   {
@@ -33,7 +33,7 @@ public class ApplicationsController : ControllerBase
     return Ok(applications);
   }
 
-  // LEGG TIL NY SØKNAD
+  // Create a new application
   [HttpPost("api/applications")]
   public async Task<IActionResult> CreateApplication([FromBody] ApplicationRequest request)
   {
@@ -55,7 +55,7 @@ public class ApplicationsController : ControllerBase
     return Created($"/api/applications/{application.Id}", application);
   }
 
-  // OPPDATER SØKNAD
+  // Update an application
   [HttpPut("api/applications/{id}")]
   public async Task<IActionResult> UpdateApplication(int id, [FromBody] ApplicationRequest updated)
   {
@@ -75,7 +75,7 @@ public class ApplicationsController : ControllerBase
     return NoContent();
   }
 
-  // SLETT SØKNAD
+  // Delete an application
   [HttpDelete("api/applications/{id}")]
   public async Task<IActionResult> DeleteApplication(int id)
   {

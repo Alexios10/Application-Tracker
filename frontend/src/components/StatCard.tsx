@@ -7,7 +7,7 @@ interface Props {
   onClick: (filter: StatFilter) => void;
 }
 
-// En enkelt klikkbar statuskort. Mottar alt det trenger som props.
+// A single clickable status card. Receives everything it needs as props.
 export function StatCard({ config, value, isActive, onClick }: Props) {
   const { label, icon: Icon, color, bg, filter } = config;
 

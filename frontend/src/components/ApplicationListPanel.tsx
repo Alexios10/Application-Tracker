@@ -5,7 +5,7 @@ import ApplicationTable from "@/components/application-table/ApplicationTable";
 
 interface Props {
   applications: Application[]; // already filtered + paginated
-  totalCount: number; // total after filtering (for "viser X av Y")
+  totalCount: number; // total after filtering (for "showing X of Y")
   page: number;
   totalPages: number;
   search: string;

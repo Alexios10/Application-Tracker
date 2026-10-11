@@ -17,7 +17,7 @@ const ResetPasswordPage: React.FC = () => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
 
-  // Redirect til login etter 3 sekunder ved suksess
+  // Redirect to login after 3 seconds on success
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => navigate("/login"), 3000);
@@ -42,7 +42,7 @@ const ResetPasswordPage: React.FC = () => {
       if (res.ok) {
         setSuccess(true);
       } else {
-        // Les feilmelding fra backend
+        // Read the error message from the backend
         try {
           const data = await res.json();
           setError(data.error || "Ugyldig eller utløpt lenke.");
@@ -99,7 +99,7 @@ const ResetPasswordPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Skjema */}
+        {/* Form */}
         <div className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur">
           {error && (
             <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">

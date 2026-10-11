@@ -12,11 +12,11 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Legg til controller-tjenester
+// Add controller services
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // Gjør at enums serialiseres/deserialiseres som tekst (f.eks. "Sendt") i stedet for tall
+        // Makes enums serialize/deserialize as text (e.g. "Sendt") instead of numbers
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
@@ -48,7 +48,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
-// ---------- IDENTITY (brukeradministrasjon) ----------
+// ---------- IDENTITY (user management) ----------
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -60,7 +60,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// ---------- JWT AUTENTISERING ----------
+// ---------- JWT AUTHENTICATION ----------
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
     ?? builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("JWT Key not configured.");
@@ -89,7 +89,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 
-    // Les JWT fra HttpOnly-cookie i stedet for Authorization-header
+    // Read the JWT from an HttpOnly cookie instead of the Authorization header
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -162,7 +162,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
-// ---------- SIKKERHETSHODER ----------
+// ---------- SECURITY HEADERS ----------
 app.Use(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";

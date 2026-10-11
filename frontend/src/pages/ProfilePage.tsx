@@ -136,7 +136,7 @@ const ProfilePage = () => {
 
   return (
     <div className="flex h-screen bg-[#0f1117] text-slate-50 overflow-hidden">
-      {/* Skrivebords sidepanel – fast posisjonert slik at den overlapper innholdet */}
+      {/* Desktop sidebar - fixed position so it overlaps the content */}
       <aside className="hidden lg:block fixed left-0 top-0 h-full z-40 border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar onAdd={addApplication} onReport={() => {}} onLogout={logout} />
       </aside>
@@ -150,12 +150,12 @@ const ProfilePage = () => {
         onLogout={logout}
       />
 
-      {/* Hovedinnhold – pl-[60px] på stor skjerm for å gi plass til kollapset sidebar */}
+      {/* Main content - pl-[60px] on large screens to make room for the collapsed sidebar */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden lg:pl-[60px]">
         <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
         <main className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col lg:flex-row gap-5 max-w-5xl mx-auto justify-center min-h-[60vh]">
-            {/* Venstre side: Skjema */}
+            {/* Left side: form */}
             <div className="flex-1 rounded-2xl bg-[#181c24] border border-slate-800/60 p-6">
               <h1 className="text-2xl font-bold mb-6 tracking-tight">
                 Brukerprofil
@@ -298,7 +298,7 @@ const ProfilePage = () => {
               </form>
             </div>
 
-            {/* Høyre side: Brukerinformasjon */}
+            {/* Right side: user information */}
             <div className="w-full lg:w-64 space-y-4 shrink-0 self-start">
               <div className="rounded-2xl bg-[#181c24] border border-slate-800/60 p-5">
                 <div className="flex items-center gap-3 mb-4">

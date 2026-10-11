@@ -7,7 +7,7 @@ import {
   ReactNode,
 } from "react";
 
-// Typer for auth-data (token lagres i HttpOnly-cookie, ikke i JS)
+// Types for auth data (the token is stored in an HttpOnly cookie, not in JS)
 export interface AuthUser {
   fullName: string;
   username: string;
@@ -36,13 +36,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 export { AuthContext };
 
-// Provider-komponent som wrapper hele appen
+// Provider component that wraps the whole app
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Sjekk om bruker er innlogget ved oppstart
-  // Prøver /me først, og ved 401 forsøker refresh for å fornye utløpt access-token
+  // Check if the user is logged in on startup
+  // Tries /me first, and on 401 calls refresh to renew an expired access token
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           credentials: "include",
         });
 
-        // Hvis access-token er utløpt, prøv å fornye med refresh-token
+        // If the access token has expired, try to renew it with the refresh token
         if (res.status === 401) {
           const refreshRes = await fetch(`${API_BASE}/api/auth/refresh`, {
             method: "POST",
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
       } catch {
-        // Nettverksfeil — bruker forblir utlogget
+        // Network error - the user stays logged out
       } finally {
         setIsLoading(false);
       }
@@ -80,26 +80,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  // Fetch-wrapper: ved 401, prøv å fornye token og kjør kallet på nytt
+  // Fetch wrapper: on 401, renew the token and retry the request
   const authFetch = useCallback(
     async (url: string, options: RequestInit = {}): Promise<Response> => {
       const res = await fetch(url, { ...options, credentials: "include" });
 
       if (res.status !== 401) return res;
 
-      // Forsøk å fornye access-token med refresh-token
+      // Try to renew the access token with the refresh token
       const refreshRes = await fetch(`${API_BASE}/api/auth/refresh`, {
         method: "POST",
         credentials: "include",
       });
 
       if (!refreshRes.ok) {
-        // Refresh feilet — logg ut brukeren
+        // Refresh failed - log the user out
         setUser(null);
         return res;
       }
 
-      // Oppdater bruker-data fra refresh-responsen
+      // Update the user data from the refresh response
       const data = await refreshRes.json();
       setUser({
         fullName: data.fullName,
@@ -107,13 +107,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin: data.isAdmin ?? false,
       });
 
-      // Kjør det opprinnelige kallet på nytt med ny access-token
+      // Retry the original request with the new access token
       return fetch(url, { ...options, credentials: "include" });
     },
     [],
   );
 
-  // Innlogging — returnerer feilmelding eller null ved suksess
+  // Login - returns an error message, or null on success
   const login = async (
     username: string,
     password: string,
@@ -138,13 +138,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: data.username,
         isAdmin: data.isAdmin ?? false,
       });
-      return null; // Ingen feil
+      return null; // No error
     } catch {
       return "Kunne ikke koble til serveren.";
     }
   };
 
-  // Registrering — returnerer feilmelding eller null ved suksess
+  // Registration - returns an error message, or null on success
   const register = async (
     username: string,
     email: string,

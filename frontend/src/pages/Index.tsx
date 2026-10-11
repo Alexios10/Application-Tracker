@@ -21,7 +21,7 @@ const Index = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
-  // Alle datahenting og mutasjoner relatert til søknader håndteres i denne hooken
+  // All fetching and changes to applications are handled by this hook
   const {
     applications,
     addApplication,
@@ -30,7 +30,7 @@ const Index = () => {
     deleteApplication,
   } = useApplications();
 
-  // Alle filtrering, søk og paginering for søknadslisten
+  // All filtering, searching and pagination for the application list
   const {
     search,
     setSearch,
@@ -43,7 +43,7 @@ const Index = () => {
     paginated,
   } = useFilteredApplications(applications);
 
-  // Antall per status for statuskortene - basert på den fullstendige søknadslisten, ikke bare den filtrerte/paginerte
+  // Count per status for the status cards - based on the full list, not the filtered/paginated one
   const countByFilter = (filter: string) =>
     filter === "all"
       ? applications.length
@@ -51,7 +51,7 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-[#0d0f14] text-slate-100 overflow-hidden">
-      {/* Skrivebords sidepanel – fast posisjonert slik at den overlapper innholdet */}
+      {/* Desktop sidebar - fixed position so it overlaps the content */}
       <aside className="hidden lg:block fixed left-0 top-0 h-full z-40 border-r border-slate-800/60 bg-[#10121a]">
         <Sidebar
           onAdd={addApplication}
@@ -60,7 +60,7 @@ const Index = () => {
         />
       </aside>
 
-      {/* Mobilskuff – skjult på skrivebord */}
+      {/* Mobile drawer - hidden on desktop */}
       <MobileDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -69,12 +69,12 @@ const Index = () => {
         onLogout={logout}
       />
 
-      {/* Hovedinnhold – pl-[60px] på stor skjerm for å gi plass til kollapset sidebar */}
+      {/* Main content - pl-[60px] on large screens to make room for the collapsed sidebar */}
       <div className="flex flex-1 flex-col overflow-hidden min-w-0 lg:pl-[60px]">
         <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
 
         <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
-          {/* Sideoverskrift */}
+          {/* Page header */}
           <div className="mb-5 flex flex-col gap-3 sm:mb-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <div className="flex items-center gap-3">
@@ -118,7 +118,7 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Status kort */}
+          {/* Status cards */}
           <div className="mb-5 grid grid-cols-2 gap-3 sm:mb-6 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
             {STAT_CONFIGS.map((config) => (
               <StatCard
@@ -131,7 +131,7 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Søknadstabell med søk og paginering */}
+          {/* Application table with search and pagination */}
           <ApplicationListPanel
             applications={paginated}
             totalCount={filtered.length}

@@ -36,7 +36,7 @@ const ForgotPasswordPage: React.FC = () => {
         return;
       }
 
-      // Backend sender e-post direkte — vi viser bare bekreftelse
+      // The backend sends the email - we only show a confirmation
       setSent(true);
     } catch (err) {
       setError("Noe gikk galt. Prøv igjen.");
@@ -62,7 +62,7 @@ const ForgotPasswordPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Skjema */}
+        {/* Form */}
         <div className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur">
           {error && (
             <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">

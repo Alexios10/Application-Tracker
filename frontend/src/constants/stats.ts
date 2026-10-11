@@ -17,7 +17,7 @@ export interface StatConfig {
   filter: StatFilter;
 }
 
-// Legg til flere stat configs her hvis vi vil ha flere stat cards, eller endre eksisterende
+// Add more stat configs here to get more stat cards, or change the existing ones
 export const STAT_CONFIGS: StatConfig[] = [
   {
     label: "Venter",

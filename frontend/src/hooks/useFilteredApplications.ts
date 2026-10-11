@@ -11,8 +11,8 @@ export function useFilteredApplications(applications: Application[]) {
   const [statusFilter, setStatusFilter] = useState<StatFilter>("all");
   const [page, setPage] = useState(1);
 
-  // Reset til første side ved endring i søk eller filter, for å unngå "ingen resultater"
-  // når man er på en høyere side enn det nye resultatsettet har.
+  // Go back to the first page when the search or filter changes, to avoid "no results"
+  // when the current page is higher than the new result set has.
   useEffect(() => {
     setPage(1);
   }, [search, statusFilter]);
