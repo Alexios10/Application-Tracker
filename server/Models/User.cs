@@ -16,4 +16,7 @@ public class User : IdentityUser
   // For token refresh/revokering
   public string? RefreshToken { get; set; }
   public DateTime? RefreshTokenExpires { get; set; }
+
+  // "Remember me" choice from the last login. Decides how long the user stays logged in.
+  public bool RememberMe { get; set; }
 }

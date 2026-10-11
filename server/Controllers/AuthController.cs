@@ -86,6 +86,8 @@ public class AuthController : ControllerBase
     if (!validPassword)
       return BadRequest(new { error = "Feil brukernavn eller passord." });
 
+    // Saved on the user so the choice is kept when the token is refreshed later
+    user.RememberMe = request.RememberMe;
     await _tokenService.SetAuthAndRefreshCookies(HttpContext, user, _db);
     return Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
   }
