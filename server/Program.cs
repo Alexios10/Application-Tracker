@@ -199,7 +199,13 @@ app.MapFallbackToFile("index.html");
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+
+    // Testene bruker en in-memory database, som ikke støtter migrasjoner
+    if (db.Database.IsRelational())
+        db.Database.Migrate();
 }
 
 app.Run();
+
+// Gjør Program synlig for integrasjonstestene (WebApplicationFactory<Program>)
+public partial class Program { }
