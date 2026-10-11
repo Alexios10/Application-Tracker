@@ -124,7 +124,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ username, password, rememberMe }),
+        // Spaces around the username are removed, the password is sent exactly as typed
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+          rememberMe,
+        }),
       });
 
       const data = await res.json();
@@ -156,7 +161,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ username, email, fullName, password }),
+        body: JSON.stringify({
+          username: username.trim(),
+          email: email.trim(),
+          fullName: fullName.trim(),
+          password,
+        }),
       });
 
       const data = await res.json();
@@ -182,7 +192,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, updateUser: setUser, authFetch, isLoading }}
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        updateUser: setUser,
+        authFetch,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

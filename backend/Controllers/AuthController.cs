@@ -31,24 +31,30 @@ public class AuthController : ControllerBase
   [EnableRateLimiting("auth")]
   public async Task<IActionResult> Register([FromBody] RegisterRequest request)
   {
-    if (string.IsNullOrWhiteSpace(request.Username) || request.Username.Length > 50)
+    // Spaces before and after are removed from everything except the password,
+    // where a space can be a real part of what the user chose
+    var username = request.Username?.Trim();
+    var email = request.Email?.Trim();
+    var fullName = request.FullName?.Trim();
+
+    if (string.IsNullOrWhiteSpace(username) || username.Length > 50)
       return BadRequest(new { error = "Brukernavn er påkrevd (maks 50 tegn)." });
-    if (string.IsNullOrWhiteSpace(request.Email) || request.Email.Length > 100)
+    if (string.IsNullOrWhiteSpace(email) || email.Length > 100)
       return BadRequest(new { error = "E-post er påkrevd (maks 100 tegn)." });
-    if (string.IsNullOrWhiteSpace(request.FullName) || request.FullName.Length > 100)
+    if (string.IsNullOrWhiteSpace(fullName) || fullName.Length > 100)
       return BadRequest(new { error = "Fullt navn er påkrevd (maks 100 tegn)." });
     if (string.IsNullOrWhiteSpace(request.Password))
       return BadRequest(new { error = "Passord er påkrevd." });
 
-    var existingUser = await _userManager.FindByNameAsync(request.Username);
+    var existingUser = await _userManager.FindByNameAsync(username);
     if (existingUser is not null)
       return BadRequest(new { error = "Brukernavnet er allerede i bruk." });
 
     var user = new User
     {
-      UserName = request.Username,
-      Email = request.Email,
-      FullName = request.FullName
+      UserName = username,
+      Email = email,
+      FullName = fullName
     };
 
     var result = await _userManager.CreateAsync(user, request.Password);
@@ -78,7 +84,12 @@ public class AuthController : ControllerBase
   [EnableRateLimiting("auth")]
   public async Task<IActionResult> Login([FromBody] LoginRequest request)
   {
-    var user = await _userManager.FindByNameAsync(request.Username);
+    // "ola " and " ola" should find the user "ola". The password is checked exactly as typed.
+    var username = request.Username?.Trim();
+    if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(request.Password))
+      return BadRequest(new { error = "Feil brukernavn eller passord." });
+
+    var user = await _userManager.FindByNameAsync(username);
     if (user is null)
       return BadRequest(new { error = "Feil brukernavn eller passord." });
 
