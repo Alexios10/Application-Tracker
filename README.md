@@ -47,7 +47,7 @@ A full-stack web application for tracking your job applications — keep tabs on
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+ (or [Bun](https://bun.sh/))
+- [Node.js](https://nodejs.org/) 18+
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [PostgreSQL](https://www.postgresql.org/download/)
 
@@ -92,8 +92,8 @@ The API will be available at `https://localhost:5001`.
 
 ```bash
 cd frontend
-npm install      # or: bun install
-npm run dev      # or: bun dev
+npm install
+npm run dev
 ```
 
 The app will be available at `http://localhost:5173`.
