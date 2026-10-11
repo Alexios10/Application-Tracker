@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace ApplicationTracker.Api.Tests;
+namespace ApplicationTracker.Api.Tests.Helpers;
 
 // Runs the whole API in memory, with its own empty in-memory database per instance.
 // Each test creates its own TestApi, so tests never affect each other.

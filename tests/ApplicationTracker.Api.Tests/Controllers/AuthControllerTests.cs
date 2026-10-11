@@ -1,8 +1,9 @@
+using ApplicationTracker.Api.Tests.Helpers;
 using System.Net.Http.Json;
 
-namespace ApplicationTracker.Api.Tests;
+namespace ApplicationTracker.Api.Tests.Controllers;
 
-public class RememberMeTests
+public class AuthControllerTests
 {
   // Returns the Set-Cookie header for the refresh token, e.g. "refresh_token=...; expires=...; path=/api/auth"
   private static string RefreshCookie(HttpResponseMessage response) =>
