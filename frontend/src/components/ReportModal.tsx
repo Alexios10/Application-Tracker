@@ -1,6 +1,7 @@
+import { getErrorMessage } from "@/lib/utils";
 import { API_BASE } from "@/lib/api";
 import React, { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogFooter } from "./ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,7 +12,7 @@ interface ReportModalProps {
 }
 
 export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
-  const { user, authFetch } = useAuth();
+  const { authFetch } = useAuth();
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,8 +36,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({ open, onClose }) => {
       setSuccess(true);
       setSubject("");
       setDescription("");
-    } catch (err: any) {
-      setError(err.message || "Ukjent feil");
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/lib/utils";
 import { API_BASE } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -32,14 +33,14 @@ const AdminReportsPage = () => {
         if (!res.ok) throw new Error("Ingen tilgang eller feil ved henting.");
         const data = await res.json();
         setReports(data);
-      } catch (err: any) {
-        setError(err.message || "Ukjent feil");
+      } catch (err) {
+        setError(getErrorMessage(err));
       } finally {
         setLoading(false);
       }
     };
     if (user) fetchReports();
-  }, [user]);
+  }, [user, authFetch]);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
