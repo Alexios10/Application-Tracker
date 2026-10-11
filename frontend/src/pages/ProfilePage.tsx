@@ -36,7 +36,7 @@ const ProfilePage = () => {
   const { addApplication } = useApplications();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [fullName, setFullName] = useState(user?.username || "");
+  const [fullName, setFullName] = useState(user?.fullName || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
@@ -66,19 +66,19 @@ const ProfilePage = () => {
     const fullNameChanged = fullName.trim() !== user?.fullName;
     const passwordChanged = password.trim() !== "";
     if (!fullNameChanged && !passwordChanged) {
-      setError("Ingen endring ├Ñ lagre.");
+      setError("Ingen endring å lagre.");
       setLoading(false);
       return;
     }
 
     if (passwordChanged) {
       if (!currentPassword) {
-        setError("Du m├Ñ skrive inn n├Ñv├ªrende passord for ├Ñ endre passord.");
+        setError("Du må skrive inn nåværende passord for å endre passord.");
         setLoading(false);
         return;
       }
       if (password === currentPassword) {
-        setError("Det nye passordet kan ikke v├ªre likt det gamle passordet.");
+        setError("Det nye passordet kan ikke være likt det gamle passordet.");
         setLoading(false);
         return;
       }
@@ -88,7 +88,7 @@ const ProfilePage = () => {
       const hasLower = /[a-z]/.test(password);
       if (!minLen || !hasDigit || !hasUpper || !hasLower) {
         setError(
-          "Passordet m├Ñ v├ªre minst 8 tegn med stor bokstav, liten bokstav og tall.",
+          "Passordet må være minst 8 tegn med stor bokstav, liten bokstav og tall.",
         );
         setLoading(false);
         return;

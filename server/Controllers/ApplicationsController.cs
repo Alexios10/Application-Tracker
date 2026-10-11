@@ -38,10 +38,21 @@ public class ApplicationsController : ControllerBase
 
   // LEGG TIL NY SØKNAD
   [HttpPost("api/applications")]
-  public async Task<IActionResult> CreateApplication([FromBody] Application application)
+  public async Task<IActionResult> CreateApplication([FromBody] ApplicationRequest request)
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-    application.UserId = userId;
+
+    // Id og UserId settes alltid av serveren, aldri av klienten
+    var application = new Application
+    {
+      Company = request.Company,
+      Position = request.Position,
+      DateSent = request.DateSent,
+      Status = request.Status,
+      Note = request.Note ?? string.Empty,
+      UserId = userId
+    };
+
     _db.Applications.Add(application);
     await _db.SaveChangesAsync();
     return Created($"/api/applications/{application.Id}", application);
@@ -49,7 +60,7 @@ public class ApplicationsController : ControllerBase
 
   // OPPDATER SØKNAD
   [HttpPut("api/applications/{id}")]
-  public async Task<IActionResult> UpdateApplication(int id, [FromBody] Application updated)
+  public async Task<IActionResult> UpdateApplication(int id, [FromBody] ApplicationRequest updated)
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
     var existing = await _db.Applications.FindAsync(id);
@@ -61,7 +72,7 @@ public class ApplicationsController : ControllerBase
     existing.Position = updated.Position;
     existing.DateSent = updated.DateSent;
     existing.Status = updated.Status;
-    existing.Note = updated.Note;
+    existing.Note = updated.Note ?? string.Empty;
 
     await _db.SaveChangesAsync();
     return NoContent();
@@ -92,11 +103,14 @@ public class ApplicationsController : ControllerBase
     var user = await _userManager.FindByIdAsync(userId);
     if (user is null) return NotFound();
 
+    // Endrer kun visningsnavnet. UserName er det brukeren logger inn med og skal ikke endres her.
     if (!string.IsNullOrWhiteSpace(req.FullName))
     {
-      user.FullName = req.FullName;
-      if (user.UserName != req.FullName)
-        user.UserName = req.FullName;
+      var fullName = req.FullName.Trim();
+      if (fullName.Length > 100)
+        return BadRequest(new { error = "Fullt navn kan maks være 100 tegn." });
+
+      user.FullName = fullName;
     }
 
     var updateResult = await _userManager.UpdateAsync(user);
