@@ -26,7 +26,7 @@ public class AuthController : ControllerBase
     _tokenService = tokenService;
   }
 
-  // REGISTRERING
+  // Register a new user
   [HttpPost("register")]
   [EnableRateLimiting("auth")]
   public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -73,7 +73,7 @@ public class AuthController : ControllerBase
     return Ok(new { message = "Bruker registrert." });
   }
 
-  // INNLOGGING
+  // Log in
   [HttpPost("login")]
   [EnableRateLimiting("auth")]
   public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -92,7 +92,7 @@ public class AuthController : ControllerBase
     return Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
   }
 
-  // HENT INNLOGGET BRUKER
+  // Get the logged-in user
   [HttpGet("me")]
   [Authorize]
   public async Task<IActionResult> Me()
@@ -106,7 +106,7 @@ public class AuthController : ControllerBase
     return Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
   }
 
-  // FORNY TOKENS
+  // Renew tokens
   [HttpPost("refresh")]
   [EnableRateLimiting("auth")]
   public async Task<IActionResult> Refresh()
@@ -126,7 +126,7 @@ public class AuthController : ControllerBase
     return Ok(new AuthResponse(user.FullName, user.UserName!, user.IsAdmin));
   }
 
-  // UTLOGGING
+  // Log out
   [HttpPost("logout")]
   public async Task<IActionResult> Logout()
   {

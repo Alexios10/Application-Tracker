@@ -34,7 +34,7 @@ namespace ApplicationTracker.Api.Controllers
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
-      // Validering
+      // Validation
       if (string.IsNullOrWhiteSpace(request.Email))
         return BadRequest("E-post er påkrevd.");
 
@@ -43,22 +43,22 @@ namespace ApplicationTracker.Api.Controllers
 
       if (user == null)
       {
-        // Ikke avslør om e-post finnes — returnerer alltid OK
+        // Don't reveal whether the email exists - always return OK
         return Ok();
       }
 
-      // Generer kryptografisk sikker token og lagre kun hashen i databasen
+      // Generate a cryptographically secure token and store only its hash in the database
       var tokenBytes = RandomNumberGenerator.GetBytes(32);
       var token = Convert.ToBase64String(tokenBytes).Replace("+", "-").Replace("/", "_");
       user.ResetPasswordToken = _tokenService.HashToken(token);
       user.ResetPasswordTokenExpires = DateTime.UtcNow.AddHours(1);
       await _context.SaveChangesAsync();
 
-      // Bygg reset-lenke med fast frontend-URL (aldri stol på Origin-header)
+      // Build the reset link from a fixed frontend URL (never trust the Origin header)
       var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "https://minesoknader.no";
       var resetLink = $"{frontendUrl}/reset-password?token={Uri.EscapeDataString(token)}";
 
-      // Send e-post i bakgrunnen — ikke blokker HTTP-responsen
+      // Send the email in the background - don't block the HTTP response
       _ = Task.Run(async () =>
       {
         try
@@ -80,14 +80,14 @@ namespace ApplicationTracker.Api.Controllers
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-      // Validering
+      // Validation
       if (string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.Password))
         return BadRequest("Token og passord er påkrevd.");
 
       if (request.Password.Length < 8)
         return BadRequest("Passordet må være minst 8 tegn.");
 
-      // Sammenlign med hashet versjon (vi lagrer aldri token i klartekst)
+      // Compare with the hashed version (we never store the token in plain text)
       var hashedToken = _tokenService.HashToken(request.Token);
       var user = await _context.Users.FirstOrDefaultAsync(
         u => u.ResetPasswordToken == hashedToken && u.ResetPasswordTokenExpires > DateTime.UtcNow);
@@ -95,13 +95,13 @@ namespace ApplicationTracker.Api.Controllers
       if (user == null)
         return BadRequest("Ugyldig eller utløpt token.");
 
-      // Bruk UserManager for å validere og sette passord (respekterer passordregler)
+      // Use UserManager to validate and set the password (respects the password rules)
       var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
       var result = await _userManager.ResetPasswordAsync(user, resetToken, request.Password);
 
       if (!result.Succeeded)
       {
-        // Oversett vanlige Identity-feilmeldinger til norsk
+        // Translate common Identity error messages to Norwegian
         var errorMessages = result.Errors.Select(e => e.Code switch
         {
           "PasswordTooShort" => "Passordet må være minst 8 tegn.",
@@ -114,7 +114,7 @@ namespace ApplicationTracker.Api.Controllers
         return BadRequest(new { error = string.Join(" ", errorMessages) });
       }
 
-      // Fjern brukt reset-token
+      // Remove the used reset token
       user.ResetPasswordToken = null;
       user.ResetPasswordTokenExpires = null;
       await _context.SaveChangesAsync();

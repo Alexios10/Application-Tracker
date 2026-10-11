@@ -22,7 +22,7 @@ namespace ApplicationTracker.Api.Controllers
       _context = context;
     }
 
-    // POST: api/reports — krever innlogging
+    // POST: api/reports - requires login
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest request)
@@ -32,7 +32,7 @@ namespace ApplicationTracker.Api.Controllers
         return BadRequest("Emne og beskrivelse er påkrevd.");
       }
 
-      // Hent bruker-ID fra JWT token — kan ikke forfalskes
+      // Get the user ID from the JWT token - it cannot be forged
       var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
       var report = new Report
@@ -48,7 +48,7 @@ namespace ApplicationTracker.Api.Controllers
       return Ok(report);
     }
 
-    // GET: api/reports — kun admin
+    // GET: api/reports - admin only
     [HttpGet]
     [Authorize]
     public async Task<ActionResult<IEnumerable<Report>>> GetReports([FromServices] UserManager<User> userManager)
@@ -65,7 +65,7 @@ namespace ApplicationTracker.Api.Controllers
     }
   }
 
-  // DTO — kun de feltene vi vil akseptere fra brukeren
+  // DTO - only the fields we accept from the user
   public class CreateReportRequest
   {
     [Required]

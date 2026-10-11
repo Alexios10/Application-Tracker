@@ -13,7 +13,7 @@ interface Report {
 }
 
 const AdminReportsPage = () => {
-  // Tilbake-knapp funksjon
+  // Back button handler
   const handleBack = () => window.history.back();
   const { user, authFetch } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);

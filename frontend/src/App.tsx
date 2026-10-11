@@ -5,13 +5,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
-import Index from "./pages/Index";
-import LoginPage from "./pages/LoginPage";
-import NotFound from "./pages/NotFound";
-import AdminReportsPage from "./pages/AdminReportsPage";
-import ProfilePage from "./pages/ProfilePage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
+import { lazy, Suspense } from "react";
+
+// Each page is loaded only when the user visits it, so the first page load
+// does not have to download the code for every page in the app
+const Index = lazy(() => import("./pages/Index"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminReportsPage = lazy(() => import("./pages/AdminReportsPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,16 +27,21 @@ const queryClient = new QueryClient({
   },
 });
 
-// Beskyttet rute — sender til login hvis ikke innlogget
+// Shown while a page or the login check is loading
+function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
+      Laster...
+    </div>
+  );
+}
+
+// Protected route - sends the user to login if not logged in
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
-        Laster...
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!user) {
@@ -42,16 +51,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Admin-beskyttet rute — krever innlogging OG admin-rettigheter
+// Admin route - requires login AND admin rights
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
-        Laster...
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!user) {
@@ -72,36 +77,38 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/reports"
-              element={
-                <AdminRoute>
-                  <AdminReportsPage />
-                </AdminRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/reports"
+                element={
+                  <AdminRoute>
+                    <AdminReportsPage />
+                  </AdminRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

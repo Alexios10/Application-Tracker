@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ApplicationTracker.Api.Models;
 
-// IdentityUser gir oss ferdig: Id, UserName, Email, PasswordHash osv.
-// Vi legger til FullName som ekstra felt
+// IdentityUser already gives us Id, UserName, Email, PasswordHash etc.
+// We add FullName as an extra field
 public class User : IdentityUser
 {
   public string FullName { get; set; } = string.Empty;
@@ -13,7 +13,7 @@ public class User : IdentityUser
   public string? ResetPasswordToken { get; set; }
   public DateTime? ResetPasswordTokenExpires { get; set; }
 
-  // For token refresh/revokering
+  // For token refresh/revocation
   public string? RefreshToken { get; set; }
   public DateTime? RefreshTokenExpires { get; set; }
 

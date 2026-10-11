@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTracker.Api.Data;
 
-// Bruker IdentityDbContext i stedet for DbContext — dette gir oss tabeller for brukere, roller osv.
+// Uses IdentityDbContext instead of DbContext - this gives us tables for users, roles etc.
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : IdentityDbContext<User>(options)
 {
@@ -42,7 +42,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(a => a.UserId)
                 .HasColumnName("user_id");
 
-            // Relasjon: Hver søknad tilhører én bruker
+            // Relationship: each application belongs to one user
             entity.HasOne(a => a.User)
                 .WithMany()
                 .HasForeignKey(a => a.UserId)
