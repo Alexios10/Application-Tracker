@@ -1,4 +1,5 @@
-﻿import { API_BASE } from "@/lib/api";
+﻿import { getErrorMessage } from "@/lib/utils";
+import { API_BASE } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -14,21 +15,13 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import {
-  ChevronLeft,
-  LogOut,
-  Monitor,
-  Smartphone,
-  Shield,
-  User,
-} from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileDrawer } from "@/components/MobileDrawer";
 import { Topbar } from "@/components/Topbar";
 import { useApplications } from "@/hooks/useApplications";
 
 const ProfilePage = () => {
-  const handleBack = () => window.history.back();
   const { user, logout, authFetch } = useAuth();
   const { addApplication } = useApplications();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -109,8 +102,8 @@ const ProfilePage = () => {
       setMessage("Profil oppdatert!");
       setPassword("");
       setCurrentPassword("");
-    } catch (err: any) {
-      setError(err.message || "Ukjent feil");
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -126,8 +119,8 @@ const ProfilePage = () => {
       });
       if (!res.ok) throw new Error("Kunne ikke slette bruker.");
       logout();
-    } catch (err: any) {
-      setError(err.message || "Ukjent feil");
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
       setDeleteDialogOpen(false);

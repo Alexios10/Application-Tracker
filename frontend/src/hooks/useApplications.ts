@@ -25,7 +25,7 @@ export function useApplications() {
       }
     }
     load();
-  }, [user]);
+  }, [user, authFetch]);
 
   async function addApplication(app: Omit<Application, "id">) {
     try {

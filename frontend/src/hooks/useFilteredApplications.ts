@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Application, ApplicationStatus } from "@/types/application";
+import { Application } from "@/types/application";
 import { StatFilter } from "@/constants/stats";
 
 const ITEMS_PER_PAGE = 10;
