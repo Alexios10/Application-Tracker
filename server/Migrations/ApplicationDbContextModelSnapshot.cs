@@ -154,6 +154,9 @@ namespace ApplicationTracker.Api.Migrations
                     b.Property<DateTime?>("RefreshTokenExpires")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("RememberMe")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ResetPasswordToken")
                         .HasColumnType("text");
 

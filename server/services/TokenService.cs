@@ -10,6 +10,11 @@ namespace ApplicationTracker.Api.Services;
 
 public class TokenService
 {
+  // How long a user stays logged in without activity.
+  // Every refresh (roughly every 15 minutes while the user is active) starts the period again.
+  public static readonly TimeSpan RememberMeLifetime = TimeSpan.FromDays(30);
+  public static readonly TimeSpan SessionLifetime = TimeSpan.FromHours(1);
+
   private readonly string _jwtKey;
   private readonly string _jwtIssuer;
   private readonly string _jwtAudience;
@@ -63,7 +68,9 @@ public class TokenService
     return Convert.ToBase64String(bytes);
   }
 
-  public void SetAuthCookie(HttpContext context, string token)
+  // Without "remember me" the cookies get no expiry date. They then become session cookies,
+  // which the browser deletes when it is closed.
+  public void SetAuthCookie(HttpContext context, string token, bool rememberMe)
   {
     context.Response.Cookies.Append("access_token", token, new CookieOptions
     {
@@ -71,11 +78,11 @@ public class TokenService
       Secure = true,
       SameSite = SameSiteMode.None,
       Path = "/",
-      Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+      Expires = rememberMe ? DateTimeOffset.UtcNow.AddMinutes(15) : null
     });
   }
 
-  public void SetRefreshCookie(HttpContext context, string refreshToken)
+  public void SetRefreshCookie(HttpContext context, string refreshToken, bool rememberMe)
   {
     context.Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
     {
@@ -83,20 +90,23 @@ public class TokenService
       Secure = true,
       SameSite = SameSiteMode.None,
       Path = "/api/auth",
-      Expires = DateTimeOffset.UtcNow.AddDays(7)
+      Expires = rememberMe ? DateTimeOffset.UtcNow.Add(RememberMeLifetime) : null
     });
   }
 
   public async Task SetAuthAndRefreshCookies(HttpContext context, User user, ApplicationDbContext db)
   {
     var accessToken = GenerateToken(user);
-    SetAuthCookie(context, accessToken);
+    SetAuthCookie(context, accessToken, user.RememberMe);
 
+    // The server-side expiry is what actually logs the user out,
+    // even if the browser keeps the cookie (e.g. "continue where you left off")
+    var lifetime = user.RememberMe ? RememberMeLifetime : SessionLifetime;
     var refreshToken = GenerateRefreshToken();
     user.RefreshToken = HashToken(refreshToken);
-    user.RefreshTokenExpires = DateTime.UtcNow.AddDays(7);
+    user.RefreshTokenExpires = DateTime.UtcNow.Add(lifetime);
     await db.SaveChangesAsync();
 
-    SetRefreshCookie(context, refreshToken);
+    SetRefreshCookie(context, refreshToken, user.RememberMe);
   }
 }

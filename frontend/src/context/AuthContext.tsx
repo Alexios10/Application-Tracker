@@ -16,7 +16,11 @@ export interface AuthUser {
 
 interface AuthContextType {
   user: AuthUser | null;
-  login: (username: string, password: string) => Promise<string | null>;
+  login: (
+    username: string,
+    password: string,
+    rememberMe: boolean,
+  ) => Promise<string | null>;
   register: (
     username: string,
     email: string,
@@ -113,13 +117,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (
     username: string,
     password: string,
+    rememberMe: boolean,
   ): Promise<string | null> => {
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, rememberMe }),
       });
 
       const data = await res.json();

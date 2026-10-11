@@ -26,6 +26,7 @@ const LoginPage = () => {
   // Skjema-felter
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
 
@@ -73,7 +74,7 @@ const LoginPage = () => {
     if (isRegister) {
       result = await register(username, email, fullName, password);
     } else {
-      result = await login(username, password);
+      result = await login(username, password, rememberMe);
     }
 
     if (result) {
@@ -256,9 +257,18 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Glemt passord-lenke kun for login */}
+            {/* "Remember me" and forgot password - login only */}
             {!isRegister && (
-              <div className="text-right mb-2">
+              <div className="flex items-center justify-between mb-2">
+                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 accent-sky-500"
+                  />
+                  Husk meg
+                </label>
                 <a
                   href="/forgot-password"
                   className="text-blue-500 hover:underline text-sm"
