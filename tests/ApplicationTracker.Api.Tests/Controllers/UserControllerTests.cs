@@ -1,10 +1,11 @@
+using ApplicationTracker.Api.Tests.Helpers;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace ApplicationTracker.Api.Tests;
+namespace ApplicationTracker.Api.Tests.Controllers;
 
-public class UserTests
+public class UserControllerTests
 {
   [Fact]
   public async Task ChangingFullName_DoesNotChangeLoginUsername()
