@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Application } from "@/types/application";
-import { StatFilter } from "@/constants/stats";
+import { StatFilter } from "@/constants/status";
 
 const ITEMS_PER_PAGE = 10;
 

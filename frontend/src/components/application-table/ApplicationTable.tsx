@@ -1,28 +1,19 @@
-import { useState, useRef, useEffect } from "react";
-import { Application, ApplicationStatus } from "@/types/application";
-import StatusBadge from "@/components/StatusBadge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { MessageSquareText, Pencil } from "lucide-react";
+import { Application, ApplicationStatus } from "@/types/application";
 import { EditApplicationModal } from "../EditApplicationModal";
 import { ApplicationDetailsModal } from "../ApplicationDetailsModal";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import { StatusSelect } from "@/components/application-table/TabelStatusSelect";
+import { StatusSelect } from "@/components/application-table/StatusSelect";
 import { DeleteDialog } from "@/components/application-table/TableDeleteDialog";
 
 interface ApplicationTableProps {
   applications: Application[];
   onUpdateStatus: (id: number, status: ApplicationStatus) => void;
   onDelete: (id: number) => void;
-  onEdit?: (app: Application) => void;
+  onEdit: (app: Application) => void;
 }
+
+const hasNote = (app: Application) => (app.note?.trim().length ?? 0) > 0;
 
 const ApplicationTable = ({
   applications,
@@ -30,322 +21,148 @@ const ApplicationTable = ({
   onDelete,
   onEdit,
 }: ApplicationTableProps) => {
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [editApp, setEditApp] = useState<Application | null>(null);
   const [detailsApp, setDetailsApp] = useState<Application | null>(null);
-  const [selectOpen, setSelectOpen] = useState(false);
-  const isMobile = useIsMobile();
-  const editRef = useRef<HTMLDivElement>(null);
-  const editRefMobile = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (editingId === null) {
-      setSelectOpen(false);
-      return;
-    }
-    const timer = setTimeout(() => setSelectOpen(true), 50);
-    return () => clearTimeout(timer);
-  }, [editingId]);
+  // Opens the details (with the note) on click, Enter or Space
+  const rowProps = (app: Application) => ({
+    onClick: () => setDetailsApp(app),
+    onKeyDown: (event: React.KeyboardEvent) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      setDetailsApp(app);
+    },
+    role: "button",
+    tabIndex: 0,
+    "aria-label": `Vis detaljer for ${app.company}`,
+  });
 
-  useEffect(() => {
-    if (!editingId) return;
+  const actions = (app: Application) => (
+    <div
+      className="flex items-center justify-end gap-1"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        onClick={() => setEditApp(app)}
+        aria-label={`Endre søknaden til ${app.company}`}
+        title="Endre søknad"
+        className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+      >
+        <Pencil className="h-4 w-4" />
+      </button>
+      <DeleteDialog company={app.company} onDelete={() => onDelete(app.id)} />
+    </div>
+  );
 
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      if (editRef.current?.contains(target)) return;
-      if (editRefMobile.current?.contains(target)) return;
-      if (target.closest(".status-select-dropdown")) return;
-      setEditingId(null);
-    };
-
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [editingId]);
-
-  const handleStatusChange = (id: number, v: ApplicationStatus) => {
-    onUpdateStatus(id, v);
-    setSelectOpen(false);
-    setEditingId(null);
-  };
-
-  const openDetails = (app: Application) => {
-    setDetailsApp(app);
-  };
-
-  const handleDetailsKeyDown = (
-    event: React.KeyboardEvent,
-    app: Application,
-  ) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    openDetails(app);
-  };
-
-  const hasNote = (app: Application) => (app.note?.trim().length ?? 0) > 0;
+  const noteIcon = (app: Application) =>
+    hasNote(app) && (
+      <MessageSquareText
+        className="h-4 w-4 shrink-0 text-muted-foreground"
+        aria-label="Har notat"
+      />
+    );
 
   return (
-    <div className="h-[40rem] w-full overflow-y-auto rounded-2xl border border-slate-800/80 bg-slate-900/70 shadow-xl">
+    <>
       <ApplicationDetailsModal
         open={detailsApp !== null}
         application={detailsApp}
         onClose={() => setDetailsApp(null)}
         onSaveNote={(updated) => {
           setDetailsApp(updated);
-          if (typeof onEdit === "function") {
-            onEdit(updated);
-          }
+          onEdit(updated);
         }}
       />
 
       <EditApplicationModal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
+        open={editApp !== null}
+        onClose={() => setEditApp(null)}
         application={editApp}
         onSave={(updated) => {
-          setEditModalOpen(false);
           setEditApp(null);
-          if (updated?.id && typeof onEdit === "function") {
-            onEdit(updated);
-          }
+          onEdit(updated);
         }}
       />
 
-      {/* Mobile card layout */}
-      <div className="flex flex-col divide-y divide-slate-800/80 min-[800px]:hidden">
-        {applications.map((app, index) => (
-          <div
+      {/* Mobile: one row per application */}
+      <ul className="divide-y md:hidden">
+        {applications.map((app) => (
+          <li
             key={app.id}
-            className="group flex flex-col gap-2 px-4 py-4 bg-slate-900/60 rounded-xl m-2 shadow-md transition-colors hover:bg-slate-900/80 relative cursor-pointer"
-            onClick={() => openDetails(app)}
-            onKeyDown={(event) => handleDetailsKeyDown(event, app)}
-            role="button"
-            tabIndex={0}
+            {...rowProps(app)}
+            className="cursor-pointer px-4 py-3 hover:bg-muted"
           >
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <div className="min-w-0 flex-1">
-                <span className="text-xs text-slate-500 mr-2">
-                  #{index + 1}
-                </span>
-                <span
-                  className="text-base font-semibold text-slate-100 truncate min-w-0 max-w-[100px] inline-block align-bottom"
-                  title={app.company}
-                >
-                  {app.company}
-                </span>
-                {hasNote(app) && (
-                  <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-cyan-700/40 bg-cyan-950/50 px-2 py-0.5 text-[11px] font-medium text-cyan-300">
-                    <MessageSquareText className="h-3 w-3" />
-                    Notat
-                  </span>
-                )}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="flex items-center gap-2 font-medium">
+                  <span className="truncate">{app.company}</span>
+                  {noteIcon(app)}
+                </p>
+                <p className="truncate text-sm text-muted-foreground">
+                  {app.position}
+                </p>
               </div>
-              <div
-                className="flex items-center gap-2"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-sky-400 hover:text-sky-300 hover:bg-sky-900/10"
-                  onClick={() => {
-                    setEditApp(app);
-                    setEditModalOpen(true);
-                  }}
-                  title="Endre søknad"
-                >
-                  <Pencil className="h-5 w-5" />
-                </Button>
-                <DeleteDialog
-                  company={app.company}
-                  onDelete={() => onDelete(app.id)}
+              <span className="shrink-0 pt-0.5 text-sm text-muted-foreground">
+                {app.dateSent}
+              </span>
+            </div>
+            <div className="mt-1 flex items-center justify-between">
+              <div className="-ml-2">
+                <StatusSelect
+                  status={app.status}
+                  onChange={(status) => onUpdateStatus(app.id, status)}
                 />
               </div>
+              {actions(app)}
             </div>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mb-2">
-              <div className="flex flex-nowrap items-center gap-3">
-                <span className="truncate max-w-[40px] flex-shrink min-w-0">
-                  {app.position}
-                </span>
-                <span className="shrink-0 text-slate-500">·</span>
-                <span className="shrink-0">{app.dateSent}</span>
-                <span className="shrink-0">·</span>
-                <div
-                  onClick={(event) => event.stopPropagation()}
-                  style={{
-                    minHeight: "2rem",
-                    position: "relative",
-                    flexShrink: 0,
-                    width: "fit-content",
-                  }}
-                >
-                  {editingId === app.id ? (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                        zIndex: 10,
-                        width: "100%",
-                        minWidth: "80px",
-                        maxWidth: "120px",
-                      }}
-                    >
-                      <StatusSelect
-                        refProp={editRefMobile}
-                        open={isMobile && selectOpen}
-                        status={app.status}
-                        onOpenChange={(open) => {
-                          setSelectOpen(open);
-                          if (!open) setEditingId(null);
-                        }}
-                        onValueChange={(v) => handleStatusChange(app.id, v)}
-                      />
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setEditingId(app.id)}
-                      className="cursor-pointer"
-                      style={{
-                        minHeight: "2rem",
-                        minWidth: "80px",
-                        maxWidth: "120px",
-                        width: "100%",
-                      }}
-                    >
-                      <StatusBadge status={app.status} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
 
-      {/* Desktop table layout */}
-      <div className="hidden min-[800px]:block w-full overflow-x-auto">
-        <Table className="min-w-[700px] w-full table-fixed">
-          <TableHeader>
-            <TableRow className="bg-slate-900/80 hover:bg-slate-900/80">
-              <TableHead className="w-[36px] text-xs font-semibold uppercase tracking-wide text-slate-400">
-                #
-              </TableHead>
-              <TableHead className="w-[22%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Bedrift
-              </TableHead>
-              <TableHead className="w-[28%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Stilling
-              </TableHead>
-              <TableHead className="w-[18%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Dato sendt
-              </TableHead>
-              <TableHead className="w-[14%] text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Status
-              </TableHead>
-              <TableHead className="w-[80px] text-xs font-semibold uppercase tracking-wide text-slate-400 text-center">
-                Handling
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {applications.map((app, index) => (
-              <TableRow
-                key={app.id}
-                className="cursor-pointer border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/80 transition-colors"
-                onClick={() => openDetails(app)}
-                onKeyDown={(event) => handleDetailsKeyDown(event, app)}
-                role="button"
-                tabIndex={0}
-              >
-                <TableCell className="text-xs text-slate-500 py-4 text-center">
-                  {index + 1}
-                </TableCell>
-                <TableCell className="text-sm font-medium text-slate-100 py-4">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className="line-clamp-2 break-words">
-                      {app.company}
-                    </span>
-                    {hasNote(app) && (
-                      <span
-                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-cyan-700/40 bg-cyan-950/50 px-2 py-0.5 text-[11px] font-medium text-cyan-300"
-                        title="Har notat"
-                      >
-                        <MessageSquareText className="h-3 w-3" />
-                        Notat
-                      </span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-sm text-slate-400 py-4">
-                  <span className="line-clamp-2 break-words">
-                    {app.position}
-                  </span>
-                </TableCell>
-                <TableCell className="text-sm text-slate-400 py-4 whitespace-nowrap">
-                  {app.dateSent}
-                </TableCell>
-
-                <TableCell
-                  className="py-4"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  {editingId === app.id ? (
-                    <StatusSelect
-                      refProp={editRef}
-                      open={!isMobile && selectOpen}
-                      status={app.status}
-                      onOpenChange={(open) => {
-                        setSelectOpen(open);
-                        if (!open) setEditingId(null);
-                      }}
-                      onValueChange={(v) => handleStatusChange(app.id, v)}
-                    />
-                  ) : (
-                    <div
-                      onClick={() => setEditingId(app.id)}
-                      className="flex h-8 w-fit items-center justify-start select-none transition-colors cursor-pointer rounded-lg px-2"
-                      style={{ minHeight: "2rem" }}
-                      tabIndex={0}
-                      role="button"
-                      aria-label="Endre status"
-                    >
-                      <StatusBadge status={app.status} />
-                    </div>
-                  )}
-                </TableCell>
-
-                <TableCell
-                  className="py-4 text-center"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-sky-400 hover:text-sky-300 hover:bg-sky-900/10"
-                      onClick={() => {
-                        setEditApp(app);
-                        setEditModalOpen(true);
-                      }}
-                      title="Endre søknad"
-                    >
-                      <Pencil className="h-5 w-5" />
-                    </Button>
-                    <DeleteDialog
-                      company={app.company}
-                      onDelete={() => onDelete(app.id)}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+      {/* Desktop: table */}
+      <table className="hidden w-full table-fixed text-left md:table">
+        <thead>
+          <tr className="border-b text-sm text-muted-foreground">
+            <th className="w-[28%] px-4 py-2.5 font-medium">Bedrift</th>
+            <th className="px-4 py-2.5 font-medium">Stilling</th>
+            <th className="w-[13%] px-4 py-2.5 font-medium">Sendt</th>
+            <th className="w-[17%] px-4 py-2.5 font-medium">Status</th>
+            <th className="w-[96px] px-4 py-2.5">
+              <span className="sr-only">Handlinger</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y">
+          {applications.map((app) => (
+            <tr
+              key={app.id}
+              {...rowProps(app)}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <td className="px-4 py-2.5 font-medium">
+                <span className="flex items-center gap-2">
+                  <span className="truncate">{app.company}</span>
+                  {noteIcon(app)}
+                </span>
+              </td>
+              <td className="truncate px-4 py-2.5 text-muted-foreground">
+                {app.position}
+              </td>
+              <td className="px-4 py-2.5 text-muted-foreground">
+                {app.dateSent}
+              </td>
+              <td className="px-2 py-1.5">
+                <StatusSelect
+                  status={app.status}
+                  onChange={(status) => onUpdateStatus(app.id, status)}
+                />
+              </td>
+              <td className="px-3 py-1.5">{actions(app)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 };
 

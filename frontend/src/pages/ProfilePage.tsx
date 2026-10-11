@@ -14,17 +14,13 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { AtSign, LogOut, User } from "lucide-react";
-import { Sidebar } from "@/components/Sidebar";
-import { MobileDrawer } from "@/components/MobileDrawer";
-import { Topbar } from "@/components/Topbar";
-import { useApplications } from "@/hooks/useApplications";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AppLayout } from "@/components/AppLayout";
+import { PasswordInput } from "@/components/PasswordInput";
 
 const ProfilePage = () => {
   const { user, logout, authFetch, updateUser } = useAuth();
-  const { applications, addApplication } = useApplications();
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [fullName, setFullName] = useState(user?.fullName || "");
   const [username, setUsername] = useState(user?.username || "");
@@ -35,8 +31,6 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -133,200 +127,132 @@ const ProfilePage = () => {
     }
   };
 
-
   return (
-    <div className="flex h-screen bg-[#0f1117] text-slate-50 overflow-hidden">
-      {/* Desktop sidebar - fixed position so it overlaps the content */}
-      <aside className="hidden lg:block fixed left-0 top-0 h-full z-40 border-r border-slate-800/60 bg-[#10121a]">
-        <Sidebar onAdd={addApplication} onReport={() => {}} onLogout={logout} />
-      </aside>
+    <AppLayout>
+      <h1 className="text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">
+        Profil
+      </h1>
 
-      {/*  Mobile Drawer  */}
-      <MobileDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onAdd={addApplication}
-        onReport={() => {}}
-        onLogout={logout}
-      />
-
-      {/* Main content - pl-[60px] on large screens to make room for the collapsed sidebar */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden lg:pl-[60px]">
-        <Topbar onOpenDrawer={() => setDrawerOpen(true)} />
-        <main className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="flex flex-col lg:flex-row gap-5 max-w-5xl mx-auto justify-center min-h-[60vh]">
-            {/* Left side: form */}
-            <div className="flex-1 rounded-2xl bg-[#181c24] border border-slate-800/60 p-6">
-              <h1 className="text-2xl font-bold mb-6 tracking-tight">
-                Brukerprofil
-              </h1>
-              <form onSubmit={handleUpdate} className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
-                      Fullt navn
-                    </label>
-                    <div className="relative">
-                      <input
-                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        maxLength={100}
-                        required
-                      />
-                      <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
-                      Brukernavn (innlogging)
-                    </label>
-                    <div className="relative">
-                      <input
-                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        maxLength={50}
-                        autoComplete="username"
-                        required
-                      />
-                      <AtSign className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
-                      Nåværende passord
-                    </label>
-                    <div className="relative">
-                      <input
-                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 pr-10 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                      />
-                      <span
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors"
-                        onClick={() =>
-                          setShowCurrentPassword(!showCurrentPassword)
-                        }
-                      >
-                        {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
-                      Nytt passord
-                    </label>
-                    <div className="relative">
-                      <input
-                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 pr-10 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
-                        type={showNewPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      <span
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                      >
-                        {showNewPassword ? <FaEye /> : <FaEyeSlash />}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {message && (
-                  <p className="text-green-400 text-sm font-medium text-center">
-                    {message}
-                  </p>
-                )}
-                {error && (
-                  <p className="text-red-400 text-sm font-medium text-center">
-                    {error}
-                  </p>
-                )}
-
-                <div className="flex items-center gap-3 pt-1">
-                  <Button
-                    type="submit"
-                    disabled={loading || !hasChanges}
-                    className="flex-1 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {loading ? "Lagrer..." : "Lagre endringer"}
-                  </Button>
-                  <AlertDialog
-                    open={deleteDialogOpen}
-                    onOpenChange={setDeleteDialogOpen}
-                  >
-                    <AlertDialogTrigger asChild>
-                      <button
-                        type="button"
-                        disabled={loading}
-                        className="flex items-center gap-2 text-sm text-red-500/80 hover:text-red-400 transition-colors px-2 py-2 rounded-xl hover:bg-red-500/10"
-                      >
-                        <LogOut className="h-3.5 w-3.5" />
-                        <span className="text-[11px] font-semibold uppercase tracking-widest">
-                          Slett bruker
-                        </span>
-                      </button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-400">
-                          Dette vil slette brukeren din permanent. Denne
-                          handlingen kan ikke angres.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
-                          Avbryt
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-600 text-white hover:bg-red-500"
-                          onClick={handleDelete}
-                        >
-                          Slett
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </form>
+      <form
+        onSubmit={handleUpdate}
+        className="mt-8 max-w-2xl rounded-xl border bg-card"
+      >
+        <section className="space-y-4 p-6">
+          <h2 className="font-semibold">Navn og brukernavn</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="fullName">Fullt navn</Label>
+              <Input
+                id="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                maxLength={100}
+                autoComplete="name"
+                required
+              />
             </div>
-
-            {/* Right side: user information */}
-            <div className="w-full lg:w-64 space-y-4 shrink-0 self-start">
-              <div className="rounded-2xl bg-[#181c24] border border-slate-800/60 p-5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-400 to-teal-600 flex items-center justify-center text-lg font-bold text-slate-900 shrink-0">
-                    {(user?.fullName || user?.username || "U")[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-100 text-sm">
-                      {user?.fullName || user?.username}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">
-                      Aktive søknader
-                    </span>
-                    <span className="text-xs font-semibold text-cyan-400">
-                      {applications.length}
-                    </span>
-                  </div>
-                </div>
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="username">Brukernavn</Label>
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                maxLength={50}
+                autoComplete="username"
+                aria-describedby="username-hint"
+                required
+              />
+              <p id="username-hint" className="text-sm text-muted-foreground">
+                Det du logger inn med.
+              </p>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+        </section>
+
+        <section className="space-y-4 border-t p-6">
+          <div>
+            <h2 className="font-semibold">Bytt passord</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Fyll inn bare hvis du vil bytte passord.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="currentPassword">Nåværende passord</Label>
+              <PasswordInput
+                id="currentPassword"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                autoComplete="current-password"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="newPassword">Nytt passord</Label>
+              <PasswordInput
+                id="newPassword"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+        </section>
+
+        <div className="flex flex-wrap items-center gap-4 border-t px-6 py-4">
+          <Button type="submit" disabled={loading || !hasChanges}>
+            {loading ? "Lagrer..." : "Lagre endringer"}
+          </Button>
+          {message && (
+            <p role="status" className="text-sm text-status-Tilbud">
+              {message}
+            </p>
+          )}
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
+        </div>
+      </form>
+
+      <section className="mt-10 max-w-2xl">
+        <h2 className="font-semibold">Slett konto</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Sletter kontoen og alle søknadene dine for godt. Dette kan ikke
+          angres.
+        </p>
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={loading}
+              className="mt-4 border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive"
+            >
+              Slett kontoen min
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Slette kontoen din?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Kontoen og alle søknadene dine blir slettet for godt. Dette kan
+                ikke angres.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Avbryt</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={handleDelete}
+              >
+                Slett kontoen min
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </section>
+    </AppLayout>
   );
 };
 

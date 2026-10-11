@@ -1,10 +1,10 @@
 import { API_BASE } from "@/lib/api";
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Briefcase, Lock, CheckCircle2, XCircle } from "lucide-react";
+import { AuthCard } from "@/components/AuthCard";
+import { PasswordInput } from "@/components/PasswordInput";
 
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const ResetPasswordPage: React.FC = () => {
     e.preventDefault();
     setError("");
     if (password !== confirm) {
-      setError("Passordene matcher ikke.");
+      setError("Passordene er ikke like.");
       return;
     }
     setLoading(true);
@@ -59,122 +59,78 @@ const ResetPasswordPage: React.FC = () => {
 
   if (!token) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/20">
-              <XCircle className="h-7 w-7 text-red-400" />
-            </div>
-            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-50">
-              Ugyldig lenke
-            </h1>
-            <p className="mt-2 text-sm text-slate-400">
-              Denne tilbakestillingslenken er ugyldig eller har utløpt.
-            </p>
-            <a
-              href="/forgot-password"
-              className="mt-4 inline-block text-sm font-medium text-sky-400 hover:text-sky-300"
-            >
-              Be om ny lenke
-            </a>
-          </div>
-        </div>
-      </div>
+      <AuthCard
+        title="Lenken virker ikke"
+        description="Lenken for nytt passord er ugyldig eller har utløpt."
+      >
+        <Link
+          to="/forgot-password"
+          className="text-sm font-medium text-link underline-offset-4 hover:underline"
+        >
+          Be om en ny lenke
+        </Link>
+      </AuthCard>
+    );
+  }
+
+  if (success) {
+    return (
+      <AuthCard
+        title="Passordet er endret"
+        description="Du sendes til innloggingen om et øyeblikk."
+      >
+        <Button onClick={() => navigate("/login")} className="w-full">
+          Gå til innlogging
+        </Button>
+      </AuthCard>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4">
-      <div className="w-full max-w-md space-y-8">
-        {/* Logo/Header */}
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40">
-            <Briefcase className="h-7 w-7 text-slate-950" />
-          </div>
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-50">
-            Nytt passord
-          </h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Velg et nytt passord for kontoen din
+    <AuthCard
+      title="Nytt passord"
+      description="Velg et nytt passord for kontoen din."
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {error && (
+          <p
+            role="alert"
+            className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive"
+          >
+            {error}
+          </p>
+        )}
+        <div className="space-y-1.5">
+          <Label htmlFor="password">Nytt passord</Label>
+          <PasswordInput
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            aria-describedby="password-hint"
+            minLength={8}
+            required
+          />
+          <p id="password-hint" className="text-sm text-muted-foreground">
+            Minst 8 tegn, med stor og liten bokstav og et tall.
           </p>
         </div>
-
-        {/* Form */}
-        <div className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur">
-          {error && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-              {error}
-            </div>
-          )}
-
-          {success ? (
-            <div className="flex flex-col items-center space-y-4 py-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20">
-                <CheckCircle2 className="h-6 w-6 text-emerald-400" />
-              </div>
-              <p className="text-center text-sm text-slate-300">
-                Passordet er endret! Du sendes til innloggingssiden...
-              </p>
-              <Button
-                onClick={() => navigate("/login")}
-                variant="ghost"
-                className="text-sky-400 hover:text-sky-300 hover:bg-slate-800/50"
-              >
-                Gå til innlogging nå
-              </Button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-300">
-                  Nytt passord
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Minst 8 tegn, stor+liten bokstav og tall"
-                    required
-                    minLength={8}
-                    className="border-slate-700/80 bg-slate-900/70 pl-10 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirm" className="text-slate-300">
-                  Gjenta nytt passord
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                  <Input
-                    id="confirm"
-                    type="password"
-                    value={confirm}
-                    onChange={(e) => setConfirm(e.target.value)}
-                    placeholder="Skriv passordet på nytt"
-                    required
-                    minLength={8}
-                    className="border-slate-700/80 bg-slate-900/70 pl-10 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-sky-500 to-emerald-400 font-semibold text-slate-950 hover:from-sky-400 hover:to-emerald-300"
-              >
-                {loading ? "Lagrer..." : "Lagre nytt passord"}
-              </Button>
-            </form>
-          )}
+        <div className="space-y-1.5">
+          <Label htmlFor="confirm">Gjenta passordet</Label>
+          <PasswordInput
+            id="confirm"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            autoComplete="new-password"
+            minLength={8}
+            required
+          />
         </div>
-      </div>
-    </div>
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Lagrer..." : "Lagre nytt passord"}
+        </Button>
+      </form>
+    </AuthCard>
   );
 };
 

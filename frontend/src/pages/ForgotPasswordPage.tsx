@@ -4,13 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Briefcase,
-  Mail,
-  ArrowLeft,
-  CheckCircle2,
-  AlertTriangle,
-} from "lucide-react";
+import { AuthCard } from "@/components/AuthCard";
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +32,7 @@ const ForgotPasswordPage: React.FC = () => {
 
       // The backend sends the email - we only show a confirmation
       setSent(true);
-    } catch (err) {
+    } catch {
       setError("Noe gikk galt. Prøv igjen.");
     } finally {
       setLoading(false);
@@ -46,96 +40,66 @@ const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4">
-      <div className="w-full max-w-md space-y-8">
-        {/* Logo/Header */}
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40">
-            <Briefcase className="h-7 w-7 text-slate-950" />
-          </div>
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-50">
-            Glemt passord
-          </h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Skriv inn e-postadressen din, så sender vi en lenke for å
-            tilbakestille passordet
+    <AuthCard
+      title="Glemt passord"
+      description={
+        sent
+          ? undefined
+          : "Skriv inn e-postadressen du registrerte deg med, så sender vi deg en lenke for å lage nytt passord."
+      }
+    >
+      {sent ? (
+        <div className="space-y-4 text-sm">
+          <p>
+            Hvis e-postadressen er registrert hos oss, har du nå fått en e-post
+            med en lenke. Lenken virker i én time.
           </p>
+          <p className="text-muted-foreground">
+            Finner du den ikke? Sjekk søppelpost-mappen.
+          </p>
+          <Link
+            to="/login"
+            className="inline-block font-medium text-link underline-offset-4 hover:underline"
+          >
+            Tilbake til innlogging
+          </Link>
         </div>
-
-        {/* Form */}
-        <div className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur">
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            <p
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive"
+            >
               {error}
-            </div>
+            </p>
           )}
-
-          {sent ? (
-            <div className="flex flex-col items-center space-y-4 py-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20">
-                <CheckCircle2 className="h-6 w-6 text-emerald-400" />
-              </div>
-              <p className="text-center text-sm text-slate-300">
-                Hvis e-postadressen er registrert, har vi sendt en lenke for å
-                tilbakestille passordet ditt.
-              </p>
-              <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-                <p className="text-sm text-amber-300">
-                  Sjekk søppelpost/spam-mappen din hvis du ikke finner e-posten
-                  i innboksen.
-                </p>
-              </div>
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 text-sm font-medium text-sky-400 hover:text-sky-300"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Tilbake til innlogging
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-300">
-                  E-postadresse
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="din@epost.no"
-                    required
-                    className="border-slate-700/80 bg-slate-900/70 pl-10 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-sky-500 to-emerald-400 font-semibold text-slate-950 hover:from-sky-400 hover:to-emerald-300"
-              >
-                {loading ? "Sender..." : "Send tilbakestillingslenke"}
-              </Button>
-
-              <p className="text-center text-sm text-slate-400">
-                Husker du passordet?{" "}
-                <Link
-                  to="/login"
-                  className="font-medium text-sky-400 hover:text-sky-300"
-                >
-                  Logg inn
-                </Link>
-              </p>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="email">E-post</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+          </div>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? "Sender..." : "Send lenke"}
+          </Button>
+          <p className="text-center text-sm text-muted-foreground">
+            Husker du passordet?{" "}
+            <Link
+              to="/login"
+              className="font-medium text-link underline-offset-4 hover:underline"
+            >
+              Logg inn
+            </Link>
+          </p>
+        </form>
+      )}
+    </AuthCard>
   );
 };
 

@@ -1,108 +1,46 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Design tokens. All colors in the app come from here, so the look can be
+  changed in one place. Values are HSL without hsl() so Tailwind can add opacity.
+*/
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 222 47% 11%;
-
+    /* Page and surfaces */
+    --background: 214 26% 95%; /* paper  #EEF1F5 */
+    --foreground: 220 50% 16%; /* ink    #15233F */
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-
+    --card-foreground: 220 50% 16%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 220 50% 16%;
 
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 220 14% 92%;
-    --secondary-foreground: 222 47% 11%;
-
-    --muted: 220 14% 95%;
-    --muted-foreground: 220 9% 46%;
-
-    --accent: 220 14% 92%;
-    --accent-foreground: 222 47% 11%;
-
-    --destructive: 0 72% 51%;
+    /* Ink is the main action color: buttons are dark blue, not colorful */
+    --primary: 220 50% 16%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 213 26% 92%;
+    --secondary-foreground: 220 50% 16%;
+    --muted: 216 33% 97%;
+    --muted-foreground: 218 15% 42%; /* #5A667A */
+    --accent: 213 26% 92%;
+    --accent-foreground: 220 50% 16%;
+    --destructive: 8 59% 46%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 90%;
-    --input: 220 13% 90%;
-    --ring: 222 47% 11%;
+    --border: 214 23% 88%; /* #D9DFE7 */
+    --input: 214 23% 82%;
+    --ring: 224 68% 51%; /* fjord #2D5BD7 - focus and links */
+    --link: 224 68% 51%;
 
-    --radius: 0.625rem;
+    --radius: 0.5rem;
 
-    /* Custom status colors */
-    --status-pending: 220 14% 95%;
-    --status-pending-foreground: 220 9% 46%;
-    --status-rejected: 0 72% 51%;
-    --status-rejected-foreground: 0 0% 100%;
-    --status-warning: 38 92% 50%;
-    --status-warning-foreground: 0 0% 100%;
-    --status-info: 217 91% 60%;
-    --status-info-foreground: 0 0% 100%;
-    --status-success: 142 71% 45%;
-    --status-success-foreground: 0 0% 100%;
-    --status-ghosted: 260 20% 50%;
-    --status-ghosted-foreground: 0 0% 100%;
-
-    /* Stats card gradients */
-    --stat-total-from: 222 47% 11%;
-    --stat-total-to: 217 33% 25%;
-    --stat-rejected-from: 0 72% 51%;
-    --stat-rejected-to: 0 65% 60%;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 96%;
-
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 96%;
-
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 96%;
-
-    --primary: 210 40% 96%;
-    --primary-foreground: 222 47% 11%;
-
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 96%;
-
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 96%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 213 27% 84%;
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* One color per application status, used in the overview bar and badges */
+    --status-sendt: 216 30% 60%;
+    --status-intervju: 41 77% 53%;
+    --status-tilbud: 152 54% 40%;
+    --status-avslag: 8 59% 54%;
+    --status-ghosted: 216 13% 70%;
   }
 }
 
@@ -116,33 +54,33 @@
     @apply overflow-x-hidden;
   }
 
-  body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: "Inter", sans-serif;
+  /* Always reserve room for the scrollbar, so the page doesn't shift sideways
+     when the content becomes tall enough to scroll (e.g. login -> register) */
+  html {
+    scrollbar-gutter: stable;
   }
-}
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Schibsted Grotesk Variable", system-ui, sans-serif;
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  /* Numbers line up in tables and counters */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.4);
-  border-radius: 9999px;
-}
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.6);
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(100, 116, 139, 0.4) transparent;
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

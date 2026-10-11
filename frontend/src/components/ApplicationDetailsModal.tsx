@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
@@ -52,99 +52,82 @@ export function ApplicationDetailsModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="border border-slate-800/70 bg-slate-950 p-6 text-slate-100 shadow-xl">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <DialogHeader>
-            <DialogTitle className="text-xl text-slate-50">
-              {application.company}
-            </DialogTitle>
-          </DialogHeader>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{application.company}</DialogTitle>
+          <DialogDescription>{application.position}</DialogDescription>
+        </DialogHeader>
 
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-xs uppercase text-slate-500">Stilling</dt>
-              <dd className="mt-1 text-slate-200">{application.position}</dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase text-slate-500">Dato sendt</dt>
-              <dd className="mt-1 text-slate-200">{application.dateSent}</dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="text-xs uppercase text-slate-500">Status</dt>
-              <dd className="mt-2">
-                <StatusBadge status={application.status} />
-              </dd>
-            </div>
-          </dl>
+        <dl className="flex flex-wrap gap-x-10 gap-y-3 text-sm">
+          <div>
+            <dt className="text-muted-foreground">Sendt</dt>
+            <dd className="mt-0.5">{application.dateSent}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Status</dt>
+            <dd className="mt-0.5">
+              <StatusBadge status={application.status} />
+            </dd>
+          </div>
+        </dl>
 
-          {hasNote && !isEditingNote && (
-            <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-              <p className="text-xs uppercase text-slate-500">Notat</p>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-200">
-                {savedNote}
-              </p>
-            </div>
-          )}
-
-          {!isEditingNote && (
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                onClick={() => setIsEditingNote(true)}
-                className="bg-sky-900 text-sky-200 hover:bg-sky-700"
-              >
-                {hasNote ? "Endre notat" : "Legg til notat"}
-              </Button>
-              {hasNote && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleDeleteNote}
-                  className="bg-slate-900/80 text-red-300 hover:bg-red-950/40 hover:text-red-200"
-                >
-                  Slett notat
-                </Button>
-              )}
-            </div>
-          )}
-
-          {isEditingNote && (
-            <div className="space-y-2">
-              <Label
-                htmlFor="application-note"
-                className="text-sm text-slate-300"
-              >
-                Notat
-              </Label>
+        <form onSubmit={handleSubmit} className="space-y-3 border-t pt-4">
+          {isEditingNote ? (
+            <>
+              <Label htmlFor="application-note">Notat</Label>
               <Textarea
                 id="application-note"
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
-                placeholder="Skriv et notat"
+                placeholder="F.eks. hvem du snakket med, eller når du bør følge opp"
                 maxLength={1000}
-                className="min-h-32 resize-none border-slate-700 bg-slate-900/80 text-slate-100 placeholder:text-slate-500 focus-visible:ring-cyan-500"
+                className="min-h-32 resize-none"
+                autoFocus
               />
-            </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsEditingNote(false)}
+                >
+                  Avbryt
+                </Button>
+                <Button type="submit">Lagre notat</Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">Notat</p>
+              {hasNote ? (
+                <p className="whitespace-pre-wrap text-sm leading-6">
+                  {savedNote}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Ingen notat ennå.
+                </p>
+              )}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditingNote(true)}
+                >
+                  {hasNote ? "Endre notat" : "Legg til notat"}
+                </Button>
+                {hasNote && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleDeleteNote}
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    Slett notat
+                  </Button>
+                )}
+              </div>
+            </>
           )}
-
-          <DialogFooter className="gap-2 pt-1">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={isEditingNote ? () => setIsEditingNote(false) : onClose}
-              className="bg-slate-900/80 text-slate-200 hover:bg-slate-800"
-            >
-              {isEditingNote ? "Avbryt" : "Lukk"}
-            </Button>
-            {isEditingNote && (
-              <Button
-                type="submit"
-                className="bg-sky-900 text-sky-200 hover:bg-sky-700"
-              >
-                Lagre notat
-              </Button>
-            )}
-          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

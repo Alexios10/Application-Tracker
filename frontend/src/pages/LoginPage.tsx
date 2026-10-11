@@ -4,9 +4,12 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Briefcase, CheckCircle2, Shield } from "lucide-react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { motion, AnimatePresence } from "motion/react";
+import { Shield } from "lucide-react";
+import { PasswordInput } from "@/components/PasswordInput";
+import { Collapse } from "@/components/Collapse";
+import { Logo } from "@/components/Logo";
+import { ApplicationStatus } from "@/types/application";
+import { STATUSES, STATUS_DOT } from "@/constants/status";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +24,6 @@ const LoginPage = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   // Form fields
   const [username, setUsername] = useState("");
@@ -60,10 +62,6 @@ const LoginPage = () => {
     return <Navigate to="/" replace />;
   }
 
-  function showPasswordToggle() {
-    setShowPassword(!showPassword);
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -95,304 +93,260 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-5xl space-y-8"
-      >
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,420px)] lg:items-start">
-          <motion.section
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-3xl border border-slate-800/70 bg-slate-900/40 p-8 shadow-xl backdrop-blur"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{
-                type: "spring",
-                stiffness: 200,
-                damping: 15,
-                delay: 0.2,
-              }}
-              className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-400 to-emerald-300 shadow-lg shadow-emerald-500/40"
-            >
-              <Briefcase className="h-7 w-7 text-slate-950" />
-            </motion.div>
-            <h1 className="mt-6 max-w-xl text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
-              Hold oversikt over hele jobbsøkerløpet ditt på ett sted
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-              Mine Søknader er en enkel jobbsøknad-tracker for deg som vil samle
-              søknader, følge intervjuinvitasjoner og ha kontroll på hvor i
-              prosessen hver stilling befinner seg.
-            </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {[
-                "Samle alle jobbsøknader i én oversikt",
-                "Følg status fra sendt til intervju og tilbud",
-                "Hold orden på datoer, selskaper og neste steg",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-slate-800/80 bg-slate-950/40 p-4 text-sm text-slate-300"
-                >
-                  <CheckCircle2 className="mb-3 h-5 w-5 text-emerald-300" />
-                  <p>{item}</p>
-                </div>
-              ))}
-            </div>
-          </motion.section>
+    <div className="flex min-h-screen flex-col">
+      <div className="mx-auto w-full max-w-5xl px-4 pt-6 sm:px-6">
+        <Logo />
+      </div>
 
-          {/* Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            onSubmit={handleSubmit}
-            className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 shadow-xl backdrop-blur"
-          >
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-50">
-                {isRegister ? "Opprett konto" : "Logg inn"}
-              </h2>
-              <p className="mt-2 text-sm text-slate-400">
-                {isRegister
-                  ? "Opprett en ny konto for å komme i gang"
-                  : "Logg inn for å se søknadene dine"}
-              </p>
-            </div>
+      <main className="mx-auto grid w-full max-w-5xl gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[1fr_400px] lg:items-start lg:gap-20 lg:pt-20">
+        {/* Aligned to the top, so the text stays put when the form changes height */}
+        <section className="lg:pt-10">
+          <h1 className="max-w-[16ch] text-[34px] font-semibold leading-[1.1] tracking-tight sm:text-[44px]">
+            Hold oversikt over jobbsøknadene dine
+          </h1>
+          <p className="mt-4 max-w-md text-[17px] leading-relaxed text-muted-foreground">
+            Legg inn hver søknad du sender, og se med en gang hvor mange som
+            venter på svar, hvor du skal på intervju og hvor det ble nei.
+          </p>
+          <ExampleOverview />
+        </section>
 
-            {/* Error message */}
-            {error && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                {error}
-              </div>
-            )}
-
-            {/* Registration fields */}
-            <AnimatePresence>
-              {isRegister && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-5"
-                >
-                  <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-                    NB: Veldig viktig at du registrerer riktig e-postadresse
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-slate-300">
-                      Fullt navn
-                    </Label>
-                    <Input
-                      id="fullName"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Ola Nordmann"
-                      required
-                      className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-slate-300">
-                      E-post
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="ola@eksempel.no"
-                      required
-                      className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Username */}
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-slate-300">
-                Brukernavn
-              </Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder={isRegister ? "Brukernavn" : ""}
-                required
-                className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-              />
-            </div>
-
-            {/* Password */}
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-300">
-                Passord
-              </Label>
-              <div className="flex justify-center items-center relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={isRegister ? "Minst 6 tegn, inkl. et tall" : ""}
-                  required
-                  minLength={6}
-                  className="border-slate-700/80 bg-slate-900/70 text-slate-50 placeholder:text-slate-500 focus-visible:ring-sky-400"
-                />
-                <span
-                  className="text-slate-50 absolute right-3 cursor-pointer"
-                  onClick={showPasswordToggle}
-                >
-                  {showPassword ? <FaEye /> : <FaEyeSlash />}
-                </span>
-              </div>
-            </div>
-
-            {/* "Remember me" and forgot password - login only */}
-            {!isRegister && (
-              <div className="flex items-center justify-between mb-2">
-                <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 accent-sky-500"
-                  />
-                  Husk meg
-                </label>
-                <a
-                  href="/forgot-password"
-                  className="text-blue-500 hover:underline text-sm"
-                >
-                  Glemt passord?
-                </a>
-              </div>
-            )}
-
-            {/* Submit button */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-sky-500 to-emerald-400 font-semibold text-slate-950 hover:from-sky-400 hover:to-emerald-300"
-            >
-              {loading
-                ? "Vennligst vent..."
-                : isRegister
-                  ? "Opprett konto"
-                  : "Logg inn"}
-            </Button>
-
-            {/* Switch between login/register */}
-            <p className="text-center text-sm text-slate-400">
-              {isRegister
-                ? "Har du allerede en konto? "
-                : "Har du ikke en konto? "}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsRegister(!isRegister);
-                  setError("");
-                }}
-                className="font-medium text-sky-400 hover:text-sky-300"
-              >
-                {isRegister ? "Logg inn" : "Registrer deg"}
-              </button>
-            </p>
-          </motion.form>
-        </div>
-
-        {/* Privacy */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-xl border bg-card p-6 sm:p-8"
         >
-          <Dialog>
-            <DialogTrigger asChild>
-              <button className="mx-auto flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-300">
-                <Shield className="h-3.5 w-3.5" />
-                Personvern og rettigheter
-              </button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[85vh] overflow-y-auto border-slate-700/60 bg-slate-900 text-slate-200 sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-semibold text-slate-50">
-                  Personvern og rettigheter
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 text-sm leading-relaxed text-slate-300">
-                <section>
-                  <h3 className="mb-1 font-semibold text-slate-100">
-                    Datainnsamling
-                  </h3>
-                  <p>
-                    Vi lagrer kun informasjon du oppgir ved registrering
-                    (brukernavn, e-postadresse og fullt navn) samt jobbsøknadene
-                    du registrerer. Vi samler ikke inn data fra tredjeparter.
-                  </p>
-                </section>
-                <section>
-                  <h3 className="mb-1 font-semibold text-slate-100">
-                    Bruk av data
-                  </h3>
-                  <p>
-                    Dataene brukes utelukkende for å gi deg oversikt over dine
-                    jobbsøknader. Vi selger eller deler aldri dine opplysninger
-                    med andre.
-                  </p>
-                </section>
-                <section>
-                  <h3 className="mb-1 font-semibold text-slate-100">
-                    Lagring og sikkerhet
-                  </h3>
-                  <p>
-                    Passord lagres kryptert. All kommunikasjon mellom
-                    nettleseren din og serveren skjer over HTTPS.
-                  </p>
-                </section>
-                <section>
-                  <h3 className="mb-1 font-semibold text-slate-100">
-                    Dine rettigheter
-                  </h3>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>
-                      Du kan når som helst be om innsyn i dataene vi lagrer om
-                      deg.
-                    </li>
-                    <li>Du kan be om at dataene dine blir slettet.</li>
-                    <li>
-                      Du kan oppdatere eller korrigere opplysningene dine.
-                    </li>
-                  </ul>
-                </section>
-                <section>
-                  <h3 className="mb-1 font-semibold text-slate-100">Kontakt</h3>
-                  <p>
-                    Har du spørsmål om personvern? Ta kontakt på{" "}
-                    <a
-                      href="mailto:sattar_saud@hotmail.com"
-                      className="text-sky-400 hover:text-sky-300 transition-colors"
-                    >
-                      minesoknader@gmail.com
-                    </a>
-                  </p>
-                </section>
+          <h2 className="mb-5 text-xl font-semibold tracking-tight">
+            {isRegister ? "Opprett konto" : "Logg inn"}
+          </h2>
+
+          {error && (
+            <p
+              role="alert"
+              className="mb-5 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive"
+            >
+              {error}
+            </p>
+          )}
+
+          <Collapse open={isRegister}>
+            <div className="space-y-5 pb-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="fullName">Fullt navn</Label>
+                <Input
+                  id="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  autoComplete="name"
+                  required
+                />
               </div>
-            </DialogContent>
-          </Dialog>
-        </motion.div>
-      </motion.div>
+              <div className="space-y-1.5">
+                <Label htmlFor="email">E-post</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  aria-describedby="email-hint"
+                  required
+                />
+                <p id="email-hint" className="text-sm text-muted-foreground">
+                  Brukes hvis du glemmer passordet, så sjekk at den er riktig.
+                </p>
+              </div>
+            </div>
+          </Collapse>
+
+          <div className="mb-5 space-y-1.5">
+            <Label htmlFor="username">Brukernavn</Label>
+            <Input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="password" className="mb-1.5 block">
+              Passord
+            </Label>
+            <PasswordInput
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={isRegister ? "new-password" : "current-password"}
+              aria-describedby={isRegister ? "password-hint" : undefined}
+              minLength={isRegister ? 8 : undefined}
+              required
+            />
+            <Collapse open={isRegister}>
+              <p
+                id="password-hint"
+                className="pt-1.5 text-sm text-muted-foreground"
+              >
+                Minst 8 tegn, med stor og liten bokstav og et tall.
+              </p>
+            </Collapse>
+          </div>
+
+          <Collapse open={!isRegister}>
+            <div className="flex items-center justify-between pt-5">
+              <label className="flex cursor-pointer select-none items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 accent-foreground"
+                />
+                Husk meg
+              </label>
+              <a
+                href="/forgot-password"
+                className="text-sm text-link underline-offset-4 hover:underline"
+              >
+                Glemt passord?
+              </a>
+            </div>
+          </Collapse>
+
+          <Button type="submit" disabled={loading} className="mt-5 w-full">
+            {loading
+              ? "Vent litt..."
+              : isRegister
+                ? "Opprett konto"
+                : "Logg inn"}
+          </Button>
+
+          <p className="mt-5 text-center text-sm text-muted-foreground">
+            {isRegister ? "Har du allerede en konto? " : "Ny her? "}
+            <button
+              type="button"
+              onClick={() => {
+                setIsRegister(!isRegister);
+                setError("");
+              }}
+              className="font-medium text-link underline-offset-4 hover:underline"
+            >
+              {isRegister ? "Logg inn" : "Opprett konto"}
+            </button>
+          </p>
+        </form>
+      </main>
+
+      {/* Pinned to the bottom of the screen, so it doesn't move when the form changes height */}
+      <footer className="mx-auto mt-auto w-full max-w-5xl px-4 pb-8 sm:px-6">
+        <PrivacyDialog />
+      </footer>
     </div>
   );
 };
+
+// A static example of the status overview, so new visitors see what they get
+const EXAMPLE_COUNTS: Record<ApplicationStatus, number> = {
+  Sendt: 11,
+  Intervju: 4,
+  Tilbud: 1,
+  Avslag: 6,
+  Ghosted: 2,
+};
+
+function ExampleOverview() {
+  const total = Object.values(EXAMPLE_COUNTS).reduce((a, b) => a + b, 0);
+  return (
+    <figure className="mt-12 hidden max-w-lg sm:block" aria-hidden="true">
+      <div className="flex h-3 gap-[3px] overflow-hidden rounded-full">
+        {STATUSES.map((status) => (
+          <div
+            key={status}
+            className={STATUS_DOT[status]}
+            style={{ width: `${(EXAMPLE_COUNTS[status] / total) * 100}%` }}
+          />
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-sm">
+        {STATUSES.map((status) => (
+          <span key={status} className="flex items-center gap-2">
+            <span className={`h-2 w-2 rounded-full ${STATUS_DOT[status]}`} />
+            {status}
+            <span className="tabular font-semibold">
+              {EXAMPLE_COUNTS[status]}
+            </span>
+          </span>
+        ))}
+      </div>
+      <figcaption className="mt-3 text-sm text-muted-foreground">
+        Slik kan det se ut etter seks uker og {total} søknader.
+      </figcaption>
+    </figure>
+  );
+}
+
+function PrivacyDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <Shield className="h-3.5 w-3.5" />
+          Personvern og rettigheter
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Personvern og rettigheter</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 text-sm leading-relaxed">
+          <section>
+            <h3 className="mb-1 font-semibold">Datainnsamling</h3>
+            <p>
+              Vi lagrer kun informasjon du oppgir ved registrering (brukernavn,
+              e-postadresse og fullt navn) samt jobbsøknadene du registrerer. Vi
+              samler ikke inn data fra tredjeparter.
+            </p>
+          </section>
+          <section>
+            <h3 className="mb-1 font-semibold">Bruk av data</h3>
+            <p>
+              Dataene brukes utelukkende for å gi deg oversikt over dine
+              jobbsøknader. Vi selger eller deler aldri dine opplysninger med
+              andre.
+            </p>
+          </section>
+          <section>
+            <h3 className="mb-1 font-semibold">Lagring og sikkerhet</h3>
+            <p>
+              Passord lagres kryptert. All kommunikasjon mellom nettleseren din
+              og serveren skjer over HTTPS.
+            </p>
+          </section>
+          <section>
+            <h3 className="mb-1 font-semibold">Dine rettigheter</h3>
+            <ul className="list-disc space-y-1 pl-5">
+              <li>
+                Du kan når som helst be om innsyn i dataene vi lagrer om deg.
+              </li>
+              <li>Du kan be om at dataene dine blir slettet.</li>
+              <li>Du kan oppdatere eller korrigere opplysningene dine.</li>
+            </ul>
+          </section>
+          <section>
+            <h3 className="mb-1 font-semibold">Kontakt</h3>
+            <p>
+              Har du spørsmål om personvern? Ta kontakt på{" "}
+              <a
+                href="mailto:minesoknader@gmail.com"
+                className="text-link underline-offset-4 hover:underline"
+              >
+                minesoknader@gmail.com
+              </a>
+            </p>
+          </section>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default LoginPage;
