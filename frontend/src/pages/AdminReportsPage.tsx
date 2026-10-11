@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,6 @@ interface Report {
   userId?: string;
   createdAt: string;
 }
-
-const API_BASE = (
-  import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
-).replace(/\/+$/, "");
 
 const AdminReportsPage = () => {
   // Tilbake-knapp funksjon
