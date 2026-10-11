@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using ApplicationTracker.Api.Data;
 using ApplicationTracker.Api.Models;
+using ApplicationTracker.Api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -21,11 +22,13 @@ namespace ApplicationTracker.Api.Controllers
   {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
+    private readonly TokenService _tokenService;
 
-    public AccountController(ApplicationDbContext context, UserManager<User> userManager)
+    public AccountController(ApplicationDbContext context, UserManager<User> userManager, TokenService tokenService)
     {
       _context = context;
       _userManager = userManager;
+      _tokenService = tokenService;
     }
 
     [HttpPost("forgot-password")]
@@ -47,7 +50,7 @@ namespace ApplicationTracker.Api.Controllers
       // Generer kryptografisk sikker token og lagre kun hashen i databasen
       var tokenBytes = RandomNumberGenerator.GetBytes(32);
       var token = Convert.ToBase64String(tokenBytes).Replace("+", "-").Replace("/", "_");
-      user.ResetPasswordToken = HashToken(token);
+      user.ResetPasswordToken = _tokenService.HashToken(token);
       user.ResetPasswordTokenExpires = DateTime.UtcNow.AddHours(1);
       await _context.SaveChangesAsync();
 
@@ -85,7 +88,7 @@ namespace ApplicationTracker.Api.Controllers
         return BadRequest("Passordet må være minst 8 tegn.");
 
       // Sammenlign med hashet versjon (vi lagrer aldri token i klartekst)
-      var hashedToken = HashToken(request.Token);
+      var hashedToken = _tokenService.HashToken(request.Token);
       var user = await _context.Users.FirstOrDefaultAsync(
         u => u.ResetPasswordToken == hashedToken && u.ResetPasswordTokenExpires > DateTime.UtcNow);
 
@@ -161,14 +164,6 @@ namespace ApplicationTracker.Api.Controllers
       Console.WriteLine($"[EMAIL] Resend response: {body}");
     }
 
-    /// <summary>
-    /// Hasher en token med SHA-256 slik at vi aldri lagrer klartekst i databasen.
-    /// </summary>
-    private static string HashToken(string token)
-    {
-      var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
-      return Convert.ToBase64String(bytes);
-    }
   }
 
   public class ResetPasswordRequest

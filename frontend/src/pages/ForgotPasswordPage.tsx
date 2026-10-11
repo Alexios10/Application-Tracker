@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,6 @@ import {
   CheckCircle2,
   AlertTriangle,
 } from "lucide-react";
-
-const API_BASE = (
-  import.meta.env.VITE_API_BASE ?? "http://localhost:5242"
-).replace(/\/+$/, "");
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
