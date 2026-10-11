@@ -15,18 +15,19 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { LogOut, User } from "lucide-react";
+import { AtSign, LogOut, User } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileDrawer } from "@/components/MobileDrawer";
 import { Topbar } from "@/components/Topbar";
 import { useApplications } from "@/hooks/useApplications";
 
 const ProfilePage = () => {
-  const { user, logout, authFetch } = useAuth();
-  const { addApplication } = useApplications();
+  const { user, logout, authFetch, updateUser } = useAuth();
+  const { applications, addApplication } = useApplications();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [fullName, setFullName] = useState(user?.fullName || "");
+  const [username, setUsername] = useState(user?.username || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
@@ -43,9 +44,10 @@ const ProfilePage = () => {
       return;
     }
     const fullNameChanged = fullName.trim() !== user.fullName;
+    const usernameChanged = username.trim() !== user.username;
     const passwordChanged = password.trim() !== "";
-    setHasChanges(fullNameChanged || passwordChanged);
-  }, [fullName, password, user]);
+    setHasChanges(fullNameChanged || usernameChanged || passwordChanged);
+  }, [fullName, username, password, user]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,8 +56,9 @@ const ProfilePage = () => {
     setError("");
 
     const fullNameChanged = fullName.trim() !== user?.fullName;
+    const usernameChanged = username.trim() !== user?.username;
     const passwordChanged = password.trim() !== "";
-    if (!fullNameChanged && !passwordChanged) {
+    if (!fullNameChanged && !usernameChanged && !passwordChanged) {
       setError("Ingen endring å lagre.");
       setLoading(false);
       return;
@@ -91,6 +94,7 @@ const ProfilePage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName,
+          username,
           password: passwordChanged ? password : undefined,
           currentPassword: passwordChanged ? currentPassword : undefined,
         }),
@@ -99,6 +103,8 @@ const ProfilePage = () => {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error || "Kunne ikke oppdatere profil.");
       }
+      // The server returns the updated user, so the new name shows everywhere right away
+      updateUser(await res.json());
       setMessage("Profil oppdatert!");
       setPassword("");
       setCurrentPassword("");
@@ -127,7 +133,6 @@ const ProfilePage = () => {
     }
   };
 
-  const { applications } = useApplications();
 
   return (
     <div className="flex h-screen bg-[#0f1117] text-slate-50 overflow-hidden">
@@ -156,18 +161,37 @@ const ProfilePage = () => {
                 Brukerprofil
               </h1>
               <form onSubmit={handleUpdate} className="space-y-5">
-                <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
-                    Brukernavn
-                  </label>
-                  <div className="relative">
-                    <input
-                      className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                    />
-                    <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
+                      Fullt navn
+                    </label>
+                    <div className="relative">
+                      <input
+                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        maxLength={100}
+                        required
+                      />
+                      <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
+                      Brukernavn (innlogging)
+                    </label>
+                    <div className="relative">
+                      <input
+                        className="w-full rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        maxLength={50}
+                        autoComplete="username"
+                        required
+                      />
+                      <AtSign className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
+                    </div>
                   </div>
                 </div>
 

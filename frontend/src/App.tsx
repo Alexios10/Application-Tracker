@@ -13,7 +13,15 @@ import ProfilePage from "./pages/ProfilePage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Data is considered fresh for 5 minutes, so switching pages or tabs does not trigger new requests
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    },
+  },
+});
 
 // Beskyttet rute — sender til login hvis ikke innlogget
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
