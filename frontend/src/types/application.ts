@@ -12,4 +12,6 @@ export interface Application {
   dateSent: string;
   status: ApplicationStatus;
   note?: string;
+  jobUrl?: string | null; // link to the job posting
+  deadline?: string | null; // "dd.MM.yy", same format as dateSent
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { MessageSquareText, Pencil } from "lucide-react";
+import { ExternalLink, MessageSquareText, Pencil } from "lucide-react";
+import { isSafeUrl } from "@/lib/applications";
 import { Application, ApplicationStatus } from "@/types/application";
 import { EditApplicationModal } from "../EditApplicationModal";
 import { ApplicationDetailsModal } from "../ApplicationDetailsModal";
@@ -54,13 +55,29 @@ const ApplicationTable = ({
     </div>
   );
 
-  const noteIcon = (app: Application) =>
-    hasNote(app) && (
-      <MessageSquareText
-        className="h-4 w-4 shrink-0 text-muted-foreground"
-        aria-label="Har notat"
-      />
-    );
+  const noteIcon = (app: Application) => (
+    <>
+      {hasNote(app) && (
+        <MessageSquareText
+          className="h-4 w-4 shrink-0 text-muted-foreground"
+          aria-label="Har notat"
+        />
+      )}
+      {isSafeUrl(app.jobUrl) && (
+        <a
+          href={app.jobUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          aria-label={`Åpne annonsen hos ${app.company}`}
+          title="Åpne annonsen"
+          className="shrink-0 rounded text-muted-foreground hover:text-link"
+        >
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      )}
+    </>
+  );
 
   return (
     <>

@@ -10,7 +10,9 @@ import {
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
+import { ExternalLink } from "lucide-react";
 import StatusBadge from "./StatusBadge";
+import { isSafeUrl } from "@/lib/applications";
 
 interface ApplicationDetailsModalProps {
   open: boolean;
@@ -69,7 +71,25 @@ export function ApplicationDetailsModal({
               <StatusBadge status={application.status} />
             </dd>
           </div>
+          {application.deadline && (
+            <div>
+              <dt className="text-muted-foreground">Søknadsfrist</dt>
+              <dd className="mt-0.5">{application.deadline}</dd>
+            </div>
+          )}
         </dl>
+
+        {isSafeUrl(application.jobUrl) && (
+          <a
+            href={application.jobUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-link underline-offset-4 hover:underline"
+          >
+            Åpne annonsen
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-3 border-t pt-4">
           {isEditingNote ? (

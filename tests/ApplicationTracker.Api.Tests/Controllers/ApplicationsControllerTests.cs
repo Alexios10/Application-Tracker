@@ -81,4 +81,46 @@ public class ApplicationsControllerTests
 
     Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
   }
+
+  [Fact]
+  public async Task Create_SavesJobUrlAndDeadline()
+  {
+    using var api = new TestApi();
+    var client = await api.LoggedInClient("kari");
+
+    var response = await client.PostAsJsonAsync("/api/applications", new
+    {
+      company = "Equinor",
+      position = "Frontend-utvikler",
+      dateSent = "2026-10-11",
+      status = "Sendt",
+      jobUrl = "https://www.finn.no/job/123",
+      deadline = "01.11.26"
+    });
+
+    Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    var created = await response.Content.ReadFromJsonAsync<JsonElement>();
+    Assert.Equal("https://www.finn.no/job/123", created.GetProperty("jobUrl").GetString());
+    Assert.Equal("01.11.26", created.GetProperty("deadline").GetString());
+  }
+
+  [Theory]
+  [InlineData("javascript:alert(1)")]
+  [InlineData("finn.no/job/123")]
+  public async Task Create_WithLinkThatIsNotHttp_ReturnsBadRequest(string jobUrl)
+  {
+    using var api = new TestApi();
+    var client = await api.LoggedInClient("kari");
+
+    var response = await client.PostAsJsonAsync("/api/applications", new
+    {
+      company = "Equinor",
+      position = "Frontend-utvikler",
+      dateSent = "2026-10-11",
+      status = "Sendt",
+      jobUrl
+    });
+
+    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+  }
 }

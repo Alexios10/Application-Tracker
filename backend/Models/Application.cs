@@ -31,6 +31,14 @@ public class Application
   [MaxLength(1000)]
   public string Note { get; set; } = string.Empty;
 
+  // Link to the job posting (optional)
+  [MaxLength(500)]
+  public string? JobUrl { get; set; }
+
+  // Application deadline, same format as DateSent: "dd.MM.yy" (optional)
+  [MaxLength(20)]
+  public string? Deadline { get; set; }
+
   // Link to the user who owns the application
   public string? UserId { get; set; }
   public User? User { get; set; }
