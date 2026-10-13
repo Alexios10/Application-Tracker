@@ -48,6 +48,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(a => a.Deadline)
                 .HasColumnName("deadline");
 
+            entity.Property(a => a.CoverLetter)
+                .HasColumnName("cover_letter");
+
             // Relationship: each application belongs to one user
             entity.HasOne(a => a.User)
                 .WithMany()

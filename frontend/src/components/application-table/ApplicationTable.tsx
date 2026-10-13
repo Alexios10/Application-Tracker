@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, MessageSquareText, Pencil } from "lucide-react";
+import { ExternalLink, FileText, MessageSquareText, Pencil } from "lucide-react";
 import { isSafeUrl } from "@/lib/applications";
 import { Application, ApplicationStatus } from "@/types/application";
 import { EditApplicationModal } from "../EditApplicationModal";
@@ -15,6 +15,8 @@ interface ApplicationTableProps {
 }
 
 const hasNote = (app: Application) => (app.note?.trim().length ?? 0) > 0;
+const hasCoverLetter = (app: Application) =>
+  (app.coverLetter?.trim().length ?? 0) > 0;
 
 const ApplicationTable = ({
   applications,
@@ -25,7 +27,7 @@ const ApplicationTable = ({
   const [editApp, setEditApp] = useState<Application | null>(null);
   const [detailsApp, setDetailsApp] = useState<Application | null>(null);
 
-  // Opens the details (with the note) on click, Enter or Space
+  // Opens the details (note and application text) on click, Enter or Space
   const rowProps = (app: Application) => ({
     onClick: () => setDetailsApp(app),
     onKeyDown: (event: React.KeyboardEvent) => {
@@ -63,6 +65,12 @@ const ApplicationTable = ({
           aria-label="Har notat"
         />
       )}
+      {hasCoverLetter(app) && (
+        <FileText
+          className="h-4 w-4 shrink-0 text-muted-foreground"
+          aria-label="Har søknadstekst"
+        />
+      )}
       {isSafeUrl(app.jobUrl) && (
         <a
           href={app.jobUrl}
@@ -85,7 +93,7 @@ const ApplicationTable = ({
         open={detailsApp !== null}
         application={detailsApp}
         onClose={() => setDetailsApp(null)}
-        onSaveNote={(updated) => {
+        onSave={(updated) => {
           setDetailsApp(updated);
           onEdit(updated);
         }}

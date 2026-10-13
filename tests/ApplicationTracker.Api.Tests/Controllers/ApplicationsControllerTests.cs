@@ -123,4 +123,47 @@ public class ApplicationsControllerTests
 
     Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
   }
+
+  [Fact]
+  public async Task Update_SavesCoverLetter()
+  {
+    using var api = new TestApi();
+    var client = await api.LoggedInClient("kari");
+
+    var created = await client.PostAsJsonAsync("/api/applications", NewApplication());
+    var id = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetInt32();
+
+    var response = await client.PutAsJsonAsync($"/api/applications/{id}", new
+    {
+      company = "Equinor",
+      position = "Frontend-utvikler",
+      dateSent = "2026-10-11",
+      status = "Sendt",
+      coverLetter = "Hei!\nJeg søker på stillingen som frontend-utvikler."
+    });
+
+    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    var applications = await client.GetFromJsonAsync<JsonElement>("/api/applications");
+    Assert.Equal(
+      "Hei!\nJeg søker på stillingen som frontend-utvikler.",
+      applications[0].GetProperty("coverLetter").GetString());
+  }
+
+  [Fact]
+  public async Task Create_WithTooLongCoverLetter_ReturnsBadRequest()
+  {
+    using var api = new TestApi();
+    var client = await api.LoggedInClient("kari");
+
+    var response = await client.PostAsJsonAsync("/api/applications", new
+    {
+      company = "Equinor",
+      position = "Frontend-utvikler",
+      dateSent = "2026-10-11",
+      status = "Sendt",
+      coverLetter = new string('a', 20001)
+    });
+
+    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+  }
 }

@@ -39,6 +39,10 @@ public class Application
   [MaxLength(20)]
   public string? Deadline { get; set; }
 
+  // The application text the user actually sent (optional)
+  [MaxLength(20000)]
+  public string? CoverLetter { get; set; }
+
   // Link to the user who owns the application
   public string? UserId { get; set; }
   public User? User { get; set; }
