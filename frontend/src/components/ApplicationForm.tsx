@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import StatusBadge from "@/components/StatusBadge";
 
-export type ApplicationFormValues = Omit<Application, "id" | "note">;
+export type ApplicationFormValues = Omit<Application, "id" | "note" | "coverLetter">;
 
 interface Props {
   initial?: ApplicationFormValues;

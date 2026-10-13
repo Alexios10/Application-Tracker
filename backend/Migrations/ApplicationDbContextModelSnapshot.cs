@@ -37,6 +37,11 @@ namespace ApplicationTracker.Api.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("company");
 
+                    b.Property<string>("CoverLetter")
+                        .HasMaxLength(20000)
+                        .HasColumnType("character varying(20000)")
+                        .HasColumnName("cover_letter");
+
                     b.Property<string>("DateSent")
                         .IsRequired()
                         .HasMaxLength(20)

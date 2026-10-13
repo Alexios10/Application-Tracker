@@ -49,6 +49,7 @@ public class ApplicationsController : ControllerBase
       Note = request.Note ?? string.Empty,
       JobUrl = EmptyToNull(request.JobUrl),
       Deadline = EmptyToNull(request.Deadline),
+      CoverLetter = EmptyToNull(request.CoverLetter),
       UserId = userId
     };
 
@@ -74,6 +75,7 @@ public class ApplicationsController : ControllerBase
     existing.Note = updated.Note ?? string.Empty;
     existing.JobUrl = EmptyToNull(updated.JobUrl);
     existing.Deadline = EmptyToNull(updated.Deadline);
+    existing.CoverLetter = EmptyToNull(updated.CoverLetter);
 
     await _db.SaveChangesAsync();
     return NoContent();

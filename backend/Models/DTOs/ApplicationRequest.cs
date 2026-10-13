@@ -30,4 +30,7 @@ public class ApplicationRequest
 
   [MaxLength(20)]
   public string? Deadline { get; set; }
+
+  [MaxLength(20000)]
+  public string? CoverLetter { get; set; }
 }

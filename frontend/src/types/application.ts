@@ -14,4 +14,5 @@ export interface Application {
   note?: string;
   jobUrl?: string | null; // link to the job posting
   deadline?: string | null; // "dd.MM.yy", same format as dateSent
+  coverLetter?: string | null; // the application text the user sent
 }
