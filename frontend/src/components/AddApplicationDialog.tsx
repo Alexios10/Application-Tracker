@@ -26,12 +26,13 @@ const AddApplicationDialog = ({ onAdd }: Props) => {
           Legg til søknad
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Ny søknad</DialogTitle>
         </DialogHeader>
         <ApplicationForm
           submitLabel="Legg til søknad"
+          showCoverLetter
           onCancel={() => setOpen(false)}
           onSubmit={(values) => {
             onAdd(values);
