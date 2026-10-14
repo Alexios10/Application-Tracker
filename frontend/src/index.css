@@ -41,6 +41,45 @@
     --status-tilbud: 152 54% 40%;
     --status-avslag: 8 59% 54%;
     --status-ghosted: 216 13% 70%;
+
+    /* Native controls (scrollbars, date pickers) follow the theme */
+    color-scheme: light;
+  }
+
+  /* Dark mode: same navy brand, with ink and paper swapped */
+  .dark {
+    --background: 222 40% 8%;
+    --foreground: 214 30% 92%;
+    --card: 222 35% 11%;
+    --card-foreground: 214 30% 92%;
+    --popover: 222 35% 12%;
+    --popover-foreground: 214 30% 92%;
+
+    /* Buttons become light with dark text */
+    --primary: 214 30% 92%;
+    --primary-foreground: 222 40% 10%;
+    --secondary: 222 25% 18%;
+    --secondary-foreground: 214 30% 92%;
+    --muted: 222 28% 16%;
+    --muted-foreground: 216 15% 65%;
+    --accent: 222 25% 18%;
+    --accent-foreground: 214 30% 92%;
+    --destructive: 6 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 22% 20%;
+    --input: 222 20% 26%;
+    --ring: 222 85% 66%;
+    --link: 222 85% 72%;
+
+    /* Slightly brighter status colors so they stand out on a dark background */
+    --status-sendt: 216 35% 62%;
+    --status-intervju: 41 80% 58%;
+    --status-tilbud: 152 50% 48%;
+    --status-avslag: 8 65% 60%;
+    --status-ghosted: 216 12% 48%;
+
+    color-scheme: dark;
   }
 }
 
@@ -58,6 +97,8 @@
      when the content becomes tall enough to scroll (e.g. login -> register) */
   html {
     scrollbar-gutter: stable;
+    /* Also colors the scrollbar gutter, so it matches the page in both themes */
+    @apply bg-background;
   }
 
   body {
@@ -101,6 +142,8 @@
     padding: 12mm;
   }
 
+  /* Always print on white, also in dark mode */
+  html,
   body {
     background: white;
   }

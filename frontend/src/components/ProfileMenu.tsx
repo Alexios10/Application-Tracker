@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LifeBuoy, LogOut, User } from "lucide-react";
+import { LifeBuoy, LogOut, Monitor, Moon, Sun, User } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 
 export function ProfileMenu({ onReport }: { onReport: () => void }) {
   const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -26,6 +28,12 @@ export function ProfileMenu({ onReport }: { onReport: () => void }) {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  const themes = [
+    { value: "light", label: "Lyst", icon: Sun },
+    { value: "dark", label: "Mørkt", icon: Moon },
+    { value: "system", label: "System", icon: Monitor },
+  ];
 
   const itemClass =
     "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm hover:bg-muted";
@@ -70,6 +78,34 @@ export function ProfileMenu({ onReport }: { onReport: () => void }) {
             <LifeBuoy className="h-4 w-4 text-muted-foreground" />
             Rapporter et problem
           </button>
+          <div className="my-1 border-t" />
+          <div className="px-3 py-2">
+            <p id="theme-label" className="mb-2 text-xs text-muted-foreground">
+              Utseende
+            </p>
+            <div
+              role="radiogroup"
+              aria-labelledby="theme-label"
+              className="grid grid-cols-3 gap-1 rounded-md bg-secondary p-1"
+            >
+              {themes.map(({ value, label, icon: Icon }) => (
+                <button
+                  key={value}
+                  role="radio"
+                  aria-checked={theme === value}
+                  onClick={() => setTheme(value)}
+                  className={`flex flex-col items-center gap-1 rounded px-1 py-1.5 text-xs transition-colors ${
+                    theme === value
+                      ? "bg-card font-medium text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="my-1 border-t" />
           <button
             className={itemClass}
