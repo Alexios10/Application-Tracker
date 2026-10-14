@@ -7,6 +7,7 @@ import { STATUSES } from "@/constants/status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -22,13 +23,16 @@ import {
 } from "@/components/ui/select";
 import StatusBadge from "@/components/StatusBadge";
 
-export type ApplicationFormValues = Omit<Application, "id" | "note" | "coverLetter">;
+// coverLetter is only included when the form shows that field (when adding)
+export type ApplicationFormValues = Omit<Application, "id" | "note">;
 
 interface Props {
   initial?: ApplicationFormValues;
   submitLabel: string;
   onSubmit: (values: ApplicationFormValues) => void;
   onCancel: () => void;
+  // Show the field for the sent application text
+  showCoverLetter?: boolean;
 }
 
 // Dates are stored as "dd.MM.yy" (e.g. "02.10.26")
@@ -40,6 +44,7 @@ export function ApplicationForm({
   submitLabel,
   onSubmit,
   onCancel,
+  showCoverLetter = false,
 }: Props) {
   const [company, setCompany] = useState(initial?.company ?? "");
   const [position, setPosition] = useState(initial?.position ?? "");
@@ -57,6 +62,7 @@ export function ApplicationForm({
       ? parse(initial.deadline, DATE_FORMAT, new Date())
       : undefined,
   );
+  const [coverLetter, setCoverLetter] = useState("");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [deadlineOpen, setDeadlineOpen] = useState(false);
 
@@ -69,6 +75,8 @@ export function ApplicationForm({
       status,
       jobUrl: jobUrl.trim() || null,
       deadline: deadline ? format(deadline, DATE_FORMAT) : null,
+      // Left out when hidden, so editing never overwrites the saved text
+      ...(showCoverLetter && { coverLetter: coverLetter.trim() || null }),
     });
   };
 
@@ -206,6 +214,22 @@ export function ApplicationForm({
           )}
         </div>
       </div>
+      {showCoverLetter && (
+        <div className="space-y-1.5">
+          <Label htmlFor="coverLetter">
+            Søknaden du sendte{" "}
+            <span className="font-normal text-muted-foreground">(valgfritt)</span>
+          </Label>
+          <Textarea
+            id="coverLetter"
+            value={coverLetter}
+            onChange={(e) => setCoverLetter(e.target.value)}
+            placeholder="Lim inn søknadsteksten du sendte, så har du den klar til intervjuet"
+            maxLength={20000}
+            className="min-h-32 resize-y"
+          />
+        </div>
+      )}
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="ghost" onClick={onCancel}>
           Avbryt
