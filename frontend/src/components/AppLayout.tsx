@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/Logo";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { ReportModal } from "@/components/ReportModal";
+import { HelpModal } from "@/components/HelpModal";
 
 // Shared frame for every page after login: top bar with navigation, then the page content
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -38,7 +39,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </NavLink>
             ))}
           </nav>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <HelpModal />
             <ProfileMenu onReport={() => setReportOpen(true)} />
           </div>
         </div>
