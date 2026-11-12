@@ -2,7 +2,7 @@
 
 A full-stack web application for tracking your job applications — keep tabs on where you've applied, the current status, and generate reports on your progress.
 
-**Live site:** [minesoknaker.no](https://www.minesoknader.no/login](https://www.minesoknader.no/login)) <!-- update if URL differs -->
+**Live site:** [minesoknaker.no](https://www.minesoknader.no/login) <!-- update if URL differs -->
 
 ---
 
